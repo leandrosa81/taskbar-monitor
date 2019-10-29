@@ -1,4 +1,4 @@
-﻿namespace SystemWatch
+﻿namespace SystemWatchBand
 {
     partial class SystemWatcherControl
     {

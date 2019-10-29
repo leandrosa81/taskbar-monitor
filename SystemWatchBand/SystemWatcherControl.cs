@@ -12,7 +12,7 @@ using CSDeskBand;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
-namespace SystemWatch
+namespace SystemWatchBand
 {    
     public partial class SystemWatcherControl: UserControl
     {

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29411.108
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemWatch", "SystemWatch\SystemWatch.csproj", "{076FFCA7-AF74-42C4-A836-6130B96A7A26}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemWatchBand", "SystemWatchBand\SystemWatchBand.csproj", "{076FFCA7-AF74-42C4-A836-6130B96A7A26}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{076FFCA7-AF74-42C4-A836-6130B96A7A26}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SystemWatch</RootNamespace>
-    <AssemblyName>SystemWatch</AssemblyName>
+    <RootNamespace>SystemWatchBand</RootNamespace>
+    <AssemblyName>SystemWatchBand</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -25,7 +25,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;DESKBAND_WINFORMS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
