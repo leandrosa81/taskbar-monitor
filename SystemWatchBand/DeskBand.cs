@@ -11,7 +11,7 @@ namespace SystemWatchBand
 {
     [ComVisible(true)]
     [Guid("13790826-15fa-46d0-9814-c2a5c6c11f32")]
-    [CSDeskBand.CSDeskBandRegistration(Name = "System Watch", ShowDeskBand = false)]
+    [CSDeskBand.CSDeskBandRegistration(Name = "System Watch Band", ShowDeskBand = false)]
     public class Deskband : CSDeskBand.CSDeskBandWin
     {
         private static Control _control;
