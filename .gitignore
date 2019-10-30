@@ -14,6 +14,7 @@ Packages
 *.user
 *.sln.docstates
 
+
 # Build results
 [Dd]ebug/
 [Rr]elease/
@@ -104,14 +105,5 @@ Desktop.ini
 node_modules/
 bower_components
 
-Cartao.WEB/npm-debug.log.*
-/Cartao.WEB/web/build
-/Cartao.WEB/npm-debug.log
-/CartaoBD/CartaoBD.jfm
-/Cartao.Web/.chrome/*
-/Cartao.Web/.vscode/*
-/Cartao.Web/dist/*
-/Cartao.Web/dist/*.*
-/Cartao.Web/dist/js/*.*
-/Cartao.Web/dist/assets/*
-/SystemWatch/*.pfx
+/SystemWatchBand/*.pfx
+*.pfx
