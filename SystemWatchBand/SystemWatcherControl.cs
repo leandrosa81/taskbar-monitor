@@ -94,8 +94,8 @@ namespace SystemWatchBand
                     points[i] = new Point(posGraficoCPU + i, Convert.ToInt32(alturaMaxima - item));
                     i++;
                 }
-                points[i] = new Point(posGraficoCPU + i, 100);
-                points[i + 1] = new Point(posGraficoCPU, 100);
+                points[i] = new Point(posGraficoCPU + i, 30);
+                points[i + 1] = new Point(posGraficoCPU, 30);
                 formGraphics.FillPolygon(brushBlue, points);
             }
 
@@ -108,8 +108,8 @@ namespace SystemWatchBand
                     points[i] = new Point(posGraficoMem + i, Convert.ToInt32(alturaMaxima - item));
                     i++;
                 }
-                points[i] = new Point(posGraficoMem + i, 100);
-                points[i + 1] = new Point(posGraficoMem, 100);
+                points[i] = new Point(posGraficoMem + i, 30);
+                points[i + 1] = new Point(posGraficoMem, 30);
                 formGraphics.FillPolygon(brushBlue, points);
             }
             System.Drawing.Font font = new Font("Helvetica", 7f, FontStyle.Bold);
