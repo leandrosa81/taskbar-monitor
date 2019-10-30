@@ -1,0 +1,12 @@
+To use this software, you can use the batch file or install it manually in your system:
+
+1. batch file
+
+Just run the batch file with Administrative privileges and everything should work. After install, right click on the task bar and select "System Watch Band" on the Toolbars submenu.
+
+2. manual install
+
+Extract The SystemWatchBand.dll file to any folder, open a command prompt (with administrative privileges) and type:
+
+C:\Windows\Microsoft.NET\Framework64\v4.0.30319\regasm /codebase SystemWatchBand.dll
+After install, right click on the task bar and select "System Watch Band" on the Toolbars submenu.

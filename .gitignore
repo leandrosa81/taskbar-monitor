@@ -107,3 +107,4 @@ bower_components
 
 /SystemWatchBand/*.pfx
 *.pfx
+build/
