@@ -50,7 +50,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.Name = "SystemWatcherControl";
-            this.Size = new System.Drawing.Size(100, 30);
+            this.Size = new System.Drawing.Size(90, 30);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.SystemWatcherControl_Paint);
             this.ResumeLayout(false);
 
