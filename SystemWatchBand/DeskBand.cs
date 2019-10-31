@@ -18,7 +18,7 @@ namespace SystemWatchBand
 
         public Deskband()
         {
-            Options.MinHorizontalSize = new Size(90, 30);
+            Options.MinHorizontalSize = new Size(150, 30);
             _control = new SystemWatcherControl(this);
         }
 
