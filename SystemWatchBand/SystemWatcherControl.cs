@@ -19,6 +19,7 @@ namespace SystemWatchBand
         
         List<Counters.ICounter> Counters;
         System.Drawing.Font font;
+        int lastSize = 30;
 
         public SystemWatcherControl(CSDeskBand.CSDeskBandWin w)
         {
@@ -71,7 +72,16 @@ namespace SystemWatchBand
 
         private void SystemWatcherControl_Paint(object sender, PaintEventArgs e)
         {
-            int maximumHeight = 30;
+            int maximumHeight = GetTaskbarHeight();
+            if (maximumHeight <= 0)
+                maximumHeight = 30;
+
+            if(lastSize  != maximumHeight)
+            {
+                this.Height = maximumHeight;
+                lastSize = maximumHeight;
+            }
+
             int graphPosition = 0;
             
             System.Drawing.SolidBrush brushBlue = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(255, 37, 84, 142));
@@ -82,23 +92,23 @@ namespace SystemWatchBand
             foreach (var ct in Counters)
             {
                 var lista = ct.GetValues(out float currentValue, out float max, out string stringValue);
-                formGraphics.FillRectangle(brushRed, new Rectangle(graphPosition + 30, Convert.ToInt32(maximumHeight - ((currentValue * 30.0f) / max)), 5, Convert.ToInt32((currentValue * 30.0f) / max)));
+                formGraphics.FillRectangle(brushRed, new Rectangle(graphPosition + 30, Convert.ToInt32(maximumHeight - ((currentValue * maximumHeight) / max)), 5, Convert.ToInt32((currentValue * maximumHeight) / max)));
                 
                 var initialGraphPosition = graphPosition + 30 - lista.Count;
                 Point[] points = new Point[lista.Count + 2];
                 int i = 0;
                 foreach (var item in lista)
                 {
-                    var convertido = Convert.ToInt32((item * 30.0f) / max);
+                    var convertido = Convert.ToInt32((item * maximumHeight) / max);
                     points[i] = new Point(initialGraphPosition + i, Convert.ToInt32(maximumHeight - convertido));
                     i++;
                 }
-                points[i] = new Point(initialGraphPosition + i, 30);
-                points[i + 1] = new Point(initialGraphPosition, 30);
+                points[i] = new Point(initialGraphPosition + i, maximumHeight);
+                points[i + 1] = new Point(initialGraphPosition, maximumHeight);
                 formGraphics.FillPolygon(brushBlue, points);
                     
                  
-                formGraphics.DrawString(stringValue, font, brushWhite, new RectangleF(graphPosition + 2, 10, 50, maximumHeight), new StringFormat());
+                formGraphics.DrawString(stringValue, font, brushWhite, new RectangleF(graphPosition + 2, (maximumHeight / 2.0f) - 5, 50, maximumHeight), new StringFormat());
                 graphPosition += 50;
             }
             
@@ -106,6 +116,10 @@ namespace SystemWatchBand
             brushBlue.Dispose();
             brushRed.Dispose();
             brushWhite.Dispose();
+        }
+        public static int GetTaskbarHeight()
+        {
+            return Screen.PrimaryScreen.Bounds.Height - Screen.PrimaryScreen.WorkingArea.Height;
         }
     }
 
