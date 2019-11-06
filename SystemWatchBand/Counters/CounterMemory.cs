@@ -40,5 +40,10 @@ namespace SystemWatchBand.Counters
             representation = (current / 1024).ToString("0.0") + "GB";
             return history;
         }
+
+        public override string GetName()
+        {
+            return "MEM";
+        }
     }
 }

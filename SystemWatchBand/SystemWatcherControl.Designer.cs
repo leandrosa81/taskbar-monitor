@@ -52,6 +52,8 @@
             this.Name = "SystemWatcherControl";
             this.Size = new System.Drawing.Size(150, 30);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.SystemWatcherControl_Paint);
+            this.MouseEnter += new System.EventHandler(this.SystemWatcherControl_MouseEnter);
+            this.MouseLeave += new System.EventHandler(this.SystemWatcherControl_MouseLeave);
             this.ResumeLayout(false);
 
         }

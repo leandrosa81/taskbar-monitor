@@ -41,5 +41,10 @@ namespace SystemWatchBand.Counters
             representation = (current / 1024 / 1024).ToString("0.0") + "MB/s";
             return history;
         }
+
+        public override string GetName()
+        {
+            return "DISK";
+        }
     }
 }

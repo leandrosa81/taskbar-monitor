@@ -8,6 +8,7 @@ namespace SystemWatchBand.Counters
 {
     abstract class ICounter
     {
+        public abstract string GetName();
         public abstract void Initialize();
 
         public abstract void Update();

@@ -18,8 +18,10 @@ namespace SystemWatchBand
     {
         
         List<Counters.ICounter> Counters;
-        System.Drawing.Font font;
+        System.Drawing.Font fontCounter;
+        Font fontTitle;
         int lastSize = 30;
+        bool mouseOver = false;
 
         public SystemWatcherControl(CSDeskBand.CSDeskBandWin w)
         {
@@ -38,8 +40,9 @@ namespace SystemWatchBand
 
             InitializeComponent();
 
-            font = new Font("Helvetica", 7f, FontStyle.Bold);
-            
+            fontCounter = new Font("Helvetica", 7f, FontStyle.Bold);
+            fontTitle = new Font("Arial", 7f, FontStyle.Bold);
+
             Counters = new List<Counters.ICounter>();
 
             {
@@ -88,6 +91,8 @@ namespace SystemWatchBand
             System.Drawing.SolidBrush brushRed = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(255, 176, 222, 255));
             System.Drawing.SolidBrush brushWhite = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(170, 185, 255, 70));
 
+            System.Drawing.SolidBrush brushTitle = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(!mouseOver ? 120 : 250, 150, 150, 150));
+
             System.Drawing.Graphics formGraphics = e.Graphics;// this.CreateGraphics();
             foreach (var ct in Counters)
             {
@@ -106,9 +111,15 @@ namespace SystemWatchBand
                 points[i] = new Point(initialGraphPosition + i, maximumHeight);
                 points[i + 1] = new Point(initialGraphPosition, maximumHeight);
                 formGraphics.FillPolygon(brushBlue, points);
-                    
-                 
-                formGraphics.DrawString(stringValue, font, brushWhite, new RectangleF(graphPosition + 2, (maximumHeight / 2.0f) - 5, 50, maximumHeight), new StringFormat());
+
+
+                var sizeString = formGraphics.MeasureString(stringValue, fontCounter);
+                formGraphics.DrawString(stringValue, fontCounter, brushWhite, new RectangleF(graphPosition +  25 - (sizeString.Width / 2 ), (maximumHeight / 2.0f) - (sizeString.Height / 2), sizeString.Width, maximumHeight), new StringFormat());
+
+                var sizeTitle = formGraphics.MeasureString(ct.GetName(), fontTitle);
+                formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + 25 - (sizeTitle.Width / 2), (maximumHeight - sizeTitle.Height) - 1, sizeTitle.Width, maximumHeight), new StringFormat());
+                
+                
                 graphPosition += 50;
             }
             
@@ -120,6 +131,19 @@ namespace SystemWatchBand
         public static int GetTaskbarHeight()
         {
             return Screen.PrimaryScreen.Bounds.Height - Screen.PrimaryScreen.WorkingArea.Height;
+        }
+
+        private void SystemWatcherControl_MouseEnter(object sender, EventArgs e)
+        {
+            mouseOver = true;
+
+            this.Invalidate();
+        }
+
+        private void SystemWatcherControl_MouseLeave(object sender, EventArgs e)
+        {
+            mouseOver = false;
+            this.Invalidate();
         }
     }
 

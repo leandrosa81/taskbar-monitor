@@ -32,5 +32,10 @@ namespace SystemWatchBand.Counters
             representation = current.ToString("0") + "%";
             return history;
         }
+
+        public override string GetName()
+        {
+            return "CPU";
+        }
     }
 }
