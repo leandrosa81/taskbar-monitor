@@ -91,15 +91,20 @@ namespace SystemWatchBand
             System.Drawing.SolidBrush brushRed = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(255, 176, 222, 255));
             System.Drawing.SolidBrush brushWhite = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(170, 185, 255, 70));
 
-            System.Drawing.SolidBrush brushTitle = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(!mouseOver ? 120 : 250, 150, 150, 150));
+            System.Drawing.SolidBrush brushShadow = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(255, 0, 0, 0));
+            System.Drawing.SolidBrush brushTitle = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(!mouseOver ? 40 : 255, 255, 255, 255));
 
             System.Drawing.Graphics formGraphics = e.Graphics;// this.CreateGraphics();
             foreach (var ct in Counters)
             {
                 var lista = ct.GetValues(out float currentValue, out float max, out string stringValue);
-                formGraphics.FillRectangle(brushRed, new Rectangle(graphPosition + 30, Convert.ToInt32(maximumHeight - ((currentValue * maximumHeight) / max)), 5, Convert.ToInt32((currentValue * maximumHeight) / max)));
+
                 
-                var initialGraphPosition = graphPosition + 30 - lista.Count;
+                
+
+                formGraphics.FillRectangle(brushRed, new Rectangle(graphPosition + 40, Convert.ToInt32(maximumHeight - ((currentValue * maximumHeight) / max)), 5, Convert.ToInt32((currentValue * maximumHeight) / max)));
+                
+                var initialGraphPosition = graphPosition + 40 - lista.Count;
                 Point[] points = new Point[lista.Count + 2];
                 int i = 0;
                 foreach (var item in lista)
@@ -114,11 +119,15 @@ namespace SystemWatchBand
 
 
                 var sizeString = formGraphics.MeasureString(stringValue, fontCounter);
+                formGraphics.DrawString(stringValue, fontCounter, brushShadow, new RectangleF(graphPosition + 25 - (sizeString.Width / 2) + 1, (maximumHeight / 2.0f) - (sizeString.Height / 2) + 1, sizeString.Width, maximumHeight), new StringFormat());
                 formGraphics.DrawString(stringValue, fontCounter, brushWhite, new RectangleF(graphPosition +  25 - (sizeString.Width / 2 ), (maximumHeight / 2.0f) - (sizeString.Height / 2), sizeString.Width, maximumHeight), new StringFormat());
 
+                 
                 var sizeTitle = formGraphics.MeasureString(ct.GetName(), fontTitle);
+                if(mouseOver)
+                    formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + 25 - (sizeTitle.Width / 2) + 1, (maximumHeight - sizeTitle.Height), sizeTitle.Width, maximumHeight), new StringFormat());
                 formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + 25 - (sizeTitle.Width / 2), (maximumHeight - sizeTitle.Height) - 1, sizeTitle.Width, maximumHeight), new StringFormat());
-                
+                    
                 
                 graphPosition += 50;
             }
@@ -127,6 +136,8 @@ namespace SystemWatchBand
             brushBlue.Dispose();
             brushRed.Dispose();
             brushWhite.Dispose();
+            brushShadow.Dispose();
+            brushTitle.Dispose();
         }
         public static int GetTaskbarHeight()
         {

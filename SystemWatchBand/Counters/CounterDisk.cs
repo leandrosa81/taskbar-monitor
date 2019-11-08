@@ -30,7 +30,7 @@ namespace SystemWatchBand.Counters
                 totalIO = Convert.ToInt64(currentValue);
 
             history.Add(currentValue);
-            if (history.Count > 30) history.RemoveAt(0);
+            if (history.Count > 40) history.RemoveAt(0);
 
         }
 

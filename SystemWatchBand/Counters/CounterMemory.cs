@@ -29,7 +29,7 @@ namespace SystemWatchBand.Counters
         {
             currentValue = (totalMemory / 1024) - ramCounter.NextValue();
             history.Add(currentValue);
-            if (history.Count > 30) history.RemoveAt(0);
+            if (history.Count > 40) history.RemoveAt(0);
 
         }
 
