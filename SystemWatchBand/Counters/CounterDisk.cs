@@ -26,11 +26,12 @@ namespace SystemWatchBand.Counters
         {
             currentValue = diskReadCounter.NextValue() + diskWriteCounter.NextValue();
             
-            if (currentValue > totalIO)
-                totalIO = Convert.ToInt64(currentValue);
+            //if (currentValue > totalIO)
+                //totalIO = Convert.ToInt64(currentValue);
 
             history.Add(currentValue);
             if (history.Count > 40) history.RemoveAt(0);
+            totalIO = Convert.ToInt64(history.Max()) + 1;
 
         }
 

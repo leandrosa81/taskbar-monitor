@@ -60,6 +60,11 @@ namespace SystemWatchBand
                 ct.Initialize();
                 Counters.Add(ct);
             }
+            {
+                var ct = new Counters.CounterNetwork();
+                ct.Initialize();
+                Counters.Add(ct);
+            }
         }
        
  

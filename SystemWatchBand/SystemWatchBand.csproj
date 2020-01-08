@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Counters\CounterNetwork.cs" />
     <Compile Include="Counters\CounterDisk.cs" />
     <Compile Include="Counters\CounterMemory.cs" />
     <Compile Include="Counters\CounterCPU.cs" />
