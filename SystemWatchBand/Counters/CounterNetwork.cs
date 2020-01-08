@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,8 +11,7 @@ namespace SystemWatchBand.Counters
 {
     class CounterNetwork: ICounter
     {
-        PerformanceCounter netReadCounter;
-        PerformanceCounter netWriteCounter;
+        List<PerformanceCounter> netCounters;        
 
         float currentValue = 0;
         long totalIO = 1;
@@ -20,16 +20,28 @@ namespace SystemWatchBand.Counters
         public override void Initialize()
         {
             PerformanceCounterCategory pcg = new PerformanceCounterCategory("Network Interface");
-            string instance = pcg.GetInstanceNames()[0];
+            string[] instances = pcg.GetInstanceNames();
+            //string instance = pcg.GetInstanceNames()[0];
             //PerformanceCounter pcsent = new PerformanceCounter("Network Interface", "Bytes Sent/sec", instance);
             //PerformanceCounter pcreceived = new PerformanceCounter("Network Interface", "Bytes Received/sec", instance);
 
-            netReadCounter = new PerformanceCounter("Network Interface", "Bytes Sent/sec", instance);
-            netWriteCounter = new PerformanceCounter("Network Interface", "Bytes Received/sec", instance);            
+            netCounters = new List<PerformanceCounter>();
+            foreach (var instance in instances)
+            {
+                netCounters.Add(new PerformanceCounter("Network Interface", "Bytes Sent/sec", instance));
+                netCounters.Add(new PerformanceCounter("Network Interface", "Bytes Received/sec", instance));
+            }
+
+            
         }
         public override void Update()
         {
-            currentValue = netReadCounter.NextValue() + netWriteCounter.NextValue();
+            currentValue = 0;
+            foreach (var netCounter in netCounters)
+            {
+                currentValue += netCounter.NextValue();
+            }
+            //netReadCounter.NextValue() + netWriteCounter.NextValue();
                                                     
             
             //if (currentValue > totalIO)
