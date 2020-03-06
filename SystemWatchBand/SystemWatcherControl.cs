@@ -40,8 +40,18 @@ namespace SystemWatchBand
 
             InitializeComponent();
 
-            fontCounter = new Font("Helvetica", 7f, FontStyle.Bold);
-            fontTitle = new Font("Arial", 7f, FontStyle.Bold);
+            float dpiX, dpiY;
+            using (Graphics graphics = this.CreateGraphics())
+            {
+                dpiX = graphics.DpiX;
+                dpiY = graphics.DpiY;
+            }
+            float fontSize = 7f;
+            if (dpiX > 96)
+                fontSize = 5f;
+
+            fontCounter = new Font("Helvetica", fontSize, FontStyle.Bold);
+            fontTitle = new Font("Arial", fontSize, FontStyle.Bold);
 
             Counters = new List<Counters.ICounter>();
 
