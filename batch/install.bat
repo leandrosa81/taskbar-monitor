@@ -1,5 +1,5 @@
 @echo OFF
-title Install System Watch Band
+title Install Taskbar Monitor
 @echo ON
 @setlocal enableextensions
 @cd /d "%~dp0"
@@ -16,10 +16,10 @@ if %errorLevel% == 0 (
 
 if defined %PROGRAMFILES(x86)% (
     rem use /unregister to uninstall
-    %SystemRoot%\Microsoft.NET\Framework64\v4.0.30319\regasm.exe /nologo /codebase "SystemWatchBand.dll"
-    %SystemRoot%\Microsoft.NET\Framework64\v4.0.30319\regasm.exe /nologo "SystemWatchBand.dll"
+    %SystemRoot%\Microsoft.NET\Framework64\v4.0.30319\regasm.exe /nologo /codebase "TaskbarMonitor.dll"
+    %SystemRoot%\Microsoft.NET\Framework64\v4.0.30319\regasm.exe /nologo "TaskbarMonitor.dll"
 ) else (
-    %SystemRoot%\Microsoft.NET\Framework\v4.0.30319\regasm.exe /nologo /codebase "SystemWatchBand.dll"
-    %SystemRoot%\Microsoft.NET\Framework\v4.0.30319\regasm.exe /nologo "SystemWatchBand.dll"
+    %SystemRoot%\Microsoft.NET\Framework\v4.0.30319\regasm.exe /nologo /codebase "TaskbarMonitor.dll"
+    %SystemRoot%\Microsoft.NET\Framework\v4.0.30319\regasm.exe /nologo "TaskbarMonitor.dll"
 )
 pause

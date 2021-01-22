@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{076FFCA7-AF74-42C4-A836-6130B96A7A26}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SystemWatchBand</RootNamespace>
-    <AssemblyName>SystemWatchBand</AssemblyName>
+    <RootNamespace>TaskbarMonitor</RootNamespace>
+    <AssemblyName>TaskbarMonitor</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

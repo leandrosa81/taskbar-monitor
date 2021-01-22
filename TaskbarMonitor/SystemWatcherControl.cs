@@ -12,7 +12,7 @@ using CSDeskBand;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
-namespace SystemWatchBand
+namespace TaskbarMonitor
 {    
     public partial class SystemWatcherControl: UserControl
     {
@@ -113,19 +113,26 @@ namespace SystemWatchBand
             foreach (var ct in Counters)
             {
                 var lista = ct.GetValues(out float currentValue, out float max, out string stringValue);
+                 
+                var pos = maximumHeight - ((currentValue * maximumHeight) / max);
+                if (pos > Int32.MaxValue) pos = Int32.MaxValue;
+                int posInt = Convert.ToInt32(pos);
 
-                
-                
-
-                formGraphics.FillRectangle(brushRed, new Rectangle(graphPosition + 40, Convert.ToInt32(maximumHeight - ((currentValue * maximumHeight) / max)), 5, Convert.ToInt32((currentValue * maximumHeight) / max)));
+                var height = (currentValue * maximumHeight) / max;
+                if (height > Int32.MaxValue) height = Int32.MaxValue;
+                int heightInt = Convert.ToInt32(height);
+                formGraphics.FillRectangle(brushRed, new Rectangle(graphPosition + 40, posInt, 5, heightInt));
                 
                 var initialGraphPosition = graphPosition + 40 - lista.Count;
                 Point[] points = new Point[lista.Count + 2];
                 int i = 0;
                 foreach (var item in lista)
                 {
-                    var convertido = Convert.ToInt32((item * maximumHeight) / max);
-                    points[i] = new Point(initialGraphPosition + i, Convert.ToInt32(maximumHeight - convertido));
+                    var heightItem = (item * maximumHeight) / max;
+                    if (heightItem > Int32.MaxValue) height = Int32.MaxValue;
+                    var convertido = Convert.ToInt32(heightItem);
+
+                    points[i] = new Point(initialGraphPosition + i, maximumHeight - convertido);
                     i++;
                 }
                 points[i] = new Point(initialGraphPosition + i, maximumHeight);

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SystemWatchBand.Counters
+namespace TaskbarMonitor.Counters
 {
     class CounterCPU: ICounter
     {

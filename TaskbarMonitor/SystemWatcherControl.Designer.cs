@@ -1,4 +1,4 @@
-﻿namespace SystemWatchBand
+﻿namespace TaskbarMonitor
 {
     partial class SystemWatcherControl
     {

@@ -105,6 +105,6 @@ Desktop.ini
 node_modules/
 bower_components
 
-/SystemWatchBand/*.pfx
+/TaskbarMonitor/*.pfx
 *.pfx
 build/

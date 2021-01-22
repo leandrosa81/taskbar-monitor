@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29411.108
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemWatchBand", "SystemWatchBand\SystemWatchBand.csproj", "{076FFCA7-AF74-42C4-A836-6130B96A7A26}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskbarMonitor", "TaskbarMonitor\TaskbarMonitor.csproj", "{076FFCA7-AF74-42C4-A836-6130B96A7A26}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskbarMonitorInstaller", "TaskbarMonitorInstaller\TaskbarMonitorInstaller.csproj", "{376BAB67-3286-40D8-8D11-DEB2BEB37088}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{076FFCA7-AF74-42C4-A836-6130B96A7A26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{076FFCA7-AF74-42C4-A836-6130B96A7A26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{076FFCA7-AF74-42C4-A836-6130B96A7A26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{376BAB67-3286-40D8-8D11-DEB2BEB37088}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{376BAB67-3286-40D8-8D11-DEB2BEB37088}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{376BAB67-3286-40D8-8D11-DEB2BEB37088}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{376BAB67-3286-40D8-8D11-DEB2BEB37088}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
