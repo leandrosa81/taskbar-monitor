@@ -18,8 +18,7 @@ namespace TaskbarMonitor.Counters
         PerformanceCounter diskReadCounter;
         PerformanceCounter diskWriteCounter;
 
-        float currentValue = 0;
-        long totalIO = 1;
+        float currentValue = 0;        
         Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
 
         public override void Initialize()
@@ -43,20 +42,24 @@ namespace TaskbarMonitor.Counters
                 currentValue = diskReadCounter.NextValue() + diskWriteCounter.NextValue();
                 info[GetCounterType()][0].CurrentValue = currentValue;
                 info[GetCounterType()][0].History.Add(currentValue);
-                if (info[GetCounterType()][0].History.Count > 40) info[GetCounterType()][0].History.RemoveAt(0);
-                totalIO = Convert.ToInt64(info[GetCounterType()][0].History.Max()) + 1;
+                if (info[GetCounterType()][0].History.Count > Options.HistorySize) info[GetCounterType()][0].History.RemoveAt(0);
+                info[GetCounterType()][0].MaximumValue = Convert.ToInt64(info[GetCounterType()][0].History.Max()) + 1;                
             }
             else
             {
                 info[GetCounterType()][0].CurrentValue = diskReadCounter.NextValue();
                 info[GetCounterType()][0].History.Add(info[GetCounterType()][0].CurrentValue);
-                if (info[GetCounterType()][0].History.Count > 40) info[GetCounterType()][0].History.RemoveAt(0);
+                if (info[GetCounterType()][0].History.Count > Options.HistorySize) info[GetCounterType()][0].History.RemoveAt(0);
                 info[GetCounterType()][0].MaximumValue = Convert.ToInt64(info[GetCounterType()][0].History.Max()) + 1;
 
                 info[GetCounterType()][1].CurrentValue = diskWriteCounter.NextValue();
                 info[GetCounterType()][1].History.Add(info[GetCounterType()][1].CurrentValue);
-                if (info[GetCounterType()][1].History.Count > 40) info[GetCounterType()][1].History.RemoveAt(0);
+                if (info[GetCounterType()][1].History.Count > Options.HistorySize) info[GetCounterType()][1].History.RemoveAt(0);
                 info[GetCounterType()][1].MaximumValue = Convert.ToInt64(info[GetCounterType()][1].History.Max()) + 1;
+
+                // if locks down same scale for both counters is on
+                float max = info[GetCounterType()][0].MaximumValue > info[GetCounterType()][1].MaximumValue ? info[GetCounterType()][0].MaximumValue : info[GetCounterType()][1].MaximumValue;
+                info[GetCounterType()][0].MaximumValue = info[GetCounterType()][1].MaximumValue = max;
             }
             
             

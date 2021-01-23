@@ -18,8 +18,10 @@ namespace TaskbarMonitor
 
         public Deskband()
         {
-            Options.MinHorizontalSize = new Size(200, 30);
-            _control = new SystemWatcherControl(this);
+            //Options.MinHorizontalSize = new Size(200, 30);
+            var ctl = new SystemWatcherControl(this);
+            Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, 30);
+            _control = ctl;
         }
 
         protected override Control Control => _control;

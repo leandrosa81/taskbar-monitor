@@ -13,44 +13,19 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 
 namespace TaskbarMonitor
-{
-    public class Options
-    {
-        public bool CPUSingleView { get; set; }
-        public bool DiskSingleView { get; set; }
-    }
-    public class GraphTheme : IDisposable
-    {
-        public Color GraphColor { get; set; }
-        public Color BarColor { get; set; }
-        public Color TextColor { get; set; }
-        public Color TextShadowColor { get; set; }
-
-        public SolidBrush BrushGraph { get; private set; }
-        public SolidBrush BrushBar { get; private set; }
-        public SolidBrush BrushText { get; private set; }
-        public SolidBrush BrushTextShadow { get; private set; }
-
-        public void init()
-        {
-            BrushGraph = new System.Drawing.SolidBrush(GraphColor);
-            BrushBar = new System.Drawing.SolidBrush(BarColor);
-            BrushText = new System.Drawing.SolidBrush(TextColor);
-            BrushTextShadow = new System.Drawing.SolidBrush(TextShadowColor);            
-        }
-
-        public void Dispose()
-        {
-            BrushGraph.Dispose();
-            BrushBar.Dispose();
-            BrushText.Dispose();
-            BrushTextShadow.Dispose();
-        }
-    }
+{    
     public partial class SystemWatcherControl: UserControl
     {
-        
-        Options options = new Options { CPUSingleView = true, DiskSingleView = true } ;
+
+        public Options Options = new Options { CPUSingleView = true, DiskSingleView = true, NetworkSingleView = true, HistorySize = 60 };        
+        public int CountersCount
+        {
+            get
+            {
+                if (Counters == null) return 0;
+                return Counters.Count;
+            }
+        }
         List<Counters.ICounter> Counters;
         System.Drawing.Font fontCounter;
         Font fontTitle;
@@ -69,11 +44,37 @@ namespace TaskbarMonitor
         }
         private void Initialize()
         {
+
+            Counters = new List<Counters.ICounter>();
+
+            {
+                var ct = new Counters.CounterCPU(Options);
+                ct.Initialize();
+                Counters.Add(ct);
+            }
+            {
+                var ct = new Counters.CounterMemory(Options);
+                ct.Initialize();
+                Counters.Add(ct);
+            }
+            {
+                var ct = new Counters.CounterDisk(Options);
+                ct.Initialize();
+                Counters.Add(ct);
+            }
+            {
+                var ct = new Counters.CounterNetwork(Options);
+                ct.Initialize();
+                Counters.Add(ct);
+            }
+
             ContextMenu cm = new ContextMenu();            
-            cm.MenuItems.Add(new MenuItem("CPU: Single view", MenuItem_onClick) {  Checked = options.CPUSingleView, Name = "CPUSingleViewEnable"  });
-            cm.MenuItems.Add(new MenuItem("CPU: Multiple cores", MenuItem_onClick) { Checked = !options.CPUSingleView, Name = "CPUSingleViewDisable" });
-            cm.MenuItems.Add(new MenuItem("Disk: Single view", MenuItem_onClick) { Checked = options.DiskSingleView, Name = "DiskSingleViewEnable" });
-            cm.MenuItems.Add(new MenuItem("Disk: Separate Read & Write", MenuItem_onClick) { Checked = !options.DiskSingleView, Name = "DiskSingleViewDisable" });            
+            cm.MenuItems.Add(new MenuItem("CPU: Single view", MenuItem_onClick) {  Checked = Options.CPUSingleView, Name = "CPUSingleViewEnable"  });
+            cm.MenuItems.Add(new MenuItem("CPU: Multiple cores", MenuItem_onClick) { Checked = !Options.CPUSingleView, Name = "CPUSingleViewDisable" });
+            cm.MenuItems.Add(new MenuItem("Disk: Single view", MenuItem_onClick) { Checked = Options.DiskSingleView, Name = "DiskSingleViewEnable" });
+            cm.MenuItems.Add(new MenuItem("Disk: Separate Read & Write", MenuItem_onClick) { Checked = !Options.DiskSingleView, Name = "DiskSingleViewDisable" });
+            cm.MenuItems.Add(new MenuItem("Network: Single view", MenuItem_onClick) { Checked = Options.NetworkSingleView, Name = "NetworkSingleViewEnable" });
+            cm.MenuItems.Add(new MenuItem("Network: Separate TX & RX", MenuItem_onClick) { Checked = !Options.NetworkSingleView, Name = "NetworkSingleViewDisable" });
             this.ContextMenu = cm;
 
             defaultTheme = new GraphTheme
@@ -97,10 +98,11 @@ namespace TaskbarMonitor
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.DoubleBuffer, true);
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-            SetStyle(ControlStyles.UserPaint, true);
+            SetStyle(ControlStyles.UserPaint, true);            
 
             InitializeComponent();
-           
+            this.Size = new Size((Options.HistorySize + 10) * CountersCount, 30);
+
 
             float dpiX, dpiY;
             using (Graphics graphics = this.CreateGraphics())
@@ -115,33 +117,13 @@ namespace TaskbarMonitor
             fontCounter = new Font("Helvetica", fontSize, FontStyle.Bold);
             fontTitle = new Font("Arial", fontSize, FontStyle.Bold);
 
-            Counters = new List<Counters.ICounter>();
-
-            {
-                var ct = new Counters.CounterCPU(options);
-                ct.Initialize();
-                Counters.Add(ct);
-            }
-            {
-                var ct = new Counters.CounterMemory(options);
-                ct.Initialize();
-                Counters.Add(ct);
-            }
-            {
-                var ct = new Counters.CounterDisk(options);
-                ct.Initialize();
-                Counters.Add(ct);
-            }
-            {
-                var ct = new Counters.CounterNetwork(options);
-                ct.Initialize();
-                Counters.Add(ct);
-            }            
+            
         }
        
  
         private void timer1_Tick(object sender, EventArgs e)
-        {            
+        {
+            
             foreach (var ct in Counters)
             {
                 ct.Update();
@@ -173,7 +155,7 @@ namespace TaskbarMonitor
 
             System.Drawing.Graphics formGraphics = e.Graphics;// this.CreateGraphics();
 
-            Action<int, int, int, bool, TaskbarMonitor.Counters.CounterInfo, GraphTheme > drawGraph = (x, y, maxH, invertido, info, theme) =>
+            Action<int, int, int, bool, bool, TaskbarMonitor.Counters.CounterInfo, GraphTheme > drawGraph = (x, y, maxH, invertido, showText, info, theme) =>
             {
                 var pos = maxH - ((info.CurrentValue * maxH) / info.MaximumValue);
                 if (pos > Int32.MaxValue) pos = Int32.MaxValue;
@@ -183,11 +165,11 @@ namespace TaskbarMonitor
                 if (height > Int32.MaxValue) height = Int32.MaxValue;
                 int heightInt = Convert.ToInt32(height);
                 if (invertido)
-                    formGraphics.FillRectangle(theme.BrushBar, new Rectangle(x + 40, maxH, 5, heightInt));
+                    formGraphics.FillRectangle(theme.BrushBar, new Rectangle(x + Options.HistorySize, maxH, 5, heightInt));
                 else
-                    formGraphics.FillRectangle(theme.BrushBar, new Rectangle(x + 40, posInt, 5, heightInt));
+                    formGraphics.FillRectangle(theme.BrushBar, new Rectangle(x + Options.HistorySize, posInt, 5, heightInt));
 
-                var initialGraphPosition = x + 40 - info.History.Count;
+                var initialGraphPosition = x + Options.HistorySize - info.History.Count;
                 Point[] points = new Point[info.History.Count + 2];
                 int i = 0;
                 int inverter = invertido ? -1 : 1;
@@ -217,12 +199,15 @@ namespace TaskbarMonitor
                 formGraphics.FillPolygon(theme.BrushGraph, points);
 
                 
-                if (mouseOver)
+                if (showText)
                 {
-                    string text = info.Name + ": " + info.StringValue;
+                    string text = info.StringValue;
+                    if (info.Name != "default")
+                        text = info.Name + ": " + text;
                     var sizeString = formGraphics.MeasureString(text, fontCounter);
-                    formGraphics.DrawString(text, fontCounter, theme.BrushTextShadow, new RectangleF(x + 25 - (sizeString.Width / 2) + 1, (maxH / 2.0f) - (sizeString.Height / 2) + 1 + y, sizeString.Width, maxH), new StringFormat());
-                    formGraphics.DrawString(text, fontCounter, theme.BrushText, new RectangleF(x + 25 - (sizeString.Width / 2), (maxH / 2.0f) - (sizeString.Height / 2) + y, sizeString.Width, maxH), new StringFormat());
+                    int offset = invertido ? 2 : -2;
+                    formGraphics.DrawString(text, fontCounter, theme.BrushTextShadow, new RectangleF(x + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, (maxH / 2.0f) - (sizeString.Height / 2) + 1 + y + offset, sizeString.Width, maxH), new StringFormat());
+                    formGraphics.DrawString(text, fontCounter, theme.BrushText, new RectangleF(x + (Options.HistorySize / 2) - (sizeString.Width / 2), (maxH / 2.0f) - (sizeString.Height / 2) + y + offset, sizeString.Width, maxH), new StringFormat());
                 }
             };
             foreach (var ct in Counters)
@@ -232,62 +217,28 @@ namespace TaskbarMonitor
 
                 if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.SINGLE)
                 {
-                    var lista = infos[0].History;
-                    var currentValue = infos[0].CurrentValue;
-                    var max = infos[0].MaximumValue;
-                    var stringValue = infos[0].StringValue;
-                    
-
-                    var pos = maximumHeight - ((currentValue * maximumHeight) / max);
-                    if (pos > Int32.MaxValue) pos = Int32.MaxValue;
-                    int posInt = Convert.ToInt32(pos);
-
-                    var height = (currentValue * maximumHeight) / max;
-                    if (height > Int32.MaxValue) height = Int32.MaxValue;
-                    int heightInt = Convert.ToInt32(height);
-                    formGraphics.FillRectangle(brushRed, new Rectangle(graphPosition + 40, posInt, 5, heightInt));
-
-                    var initialGraphPosition = graphPosition + 40 - lista.Count;
-                    Point[] points = new Point[lista.Count + 2];
-                    int i = 0;
-                    foreach (var item in lista)
-                    {
-                        var heightItem = (item * maximumHeight) / max;
-                        if (heightItem > Int32.MaxValue) height = Int32.MaxValue;
-                        var convertido = Convert.ToInt32(heightItem);
-
-                        points[i] = new Point(initialGraphPosition + i, maximumHeight - convertido);
-                        i++;
-                    }
-                    points[i] = new Point(initialGraphPosition + i, maximumHeight);
-                    points[i + 1] = new Point(initialGraphPosition, maximumHeight);
-                    formGraphics.FillPolygon(brushBlue, points);
-
-
-                    var sizeString = formGraphics.MeasureString(stringValue, fontCounter);
-                    formGraphics.DrawString(stringValue, fontCounter, brushShadow, new RectangleF(graphPosition + 25 - (sizeString.Width / 2) + 1, (maximumHeight / 2.0f) - (sizeString.Height / 2) + 1, sizeString.Width, maximumHeight), new StringFormat());
-                    formGraphics.DrawString(stringValue, fontCounter, brushWhite, new RectangleF(graphPosition + 25 - (sizeString.Width / 2), (maximumHeight / 2.0f) - (sizeString.Height / 2), sizeString.Width, maximumHeight), new StringFormat());
-
+                    drawGraph(graphPosition, 0, maximumHeight, false, true, infos[0], defaultTheme);
+                     
 
                     var sizeTitle = formGraphics.MeasureString(ct.GetName(), fontTitle);
                     if (mouseOver)
-                        formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + 25 - (sizeTitle.Width / 2) + 1, (maximumHeight - sizeTitle.Height), sizeTitle.Width, maximumHeight), new StringFormat());
-                    formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + 25 - (sizeTitle.Width / 2), (maximumHeight - sizeTitle.Height) - 1, sizeTitle.Width, maximumHeight), new StringFormat());
+                        formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) + 1, (maximumHeight - sizeTitle.Height), sizeTitle.Width, maximumHeight), new StringFormat());
+                    formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), (maximumHeight - sizeTitle.Height) - 1, sizeTitle.Width, maximumHeight), new StringFormat());
                 }
                 else if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED)
                 {
                     for (int z = 0; z < infos.Count; z++)
                     {
-                        drawGraph(graphPosition, z * (maximumHeight / 2), maximumHeight / 2, z == 1, infos[z], z == 0 ? defaultTheme : alternateTheme);
+                        drawGraph(graphPosition, z * (maximumHeight / 2), maximumHeight / 2, z == 1, true, infos[z], z == 0 ? defaultTheme : alternateTheme);
                     }
 
                     var sizeTitle = formGraphics.MeasureString(ct.GetName(), fontTitle);
                     if (mouseOver)
-                        formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + 25 - (sizeTitle.Width / 2) + 1, (maximumHeight/ 2  - sizeTitle.Height / 2) + 2, sizeTitle.Width, maximumHeight), new StringFormat());
-                    formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + 25 - (sizeTitle.Width / 2), (maximumHeight /2 - sizeTitle.Height / 2) + 1, sizeTitle.Width, maximumHeight), new StringFormat());
+                        formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) + 1, (maximumHeight/ 2  - sizeTitle.Height / 2) + 2, sizeTitle.Width, maximumHeight), new StringFormat());
+                    formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), (maximumHeight /2 - sizeTitle.Height / 2) + 1, sizeTitle.Width, maximumHeight), new StringFormat());
                 }
 
-                graphPosition += 50;
+                graphPosition += Options.HistorySize + 10;
             }
             
             
@@ -341,13 +292,63 @@ namespace TaskbarMonitor
                 ContextMenu.MenuItems["DiskSingleViewEnable"].Checked = false;
             }
 
-            options.CPUSingleView = ContextMenu.MenuItems["CPUSingleViewEnable"].Checked;
-            options.DiskSingleView = ContextMenu.MenuItems["DiskSingleViewEnable"].Checked;
+            if (menu.Name == "NetworkSingleViewEnable" && !menu.Checked)
+            {
+                menu.Checked = true;
+                ContextMenu.MenuItems["NetworkSingleViewDisable"].Checked = false;
+            }
+            else if (menu.Name == "NetworkSingleViewDisable" && !menu.Checked)
+            {
+                menu.Checked = true;
+                ContextMenu.MenuItems["NetworkSingleViewEnable"].Checked = false;
+            }
+            
+
+            Options.CPUSingleView = ContextMenu.MenuItems["CPUSingleViewEnable"].Checked;
+            Options.DiskSingleView = ContextMenu.MenuItems["DiskSingleViewEnable"].Checked;
+            Options.NetworkSingleView = ContextMenu.MenuItems["NetworkSingleViewEnable"].Checked;
             Invalidate();
         }
 
          
     }
 
-    
+    public class Options
+    {
+        public bool CPUSingleView { get; set; }
+        public bool DiskSingleView { get; set; }
+        public bool NetworkSingleView { get; set; }
+
+        public int HistorySize { get; set; }
+    }
+    public class GraphTheme : IDisposable
+    {
+        public Color GraphColor { get; set; }
+        public Color BarColor { get; set; }
+        public Color TextColor { get; set; }
+        public Color TextShadowColor { get; set; }
+
+        public SolidBrush BrushGraph { get; private set; }
+        public SolidBrush BrushBar { get; private set; }
+        public SolidBrush BrushText { get; private set; }
+        public SolidBrush BrushTextShadow { get; private set; }
+
+        public void init()
+        {
+            BrushGraph = new System.Drawing.SolidBrush(GraphColor);
+            BrushBar = new System.Drawing.SolidBrush(BarColor);
+            BrushText = new System.Drawing.SolidBrush(TextColor);
+            BrushTextShadow = new System.Drawing.SolidBrush(TextShadowColor);
+        }
+
+        public void Dispose()
+        {
+            BrushGraph.Dispose();
+            BrushBar.Dispose();
+            BrushText.Dispose();
+            BrushTextShadow.Dispose();
+        }
+    }
+
+
 }

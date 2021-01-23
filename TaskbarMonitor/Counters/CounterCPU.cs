@@ -31,7 +31,7 @@ namespace TaskbarMonitor.Counters
             currentValue = cpuCounter.NextValue();
             info[GetCounterType()][0].CurrentValue = currentValue;
             info[GetCounterType()][0].History.Add(currentValue);
-            if (info[GetCounterType()][0].History.Count > 40) info[GetCounterType()][0].History.RemoveAt(0);            
+            if (info[GetCounterType()][0].History.Count > Options.HistorySize) info[GetCounterType()][0].History.RemoveAt(0);            
 
         }
         public override List<CounterInfo> GetValues()
