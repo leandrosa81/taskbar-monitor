@@ -11,7 +11,7 @@ namespace TaskbarMonitor
 {
     [ComVisible(true)]
     [Guid("13790826-15fa-46d0-9814-c2a5c6c11f32")]
-    [CSDeskBand.CSDeskBandRegistration(Name = "System Watch Band", ShowDeskBand = true)]
+    [CSDeskBand.CSDeskBandRegistration(Name = "Taskbar Monitor", ShowDeskBand = true)]
     public class Deskband : CSDeskBand.CSDeskBandWin
     {
         private static Control _control;

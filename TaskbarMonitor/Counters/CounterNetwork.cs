@@ -11,11 +11,17 @@ namespace TaskbarMonitor.Counters
 {
     class CounterNetwork: ICounter
     {
+        public CounterNetwork(Options options)
+           : base(options)
+        {
+
+        }
         List<PerformanceCounter> netCounters;        
 
         float currentValue = 0;
         long totalIO = 1;
-        List<float> history = new List<float>();
+
+        Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
 
         public override void Initialize()
         {
@@ -32,7 +38,9 @@ namespace TaskbarMonitor.Counters
                 netCounters.Add(new PerformanceCounter("Network Interface", "Bytes Received/sec", instance));
             }
 
-            
+            info.Add(CounterType.SINGLE, new List<CounterInfo> {
+                new CounterInfo() { Name = "default", History = new List<float>() }
+            });
         }
         public override void Update()
         {
@@ -42,31 +50,37 @@ namespace TaskbarMonitor.Counters
                 currentValue += netCounter.NextValue();
             }
             //netReadCounter.NextValue() + netWriteCounter.NextValue();
-                                                    
-            
-            //if (currentValue > totalIO)
-                //totalIO = Convert.ToInt64(currentValue);
 
-            history.Add(currentValue);            
-            if (history.Count > 40) history.RemoveAt(0);
-            totalIO = Convert.ToInt64(history.Max()) + 1;
+
+            //if (currentValue > totalIO)
+            //totalIO = Convert.ToInt64(currentValue);
+
+            info[GetCounterType()][0].CurrentValue = currentValue;
+            info[GetCounterType()][0].History.Add(currentValue);
+            if (info[GetCounterType()][0].History.Count > 40) info[GetCounterType()][0].History.RemoveAt(0);
+            totalIO = Convert.ToInt64(info[GetCounterType()][0].History.Max()) + 1;
 
         }
 
-        public override List<float> GetValues(out float current, out float max, out string representation)
+        public override List<CounterInfo> GetValues()
         {
-            max = totalIO;
-            current = currentValue;
-            if(current > (1024 * 1024))
-                representation = (current / 1024 / 1024).ToString("0.0") + "MB/s";
+            info[GetCounterType()][0].MaximumValue = totalIO;
+            if (info[GetCounterType()][0].CurrentValue > (1024 * 1024))
+                info[GetCounterType()][0].StringValue = (info[GetCounterType()][0].CurrentValue / 1024 / 1024).ToString("0.0") + "MB/s";
             else
-                representation = (current / 1024).ToString("0.0") + "KB/s";
-            return history;
+                info[GetCounterType()][0].StringValue = (info[GetCounterType()][0].CurrentValue / 1024).ToString("0.0") + "KB/s";
+
+            return info[GetCounterType()];
         }
 
         public override string GetName()
         {
             return "NET";
+        }
+
+        public override CounterType GetCounterType()
+        {
+            return CounterType.SINGLE;
         }
     }
 }

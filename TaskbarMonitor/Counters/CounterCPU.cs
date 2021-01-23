@@ -7,35 +7,50 @@ using System.Threading.Tasks;
 
 namespace TaskbarMonitor.Counters
 {
-    class CounterCPU: ICounter
+    class CounterCPU : ICounter
     {
         PerformanceCounter cpuCounter;
         float currentValue = 0;
-        List<float> history = new List<float>();
+        
+        Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
+        public CounterCPU(Options options)
+            : base(options)
+        {
+
+        }
 
         public override void Initialize()
         {
             cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+            info.Add(CounterType.SINGLE, new List<CounterInfo> {
+                new CounterInfo() { Name = "default", History = new List<float>() }
+            });            
         }
         public override void Update()
         {
             currentValue = cpuCounter.NextValue();
-            history.Add(currentValue);
-            if (history.Count > 40) history.RemoveAt(0);
+            info[GetCounterType()][0].CurrentValue = currentValue;
+            info[GetCounterType()][0].History.Add(currentValue);
+            if (info[GetCounterType()][0].History.Count > 40) info[GetCounterType()][0].History.RemoveAt(0);            
 
         }
-
-        public override List<float> GetValues(out float current, out float max, out string representation)
+        public override List<CounterInfo> GetValues()
         {
-            max = 100.0f;
-            current = currentValue;
-            representation = current.ToString("0") + "%";
-            return history;
+            info[GetCounterType()][0].MaximumValue = 100.0f;
+            info[GetCounterType()][0].StringValue = info[GetCounterType()][0].CurrentValue.ToString("0") + "%";
+
+            return info[GetCounterType()];
         }
+       
 
         public override string GetName()
         {
             return "CPU";
+        }
+
+        public override CounterType GetCounterType()
+        {
+            return CounterType.SINGLE;
         }
     }
 }

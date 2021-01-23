@@ -19,9 +19,9 @@ namespace TaskbarMonitorInstaller
         static void Main(string[] args)
         {
             InstallInfo info = new InstallInfo { 
-                FilesToCopy = new List<string> { "SystemWatchBand.dll" },
-                FilesToRegister = new List<string> { "SystemWatchBand.dll" },
-                TargetPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "SystemWatchBand")
+                FilesToCopy = new List<string> { "TaskbarMonitor.dll" },
+                FilesToRegister = new List<string> { "TaskbarMonitor.dll" },
+                TargetPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "TaskbarMonitor")
             };            
 
             if (args.Length > 0 && args[0].ToLower() == "/uninstall")

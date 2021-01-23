@@ -10,6 +10,13 @@ namespace TaskbarMonitor.Counters
 {
     class CounterMemory: ICounter
     {
+
+        public CounterMemory(Options options)
+           : base(options)
+        {
+
+        }
+
         [DllImport("kernel32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool GetPhysicallyInstalledSystemMemory(out long TotalMemoryInKilobytes);
@@ -17,33 +24,42 @@ namespace TaskbarMonitor.Counters
         PerformanceCounter ramCounter;
         float currentValue = 0;
         long totalMemory = 0;
-        List<float> history = new List<float>();
+        Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
 
         public override void Initialize()
         {
             ramCounter = new PerformanceCounter("Memory", "Available MBytes");
             
             GetPhysicallyInstalledSystemMemory(out totalMemory);
+            info.Add(CounterType.SINGLE, new List<CounterInfo> {
+                new CounterInfo() { Name = "default", History = new List<float>() }
+            });
         }
         public override void Update()
         {
             currentValue = (totalMemory / 1024) - ramCounter.NextValue();
-            history.Add(currentValue);
-            if (history.Count > 40) history.RemoveAt(0);
+            info[GetCounterType()][0].CurrentValue = currentValue;
+            info[GetCounterType()][0].History.Add(currentValue);
+            if (info[GetCounterType()][0].History.Count > 40) info[GetCounterType()][0].History.RemoveAt(0);
 
         }
-
-        public override List<float> GetValues(out float current, out float max, out string representation)
+        public override List<CounterInfo> GetValues()
         {
-            max = totalMemory / 1024;
-            current = currentValue;
-            representation = (current / 1024).ToString("0.0") + "GB";
-            return history;
+            info[GetCounterType()][0].MaximumValue = totalMemory / 1024;
+            info[GetCounterType()][0].StringValue = (info[GetCounterType()][0].CurrentValue / 1024).ToString("0.0") + "GB";
+
+            return info[GetCounterType()];
         }
+       
 
         public override string GetName()
         {
             return "MEM";
+        }
+
+        public override CounterType GetCounterType()
+        {
+            return CounterType.SINGLE;
         }
     }
 }
