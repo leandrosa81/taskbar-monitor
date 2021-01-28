@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace TaskbarMonitor.Counters
 {
-    class CounterNetwork: ICounter
+    class CounterNetwork : ICounter
     {
         public CounterNetwork(Options options)
            : base(options)
@@ -18,10 +18,7 @@ namespace TaskbarMonitor.Counters
         }
         List<PerformanceCounter> netCountersSent;
         List<PerformanceCounter> netCountersReceived;
-
-        float currentValue = 0;
-        long totalIO = 1;
-
+         
         Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
 
         public override void Initialize()
@@ -45,77 +42,60 @@ namespace TaskbarMonitor.Counters
             });
 
             info.Add(CounterType.MIRRORED, new List<CounterInfo> {
-                new CounterInfo() { Name = "RX", History = new List<float>(), MaximumValue = 1 },
-                new CounterInfo() { Name = "TX", History = new List<float>(), MaximumValue = 1 }
-                
+                new CounterInfo() { Name = "D", History = new List<float>(), MaximumValue = 1 },
+                new CounterInfo() { Name = "U", History = new List<float>(), MaximumValue = 1 }
+
+            });
+            info.Add(CounterType.STACKED, new List<CounterInfo> {
+                new CounterInfo() { Name = "D", History = new List<float>(), MaximumValue = 1 },
+                new CounterInfo() { Name = "U", History = new List<float>(), MaximumValue = 1 }
+
             });
         }
+
+       
+
         public override void Update()
         {
-            if (Options.NetworkSingleView)
+            Action<CounterType, int, float> addValue = (counterType, index, value) =>
             {
-                currentValue = 0;
-                foreach (var netCounter in netCountersSent)
-                {
-                    currentValue += netCounter.NextValue();
-                }
-                foreach (var netCounter in netCountersReceived)
-                {
-                    currentValue += netCounter.NextValue();
-                }
-                info[GetCounterType()][0].CurrentValue = currentValue;
-                info[GetCounterType()][0].History.Add(currentValue);
-                if (info[GetCounterType()][0].History.Count > Options.HistorySize) info[GetCounterType()][0].History.RemoveAt(0);
-                info[GetCounterType()][0].MaximumValue = Convert.ToInt64(info[GetCounterType()][0].History.Max()) + 1;
-            }
-            else
+                info[counterType][index].CurrentValue = value;
+                info[counterType][index].History.Add(value);
+                if (info[counterType][index].History.Count > Options.HistorySize) info[counterType][index].History.RemoveAt(0);
+                info[counterType][index].MaximumValue = Convert.ToInt64(info[counterType][index].History.Max()) + 1;
+
+                if (info[counterType][index].CurrentValue > (1024 * 1024))
+                    info[counterType][index].StringValue = (info[counterType][index].CurrentValue / 1024 / 1024).ToString("0.0") + "MB/s";
+                else
+                    info[counterType][index].StringValue = (info[counterType][index].CurrentValue / 1024).ToString("0.0") + "KB/s";
+            };
+
+            float currentSent = 0;
+            float currentReceived = 0;
+            foreach (var netCounter in netCountersSent)
             {
-                currentValue = 0;
-                foreach (var netCounter in netCountersReceived)
-                {
-                    currentValue += netCounter.NextValue();
-                }                 
-                info[GetCounterType()][0].CurrentValue = currentValue;
-                info[GetCounterType()][0].History.Add(currentValue);
-                if (info[GetCounterType()][0].History.Count > Options.HistorySize) info[GetCounterType()][0].History.RemoveAt(0);
-                info[GetCounterType()][0].MaximumValue = Convert.ToInt64(info[GetCounterType()][0].History.Max()) + 1;
-
-                currentValue = 0;
-                foreach (var netCounter in netCountersSent)
-                {
-                    currentValue += netCounter.NextValue();
-                }
-                info[GetCounterType()][1].CurrentValue = currentValue;
-                info[GetCounterType()][1].History.Add(currentValue);
-                if (info[GetCounterType()][1].History.Count > Options.HistorySize) info[GetCounterType()][1].History.RemoveAt(0);
-                info[GetCounterType()][1].MaximumValue = Convert.ToInt64(info[GetCounterType()][1].History.Max()) + 1;
-
-                // if locks down same scale for both counters is on
-                float max = info[GetCounterType()][0].MaximumValue > info[GetCounterType()][1].MaximumValue ? info[GetCounterType()][0].MaximumValue : info[GetCounterType()][1].MaximumValue;
-                info[GetCounterType()][0].MaximumValue = info[GetCounterType()][1].MaximumValue = max;
+                currentSent += netCounter.NextValue();                
             }
+            foreach (var netCounter in netCountersReceived)
+            {
+                currentReceived += netCounter.NextValue();
+            }
+            addValue(CounterType.SINGLE, 0, currentSent + currentReceived);
 
-            
+            addValue(CounterType.MIRRORED, 0, currentReceived);
+            addValue(CounterType.MIRRORED, 1, currentSent);
+
+            addValue(CounterType.STACKED, 0, currentReceived);
+            addValue(CounterType.STACKED, 1, currentSent);
+
+            // if locks down same scale for both counters is on
+            //float max = info[GetCounterType()][0].MaximumValue > info[GetCounterType()][1].MaximumValue ? info[GetCounterType()][0].MaximumValue : info[GetCounterType()][1].MaximumValue;
+            //info[GetCounterType()][0].MaximumValue = info[GetCounterType()][1].MaximumValue = max;
 
         }
 
         public override List<CounterInfo> GetValues()
-        {
-            if (info[GetCounterType()][0].CurrentValue > (1024 * 1024))
-                info[GetCounterType()][0].StringValue = (info[GetCounterType()][0].CurrentValue / 1024 / 1024).ToString("0.0") + "MB/s";
-            else
-                info[GetCounterType()][0].StringValue = (info[GetCounterType()][0].CurrentValue / 1024).ToString("0.0") + "KB/s";
-
-            if (!Options.NetworkSingleView)
-            {
-                if (info[GetCounterType()][1].CurrentValue > (1024 * 1024))
-                    info[GetCounterType()][1].StringValue = (info[GetCounterType()][1].CurrentValue / 1024 / 1024).ToString("0.0") + "MB/s";
-                else
-                    info[GetCounterType()][1].StringValue = (info[GetCounterType()][1].CurrentValue / 1024).ToString("0.0") + "KB/s";
-            }
-
-            
-
+        {            
             return info[GetCounterType()];
         }
 
@@ -126,7 +106,7 @@ namespace TaskbarMonitor.Counters
 
         public override CounterType GetCounterType()
         {
-            return Options.NetworkSingleView ? CounterType.SINGLE : CounterType.MIRRORED;
+            return Options.CounterOptions["NET"].GraphType;//
         }
     }
 }

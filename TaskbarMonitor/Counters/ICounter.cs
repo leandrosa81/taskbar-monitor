@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TaskbarMonitor.Counters
 {
-    class CounterInfo
+    public class CounterInfo
     {
         public string Name { get; set; }
         public float MaximumValue { get; set; }
@@ -14,7 +14,7 @@ namespace TaskbarMonitor.Counters
         public string StringValue { get; set; }
         public List<float> History { get; set; }
     }
-    abstract class ICounter
+    public abstract class ICounter
     {
         public Options Options { get; private set; }
 

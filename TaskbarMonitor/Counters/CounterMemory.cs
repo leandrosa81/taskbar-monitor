@@ -32,7 +32,7 @@ namespace TaskbarMonitor.Counters
             
             GetPhysicallyInstalledSystemMemory(out totalMemory);
             info.Add(CounterType.SINGLE, new List<CounterInfo> {
-                new CounterInfo() { Name = "default", History = new List<float>() }
+                new CounterInfo() { Name = "default", History = new List<float>(), MaximumValue = totalMemory / 1024 }
             });
         }
         public override void Update()
@@ -41,13 +41,12 @@ namespace TaskbarMonitor.Counters
             info[GetCounterType()][0].CurrentValue = currentValue;
             info[GetCounterType()][0].History.Add(currentValue);
             if (info[GetCounterType()][0].History.Count > Options.HistorySize) info[GetCounterType()][0].History.RemoveAt(0);
+            
+            info[GetCounterType()][0].StringValue = (info[GetCounterType()][0].CurrentValue / 1024).ToString("0.0") + "GB";
 
         }
         public override List<CounterInfo> GetValues()
-        {
-            info[GetCounterType()][0].MaximumValue = totalMemory / 1024;
-            info[GetCounterType()][0].StringValue = (info[GetCounterType()][0].CurrentValue / 1024).ToString("0.0") + "GB";
-
+        {            
             return info[GetCounterType()];
         }
        

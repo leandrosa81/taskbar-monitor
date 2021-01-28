@@ -17,8 +17,7 @@ namespace TaskbarMonitor.Counters
         }
         PerformanceCounter diskReadCounter;
         PerformanceCounter diskWriteCounter;
-
-        float currentValue = 0;        
+                 
         Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
 
         public override void Initialize()
@@ -33,47 +32,45 @@ namespace TaskbarMonitor.Counters
             info.Add(CounterType.MIRRORED, new List<CounterInfo> {
                 new CounterInfo() { Name = "R", History = new List<float>(), MaximumValue = 1 },
                 new CounterInfo() { Name = "W", History = new List<float>(), MaximumValue = 1 }
-            });             
+            });
+
+            info.Add(CounterType.STACKED, new List<CounterInfo> {
+                new CounterInfo() { Name = "R", History = new List<float>(), MaximumValue = 1 },
+                new CounterInfo() { Name = "W", History = new List<float>(), MaximumValue = 1 }
+            });
         }
         public override void Update()
-        {            
-            if (Options.DiskSingleView)
+        {
+            Action<CounterType, int, float> addValue = (counterType, index, value) =>
             {
-                currentValue = diskReadCounter.NextValue() + diskWriteCounter.NextValue();
-                info[GetCounterType()][0].CurrentValue = currentValue;
-                info[GetCounterType()][0].History.Add(currentValue);
-                if (info[GetCounterType()][0].History.Count > Options.HistorySize) info[GetCounterType()][0].History.RemoveAt(0);
-                info[GetCounterType()][0].MaximumValue = Convert.ToInt64(info[GetCounterType()][0].History.Max()) + 1;                
-            }
-            else
-            {
-                info[GetCounterType()][0].CurrentValue = diskReadCounter.NextValue();
-                info[GetCounterType()][0].History.Add(info[GetCounterType()][0].CurrentValue);
-                if (info[GetCounterType()][0].History.Count > Options.HistorySize) info[GetCounterType()][0].History.RemoveAt(0);
-                info[GetCounterType()][0].MaximumValue = Convert.ToInt64(info[GetCounterType()][0].History.Max()) + 1;
+                info[counterType][index].CurrentValue = value;
+                info[counterType][index].History.Add(value);
+                if (info[counterType][index].History.Count > Options.HistorySize) info[counterType][index].History.RemoveAt(0);
+                info[counterType][index].MaximumValue = Convert.ToInt64(info[counterType][index].History.Max()) + 1;
 
-                info[GetCounterType()][1].CurrentValue = diskWriteCounter.NextValue();
-                info[GetCounterType()][1].History.Add(info[GetCounterType()][1].CurrentValue);
-                if (info[GetCounterType()][1].History.Count > Options.HistorySize) info[GetCounterType()][1].History.RemoveAt(0);
-                info[GetCounterType()][1].MaximumValue = Convert.ToInt64(info[GetCounterType()][1].History.Max()) + 1;
+                info[counterType][index].StringValue = (info[counterType][index].CurrentValue / 1024 / 1024).ToString("0.0") + "MB/s";
+            };
 
-                // if locks down same scale for both counters is on
-                float max = info[GetCounterType()][0].MaximumValue > info[GetCounterType()][1].MaximumValue ? info[GetCounterType()][0].MaximumValue : info[GetCounterType()][1].MaximumValue;
-                info[GetCounterType()][0].MaximumValue = info[GetCounterType()][1].MaximumValue = max;
-            }
-            
-            
+            float currentRead = diskReadCounter.NextValue();
+            float currentWritten = diskWriteCounter.NextValue();
+
+            addValue(CounterType.SINGLE, 0, currentRead + currentWritten);
+
+            addValue(CounterType.MIRRORED, 0, currentRead);
+            addValue(CounterType.MIRRORED, 1, currentWritten);
+
+            addValue(CounterType.STACKED, 0, currentRead);
+            addValue(CounterType.STACKED, 1, currentWritten);
+
+            // if locks down same scale for both counters is on
+            //float max = info[GetCounterType()][0].MaximumValue > info[GetCounterType()][1].MaximumValue ? info[GetCounterType()][0].MaximumValue : info[GetCounterType()][1].MaximumValue;
+            //info[GetCounterType()][0].MaximumValue = info[GetCounterType()][1].MaximumValue = max;
 
         }
 
         public override List<CounterInfo> GetValues()
         {                        
-            info[GetCounterType()][0].StringValue = (info[GetCounterType()][0].CurrentValue / 1024 / 1024).ToString("0.0") + "MB/s";
-            if (!Options.DiskSingleView)
-            {
-                info[GetCounterType()][1].StringValue = (info[GetCounterType()][1].CurrentValue / 1024 / 1024).ToString("0.0") + "MB/s";
-            }
-
+            
             return info[GetCounterType()];
         }
          
@@ -83,8 +80,8 @@ namespace TaskbarMonitor.Counters
         }
 
         public override CounterType GetCounterType()
-        {            
-            return Options.DiskSingleView ? CounterType.SINGLE : CounterType.MIRRORED;
+        {
+            return Options.CounterOptions["DISK"].GraphType;// ? CounterType.SINGLE : CounterType.MIRRORED;
         }
     }
 }
