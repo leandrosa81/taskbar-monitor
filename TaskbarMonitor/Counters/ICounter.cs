@@ -11,7 +11,7 @@ namespace TaskbarMonitor.Counters
         public string Name { get; set; }
         public float MaximumValue { get; set; }
         public float CurrentValue { get; set; }
-        public string StringValue { get; set; }
+        public string CurrentStringValue { get; set; }
         public List<float> History { get; set; }
     }
     public abstract class ICounter

@@ -65,9 +65,9 @@ namespace TaskbarMonitor.Counters
                 info[counterType][index].MaximumValue = Convert.ToInt64(info[counterType][index].History.Max()) + 1;
 
                 if (info[counterType][index].CurrentValue > (1024 * 1024))
-                    info[counterType][index].StringValue = (info[counterType][index].CurrentValue / 1024 / 1024).ToString("0.0") + "MB/s";
+                    info[counterType][index].CurrentStringValue = (info[counterType][index].CurrentValue / 1024 / 1024).ToString("0.0") + "MB/s";
                 else
-                    info[counterType][index].StringValue = (info[counterType][index].CurrentValue / 1024).ToString("0.0") + "KB/s";
+                    info[counterType][index].CurrentStringValue = (info[counterType][index].CurrentValue / 1024).ToString("0.0") + "KB/s";
             };
 
             float currentSent = 0;

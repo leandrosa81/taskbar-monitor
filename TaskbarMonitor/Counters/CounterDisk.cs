@@ -48,7 +48,7 @@ namespace TaskbarMonitor.Counters
                 if (info[counterType][index].History.Count > Options.HistorySize) info[counterType][index].History.RemoveAt(0);
                 info[counterType][index].MaximumValue = Convert.ToInt64(info[counterType][index].History.Max()) + 1;
 
-                info[counterType][index].StringValue = (info[counterType][index].CurrentValue / 1024 / 1024).ToString("0.0") + "MB/s";
+                info[counterType][index].CurrentStringValue = (info[counterType][index].CurrentValue / 1024 / 1024).ToString("0.0") + "MB/s";
             };
 
             float currentRead = diskReadCounter.NextValue();

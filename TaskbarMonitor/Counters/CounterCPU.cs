@@ -49,7 +49,7 @@ namespace TaskbarMonitor.Counters
             info[CounterType.SINGLE][0].CurrentValue = currentValue;
             info[CounterType.SINGLE][0].History.Add(currentValue);
             if (info[CounterType.SINGLE][0].History.Count > Options.HistorySize) info[CounterType.SINGLE][0].History.RemoveAt(0);            
-            info[CounterType.SINGLE][0].StringValue = info[CounterType.SINGLE][0].CurrentValue.ToString("0") + "%";
+            info[CounterType.SINGLE][0].CurrentStringValue = info[CounterType.SINGLE][0].CurrentValue.ToString("0") + "%";
 
             foreach (var item in cpuCounterCores)
             {
@@ -58,7 +58,7 @@ namespace TaskbarMonitor.Counters
                 ct.History.Add(ct.CurrentValue);
                 if (ct.History.Count > Options.HistorySize) ct.History.RemoveAt(0);
 
-                ct.StringValue = info[CounterType.SINGLE][0].StringValue;// same string value from SINGLE
+                ct.CurrentStringValue = info[CounterType.SINGLE][0].CurrentStringValue;// same string value from SINGLE
             }
 
         }
