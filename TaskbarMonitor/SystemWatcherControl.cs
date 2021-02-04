@@ -235,7 +235,7 @@ namespace TaskbarMonitor
 
                 positions.Add(CounterOptions.DisplayPosition.MIDDLE, (maximumHeight / 2 - sizeTitle.Height / 2) + 2 + graphPositionY);
                 positions.Add(CounterOptions.DisplayPosition.TOP, 2 + graphPositionY);
-                positions.Add(CounterOptions.DisplayPosition.BOTTOM, (maximumHeight - sizeTitle.Height) + graphPositionY);
+                positions.Add(CounterOptions.DisplayPosition.BOTTOM, (maximumHeight - sizeTitle.Height + 1) + graphPositionY);
 
                 if ((opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW
                     || (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver))
