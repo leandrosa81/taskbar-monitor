@@ -21,7 +21,13 @@ namespace TaskbarMonitor
             //Options.MinHorizontalSize = new Size(200, 30);
             var ctl = new SystemWatcherControl(this);
             Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, 30);
+            ctl.OnChangeSize += Ctl_OnChangeSize;
             _control = ctl;
+        }
+
+        private void Ctl_OnChangeSize(Size size)
+        {
+            Options.MinHorizontalSize = size;
         }
 
         protected override Control Control => _control;

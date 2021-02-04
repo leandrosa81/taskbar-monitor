@@ -55,6 +55,7 @@
     <Compile Include="Counters\ICounter.cs" />
     <Compile Include="CSDeskBand.cs" />
     <Compile Include="DeskBand.cs" />
+    <Compile Include="GithubUpdater.cs" />
     <Compile Include="GraphTheme.cs" />
     <Compile Include="OptionForm.cs">
       <SubType>Form</SubType>
@@ -63,6 +64,11 @@
       <DependentUpon>OptionForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Options.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="SystemWatcherControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -75,6 +81,10 @@
   <ItemGroup>
     <EmbeddedResource Include="OptionForm.resx">
       <DependentUpon>OptionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="SystemWatcherControl.resx">
       <DependentUpon>SystemWatcherControl.cs</DependentUpon>

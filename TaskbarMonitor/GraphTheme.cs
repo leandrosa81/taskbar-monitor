@@ -15,6 +15,9 @@ namespace TaskbarMonitor
         public Color TextColor { get; set; }
         public Color TextShadowColor { get; set; }
 
+        public Color TitleColor { get; set; }
+        public Color TitleShadowColor { get; set; }
+
         public List<Color> StackedColors { get; set; }
 
         public Color getNthColor(int total, int n)

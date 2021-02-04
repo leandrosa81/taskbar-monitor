@@ -16,7 +16,9 @@ namespace TaskbarMonitor
 {    
     public partial class SystemWatcherControl: UserControl
     {
-        
+        public delegate void SizeChangeHandler(Size size);
+        public event SizeChangeHandler OnChangeSize;
+        public Version Version { get; set; } = new Version("0.2.0");
         public Options Options = new Options { CounterOptions = new Dictionary<string, CounterOptions>
         {
             { "CPU", new CounterOptions { 
@@ -48,7 +50,8 @@ namespace TaskbarMonitor
                     TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED
                 } } }
         }
-        , HistorySize = 50 };        
+        , HistorySize = 50
+        ,PollTime = 3 };        
         public int CountersCount
         {
             get
@@ -63,15 +66,14 @@ namespace TaskbarMonitor
         Font fontTitle;
         int lastSize = 30;
         bool mouseOver = false;
-        GraphTheme defaultTheme;
-        GraphTheme alternateTheme;
+        GraphTheme defaultTheme;        
 
         public SystemWatcherControl(CSDeskBand.CSDeskBandWin w)
-        {
+        {            
             Initialize();
         }
         public SystemWatcherControl()
-        {
+        {            
             Initialize();
         }
         private void Initialize()
@@ -102,6 +104,7 @@ namespace TaskbarMonitor
 
             ContextMenu cm = new ContextMenu();                       
             cm.MenuItems.Add(new MenuItem("Settings...", MenuItem_Settings_onClick));
+            cm.MenuItems.Add(new MenuItem(String.Format("About taskbar-monitor (v{0})...",Version.ToString(3)), MenuItem_About_onClick));
             this.ContextMenu = cm;
 
             defaultTheme = new GraphTheme
@@ -109,24 +112,15 @@ namespace TaskbarMonitor
                 BarColor = Color.FromArgb(255, 176, 222, 255),
                 TextColor = Color.FromArgb(200, 185, 255, 70),
                 TextShadowColor = Color.FromArgb(255, 0, 0, 0),
+                TitleColor = Color.FromArgb(255, 255, 255, 255),
+                TitleShadowColor = Color.FromArgb(255, 0, 0, 0),
                 StackedColors = new List<Color> 
                 { 
                     Color.FromArgb(255, 37, 84, 142) ,
                     Color.FromArgb(255, 65, 144, 242)
                 }
             };
-             
-            alternateTheme = new GraphTheme
-            {                
-                BarColor = Color.FromArgb(255, 255, 255, 255),
-                TextColor = Color.FromArgb(200, 185, 255, 70),
-                TextShadowColor = Color.FromArgb(255, 0, 0, 0),
-                StackedColors = new List<Color>
-                {
-                    Color.FromArgb(255, 59, 131, 219),
-                    Color.FromArgb(255, 50, 50, 50)
-                }
-            };
+              
              
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.DoubleBuffer, true);
@@ -170,6 +164,8 @@ namespace TaskbarMonitor
                 controlHeight = Convert.ToInt32(Math.Ceiling((float)CountersCount / (float)countersPerLine)) * (30 + 10);
             }
             this.Size = new Size(controlWidth, controlHeight);
+            if(OnChangeSize != null)
+                OnChangeSize(new Size(controlWidth, controlHeight));            
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -179,6 +175,8 @@ namespace TaskbarMonitor
             {
                 ct.Update();
             }
+            if(timer1.Interval != Options.PollTime * 1000)
+                timer1.Interval = Options.PollTime * 1000;
 
             this.Invalidate();
         }
@@ -201,64 +199,83 @@ namespace TaskbarMonitor
             
             System.Drawing.Graphics formGraphics = e.Graphics;// this.CreateGraphics();
 
-            SolidBrush BrushGraph = new SolidBrush(defaultTheme.getNthColor(2, 0));
-            SolidBrush BrushGraphLast = new SolidBrush(defaultTheme.getNthColor(2, 1));
-            SolidBrush BrushBar = new SolidBrush(defaultTheme.BarColor);
-            SolidBrush BrushText = new SolidBrush(defaultTheme.TextColor);
-            SolidBrush BrushTextShadow = new SolidBrush(defaultTheme.TextShadowColor);
-
-            
-             
-            
-             
             foreach (var ct in Counters)
             {
                 var infos = ct.GetValues();
                 var opt = Options.CounterOptions[ct.GetName()];
-                var showCurrentValue = opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW ||
-                        (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver);
+                var showCurrentValue = !opt.CurrentValueAsSummary && 
+                    (opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW || (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver));
 
                 if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.SINGLE)
                 {
-                    
+
                     drawGraph(formGraphics, graphPosition, 0 + graphPositionY, maximumHeight, false, showCurrentValue, true, infos[0], defaultTheme, opt);
-                      
+
                 }
                 else if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED)
                 {
-                    
-                     
+
+
                     for (int z = 0; z < infos.Count; z++)
                     {
-                        var info = opt.InvertOrder ? infos[infos.Count-1 -z] : infos[z];
+                        var info = opt.InvertOrder ? infos[infos.Count - 1 - z] : infos[z];
                         drawGraph(formGraphics, graphPosition, z * (maximumHeight / 2) + graphPositionY, maximumHeight / 2, z == 1, showCurrentValue, false, info, defaultTheme, opt);
                     }
-                    
-                     
+
+
                 }
                 else if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.STACKED)
-                {                    
-                    drawStackedGraph(formGraphics, graphPosition, 0 + graphPositionY, maximumHeight, opt.InvertOrder, showCurrentValue, true, infos, defaultTheme, opt);                    
+                {
+                    drawStackedGraph(formGraphics, graphPosition, 0 + graphPositionY, maximumHeight, opt.InvertOrder, showCurrentValue, true, infos, defaultTheme, opt);
 
                 }
 
-                if(opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW
-                    || (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER))
-                {
+                var sizeTitle = formGraphics.MeasureString(ct.GetName(), fontTitle);
+                Dictionary<CounterOptions.DisplayPosition, float> positions = new Dictionary<CounterOptions.DisplayPosition, float>();
 
+                positions.Add(CounterOptions.DisplayPosition.MIDDLE, (maximumHeight / 2 - sizeTitle.Height / 2) + 2 + graphPositionY);
+                positions.Add(CounterOptions.DisplayPosition.TOP, 2 + graphPositionY);
+                positions.Add(CounterOptions.DisplayPosition.BOTTOM, (maximumHeight - sizeTitle.Height) + graphPositionY);
+
+                if ((opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW
+                    || (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver))
+                    && opt.CurrentValueAsSummary)
+                {
+                    string text = infos[0].CurrentStringValue;
+                    
+                    var sizeString = formGraphics.MeasureString(text, fontCounter);                    
+                    float ypos = positions[opt.SummaryPosition];                    
+
+                    SolidBrush BrushText = new SolidBrush(defaultTheme.TextColor);
+                    SolidBrush BrushTextShadow = new SolidBrush(defaultTheme.TextShadowColor);
+                    formGraphics.DrawString(text, fontCounter, BrushTextShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, ypos + 1, sizeString.Width, maximumHeight), new StringFormat());
+                    formGraphics.DrawString(text, fontCounter, BrushText, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2), ypos, sizeString.Width, maximumHeight), new StringFormat());
+                    BrushText.Dispose();
+                    BrushTextShadow.Dispose();
                 }
 
                 if (opt.ShowTitle == CounterOptions.DisplayType.SHOW
                 || (opt.ShowTitle == CounterOptions.DisplayType.HOVER))
                 {
-                    System.Drawing.SolidBrush brushShadow = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(255, 0, 0, 0));
-                    System.Drawing.SolidBrush brushTitle = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(opt.ShowTitle == CounterOptions.DisplayType.HOVER &&  !mouseOver ? 40 : 255, 255, 255, 255));
+                    System.Drawing.SolidBrush brushShadow = new System.Drawing.SolidBrush(defaultTheme.TitleShadowColor);
+                    var titleColor = defaultTheme.TitleColor;
+
+                    if (opt.ShowTitle == CounterOptions.DisplayType.HOVER && !mouseOver)
+                        titleColor = Color.FromArgb(40, titleColor.R, titleColor.G, titleColor.B);
+
+                    System.Drawing.SolidBrush brushTitle = new System.Drawing.SolidBrush(titleColor);
 
 
-                    var sizeTitle = formGraphics.MeasureString(ct.GetName(), fontTitle);
-                    //if (mouseOver)
-                    formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) + 1, (maximumHeight / 2 - sizeTitle.Height / 2) + 2 + graphPositionY, sizeTitle.Width, maximumHeight), new StringFormat());
-                    formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), (maximumHeight / 2 - sizeTitle.Height / 2) + 1 + graphPositionY, sizeTitle.Width, maximumHeight), new StringFormat());
+                    if (
+                        (opt.ShowTitleShadowOnHover && opt.ShowTitle == CounterOptions.DisplayType.HOVER && !mouseOver)
+                        || (opt.ShowTitle == CounterOptions.DisplayType.HOVER && mouseOver)
+                        || opt.ShowTitle == CounterOptions.DisplayType.SHOW 
+                       )
+                    {
+                        formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) - 1, positions[opt.TitlePosition] - 1, sizeTitle.Width, maximumHeight), new StringFormat());
+                        formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), positions[opt.TitlePosition], sizeTitle.Width, maximumHeight), new StringFormat());
+                    }
+                     
 
                     brushShadow.Dispose();
                     brushTitle.Dispose();
@@ -451,13 +468,34 @@ namespace TaskbarMonitor
             mouseOver = false;
             this.Invalidate();
         }
-        public void MenuItem_Settings_onClick(object sender, EventArgs e)
+
+        private void OpenSettings(int activeIndex = 0)
         {
-            OptionForm optForm = new OptionForm(this.Options);
-            optForm.Show();
+            var qtd = Application.OpenForms.OfType<OptionForm>();
+            OptionForm optForm = null;
+            if (qtd.Count() == 0)
+            {
+                optForm = new OptionForm(this.Options, this.defaultTheme, this.Version);
+                optForm.Show();
+            }
+            else
+            {
+                optForm = qtd.First();
+                optForm.Focus();
+            }
+            optForm.OpenTab(activeIndex);
         }
-        
-         
+        private void MenuItem_Settings_onClick(object sender, EventArgs e)
+        {
+            OpenSettings();
+        }
+        private void MenuItem_About_onClick(object sender, EventArgs e)
+        {
+            OpenSettings(2);
+
+        }
+
+
     }
 
     
