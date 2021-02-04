@@ -180,7 +180,8 @@ namespace TaskbarMonitor
 
             if (btnCheckUpdate.Text == "there is an update!")
             {
-                System.Diagnostics.Process.Start(update.GetURL());
+                
+                //lblLatestVersion.Text = "";
             }
             else
             {
@@ -190,7 +191,16 @@ namespace TaskbarMonitor
                 
                 var task = update.CheckForUpdatesAsync(this.Version, 3);
 
-                btnCheckUpdate.Text = !task.Result ? "no updates" : "there is an update!";
+                var latestVersion = task.Result;
+                btnCheckUpdate.Text = latestVersion == null? "no updates" : "there is an update!";
+                if(latestVersion != null)
+                {
+                    lblLatestVersion.Visible = false;
+                    linkLatestVersion.Text = "v" + latestVersion.ToString();
+                    linkLatestVersion.Top = lblLatestVersion.Top;
+                    linkLatestVersion.Left = lblLatestVersion.Left;
+                    linkLatestVersion.Visible = true;
+                }
                 btnCheckUpdate.Enabled = true;
             }
             
@@ -298,6 +308,12 @@ namespace TaskbarMonitor
                 listTitlePosition.Text = vals.First().ToString();
                 //ActiveCounter.TitlePosition = vals.First();
             }
+        }
+
+        private void linkLatestVersion_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            GithubUpdater update = new GithubUpdater("leandrosa81", "taskbar-monitor");
+            System.Diagnostics.Process.Start(update.GetURL());
         }
     }
 }

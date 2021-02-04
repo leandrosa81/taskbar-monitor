@@ -90,7 +90,7 @@
             this.label24 = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.btnCheckUpdate = new System.Windows.Forms.Button();
-            this.label17 = new System.Windows.Forms.Label();
+            this.lblLatestVersion = new System.Windows.Forms.Label();
             this.label18 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
@@ -104,6 +104,7 @@
             this.label9 = new System.Windows.Forms.Label();
             this.panelFooter = new System.Windows.Forms.Panel();
             this.buttonResetDefaults = new System.Windows.Forms.Button();
+            this.linkLatestVersion = new System.Windows.Forms.LinkLabel();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editHistorySize)).BeginInit();
             this.panelMenu.SuspendLayout();
@@ -810,8 +811,9 @@
             // 
             this.tabPage3.BackColor = System.Drawing.Color.Transparent;
             this.tabPage3.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("tabPage3.BackgroundImage")));
+            this.tabPage3.Controls.Add(this.linkLatestVersion);
             this.tabPage3.Controls.Add(this.btnCheckUpdate);
-            this.tabPage3.Controls.Add(this.label17);
+            this.tabPage3.Controls.Add(this.lblLatestVersion);
             this.tabPage3.Controls.Add(this.label18);
             this.tabPage3.Controls.Add(this.textBox1);
             this.tabPage3.Controls.Add(this.label15);
@@ -842,16 +844,16 @@
             this.btnCheckUpdate.UseVisualStyleBackColor = true;
             this.btnCheckUpdate.Click += new System.EventHandler(this.btnCheckUpdate_Click);
             // 
-            // label17
+            // lblLatestVersion
             // 
-            this.label17.AutoSize = true;
-            this.label17.Font = new System.Drawing.Font("Calibri", 9F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label17.ForeColor = System.Drawing.Color.DimGray;
-            this.label17.Location = new System.Drawing.Point(282, 86);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(26, 14);
-            this.label17.TabIndex = 11;
-            this.label17.Text = "N/A";
+            this.lblLatestVersion.AutoSize = true;
+            this.lblLatestVersion.Font = new System.Drawing.Font("Calibri", 9F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblLatestVersion.ForeColor = System.Drawing.Color.DimGray;
+            this.lblLatestVersion.Location = new System.Drawing.Point(282, 86);
+            this.lblLatestVersion.Name = "lblLatestVersion";
+            this.lblLatestVersion.Size = new System.Drawing.Size(26, 14);
+            this.lblLatestVersion.TabIndex = 11;
+            this.lblLatestVersion.Text = "N/A";
             // 
             // label18
             // 
@@ -981,6 +983,18 @@
             this.buttonResetDefaults.Text = "Reset to defaults";
             this.buttonResetDefaults.UseVisualStyleBackColor = true;
             // 
+            // linkLatestVersion
+            // 
+            this.linkLatestVersion.AutoSize = true;
+            this.linkLatestVersion.Location = new System.Drawing.Point(282, 107);
+            this.linkLatestVersion.Name = "linkLatestVersion";
+            this.linkLatestVersion.Size = new System.Drawing.Size(14, 14);
+            this.linkLatestVersion.TabIndex = 13;
+            this.linkLatestVersion.TabStop = true;
+            this.linkLatestVersion.Text = "a";
+            this.linkLatestVersion.Visible = false;
+            this.linkLatestVersion.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLatestVersion_LinkClicked);
+            // 
             // OptionForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1070,7 +1084,7 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Panel panelFooter;
         private System.Windows.Forms.Button buttonResetDefaults;
-        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.Label lblLatestVersion;
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.Button btnCheckUpdate;
         private System.Windows.Forms.ComboBox listSummaryPosition;
@@ -1106,5 +1120,6 @@
         private System.Windows.Forms.Label label24;
         private System.Windows.Forms.Label label31;
         private System.Windows.Forms.CheckBox checkSeparateScales;
+        private System.Windows.Forms.LinkLabel linkLatestVersion;
     }
 }
