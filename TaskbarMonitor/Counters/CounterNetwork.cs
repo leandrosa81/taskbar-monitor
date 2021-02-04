@@ -89,8 +89,12 @@ namespace TaskbarMonitor.Counters
             addValue(CounterType.STACKED, 1, currentSent);
 
             // if locks down same scale for both counters is on
-            //float max = info[GetCounterType()][0].MaximumValue > info[GetCounterType()][1].MaximumValue ? info[GetCounterType()][0].MaximumValue : info[GetCounterType()][1].MaximumValue;
-            //info[GetCounterType()][0].MaximumValue = info[GetCounterType()][1].MaximumValue = max;
+            if (!Options.CounterOptions["NET"].SeparateScales)
+            {
+                float max = info[GetCounterType()][0].MaximumValue > info[GetCounterType()][1].MaximumValue ? info[GetCounterType()][0].MaximumValue : info[GetCounterType()][1].MaximumValue;
+                info[GetCounterType()][0].MaximumValue = info[GetCounterType()][1].MaximumValue = max;
+            }
+
 
         }
 
