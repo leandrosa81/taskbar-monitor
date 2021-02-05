@@ -26,7 +26,10 @@ namespace TaskbarMonitor
         public async Task<Version> CheckForUpdatesAsync(Version version, int fieldCount)
         {
             Version latest = null;
-            //https://github.com/leandrosa81/taskbar-monitor/releases            
+            //https://github.com/leandrosa81/taskbar-monitor/releases    
+            System.Net.ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
+            System.Net.ServicePointManager.Expect100Continue = true;
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
             using (var client = new HttpClient())
             {
                 var result = client.GetAsync(GetURL()).Result;
