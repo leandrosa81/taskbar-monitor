@@ -48,6 +48,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\MenuButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Counters\CounterNetwork.cs" />
     <Compile Include="Counters\CounterDisk.cs" />
     <Compile Include="Counters\CounterMemory.cs" />
@@ -92,6 +95,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="leandro.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controls\NewFolder1\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

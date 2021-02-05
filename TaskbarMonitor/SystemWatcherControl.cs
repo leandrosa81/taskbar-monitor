@@ -19,39 +19,20 @@ namespace TaskbarMonitor
         public delegate void SizeChangeHandler(Size size);
         public event SizeChangeHandler OnChangeSize;
         public Version Version { get; set; } = new Version("0.2.0");
-        public Options Options = new Options { CounterOptions = new Dictionary<string, CounterOptions>
-        {
-            { "CPU", new CounterOptions { 
-                GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
-                {
-                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED
-                }
-            }                
-            },
-            { "MEM", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
-                {
-                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE                    
-                } } },
-            { "DISK", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
-                {
-                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED,
-                    TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED
-                } } },
-            { "NET", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
-                {
-                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED,
-                    TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED
-                } } }
+        public Options Options { get; set; }
+
+        private bool _previewMode = false;
+        private ContextMenu _contextMenu = null;
+        public bool PreviewMode { get
+            {
+                return _previewMode;
+            }
+            set
+            {
+                _previewMode = value;
+                this.ContextMenu = _previewMode ? null : _contextMenu;                
+            }
         }
-        , HistorySize = 50
-        ,PollTime = 3 };        
         public int CountersCount
         {
             get
@@ -68,44 +49,93 @@ namespace TaskbarMonitor
         bool mouseOver = false;
         GraphTheme defaultTheme;        
 
-        public SystemWatcherControl(CSDeskBand.CSDeskBandWin w)
-        {            
+        public SystemWatcherControl(CSDeskBand.CSDeskBandWin w, Options opt)
+        {
+            this.Options = opt;
             Initialize();
         }
         public SystemWatcherControl()
-        {            
+        {
+            this.Options = new Options
+            {
+                CounterOptions = new Dictionary<string, CounterOptions>
+        {
+            { "CPU", new CounterOptions {
+                GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
+                {
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED
+                }
+            }
+            },
+            { "MEM", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
+                {
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE
+                } } },
+            { "DISK", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
+                {
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED,
+                    TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED
+                } } },
+            { "NET", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
+                {
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED,
+                    TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED
+                } } }
+        }
+        ,
+                HistorySize = 50
+        ,
+                PollTime = 3
+            };
             Initialize();
         }
-        private void Initialize()
+        public void ApplyOptions()
         {
-            
             Counters = new List<Counters.ICounter>();
-
+            if (Options.CounterOptions.ContainsKey("CPU"))
             {
                 var ct = new Counters.CounterCPU(Options);
                 ct.Initialize();
                 Counters.Add(ct);
             }
+            if (Options.CounterOptions.ContainsKey("MEM"))
             {
                 var ct = new Counters.CounterMemory(Options);
                 ct.Initialize();
                 Counters.Add(ct);
             }
+            if (Options.CounterOptions.ContainsKey("DISK"))
             {
                 var ct = new Counters.CounterDisk(Options);
                 ct.Initialize();
                 Counters.Add(ct);
             }
+            if (Options.CounterOptions.ContainsKey("NET"))
             {
                 var ct = new Counters.CounterNetwork(Options);
                 ct.Initialize();
                 Counters.Add(ct);
             }
+             
+            AdjustControlSize();
+             
+        }
+        private void Initialize()
+        {
 
-            ContextMenu cm = new ContextMenu();                       
-            cm.MenuItems.Add(new MenuItem("Settings...", MenuItem_Settings_onClick));
-            cm.MenuItems.Add(new MenuItem(String.Format("About taskbar-monitor (v{0})...",Version.ToString(3)), MenuItem_About_onClick));
-            this.ContextMenu = cm;
+            ApplyOptions();
+
+            _contextMenu = new ContextMenu();
+            _contextMenu.MenuItems.Add(new MenuItem("Settings...", MenuItem_Settings_onClick));
+            _contextMenu.MenuItems.Add(new MenuItem(String.Format("About taskbar-monitor (v{0})...",Version.ToString(3)), MenuItem_About_onClick));
+            this.ContextMenu = _contextMenu;
 
             defaultTheme = new GraphTheme
             {                
@@ -125,7 +155,7 @@ namespace TaskbarMonitor
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.DoubleBuffer, true);
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-            SetStyle(ControlStyles.UserPaint, true);            
+            SetStyle(ControlStyles.UserPaint, true);
 
             InitializeComponent();
             AdjustControlSize();

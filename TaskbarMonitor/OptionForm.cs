@@ -12,7 +12,7 @@ namespace TaskbarMonitor
 {
     public partial class OptionForm : Form
     {
-        public Options Options { get; private set; }
+        private Options Options { get; set; }
         private Version Version;
         private GraphTheme Theme;
         private CounterOptions ActiveCounter = null;
@@ -22,6 +22,7 @@ namespace TaskbarMonitor
             this.Version = version;
             this.Theme = theme;
             this.Options = opt;
+            
             InitializeComponent();
             this.editHistorySize.Value = opt.HistorySize;
             this.editPollTime.Value = opt.PollTime;
@@ -35,6 +36,7 @@ namespace TaskbarMonitor
 
             ActiveCounter = opt.CounterOptions.First().Value;
             UpdateForm();
+            UpdateReplicateSettingsMenu();
             btnColorBar.BackColor = this.Theme.BarColor;
             btnColorCurrentValue.BackColor = this.Theme.TextColor;
             btnColorCurrentValueShadow.BackColor = this.Theme.TextShadowColor;
@@ -42,6 +44,28 @@ namespace TaskbarMonitor
             btnColorTitleShadow.BackColor = this.Theme.TitleShadowColor;
             btnColor1.BackColor = this.Theme.StackedColors[0];
             btnColor2.BackColor = this.Theme.StackedColors[1];
+
+            swcPreview.Options = new Options
+            {
+                CounterOptions = new Dictionary<string, CounterOptions>
+        {
+            { "CPU", new CounterOptions {
+                GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
+                {
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED
+                }
+            }
+                    }
+                }
+            ,
+                HistorySize = 50
+        ,
+                PollTime = 3
+            };
+            swcPreview.ApplyOptions();
+
             initializing = false;
         }
 
@@ -58,7 +82,53 @@ namespace TaskbarMonitor
         {
             if (initializing) return;
             ActiveCounter = Options.CounterOptions[listCounters.Text];
+            UpdateReplicateSettingsMenu();
             UpdateForm();
+        }
+
+        private void UpdateReplicateSettingsMenu()
+        {
+            contextMenuStripReplicateSettings.Items.Clear();
+            contextMenuStripReplicateSettings.Items.Add(new ToolStripMenuItem("All other graphs", null, contextMenuStripReplicateSettings_OnClick));
+            contextMenuStripReplicateSettings.Items.Add(new ToolStripSeparator());
+            foreach (var item in Options.CounterOptions.Keys.AsEnumerable().ToList())
+            {
+                if (item != listCounters.Text)
+                {
+                    contextMenuStripReplicateSettings.Items.Add(new ToolStripMenuItem(item, null, contextMenuStripReplicateSettings_OnClick));
+                }
+            }
+        }
+        private void contextMenuStripReplicateSettings_OnClick(object sender, EventArgs e)
+        {
+            var menu = sender as ToolStripMenuItem;
+            List<string> destiny = new List<string>();
+            if(menu.Text == "All other graphs")
+            {
+                foreach (var item in Options.CounterOptions.Keys.AsEnumerable().ToList())
+                {
+                    if (item != listCounters.Text)
+                    {
+                        destiny.Add(item);
+                    }
+                }
+            }
+            else
+            {
+                destiny.Add(menu.Text);
+            }
+
+            foreach (var item in destiny)
+            {
+                Options.CounterOptions[item].ShowTitle = ActiveCounter.ShowTitle;
+                Options.CounterOptions[item].ShowCurrentValue = ActiveCounter.ShowCurrentValue;
+                Options.CounterOptions[item].CurrentValueAsSummary = ActiveCounter.CurrentValueAsSummary;
+                Options.CounterOptions[item].SummaryPosition = ActiveCounter.SummaryPosition;
+                Options.CounterOptions[item].ShowTitleShadowOnHover = ActiveCounter.ShowTitleShadowOnHover;
+                Options.CounterOptions[item].ShowCurrentValueShadowOnHover = ActiveCounter.ShowCurrentValueShadowOnHover;
+                Options.CounterOptions[item].TitlePosition = ActiveCounter.TitlePosition;                
+
+            }
         }
 
         private void UpdateForm()
@@ -178,29 +248,34 @@ namespace TaskbarMonitor
         {
             GithubUpdater update = new GithubUpdater("leandrosa81", "taskbar-monitor");
 
-            if (btnCheckUpdate.Text == "there is an update!")
-            {
-                
-                //lblLatestVersion.Text = "";
-            }
-            else
+            if (btnCheckUpdate.Text == "Check for updates")            
             {
                 btnCheckUpdate.Enabled = false;
                 btnCheckUpdate.Text = "checking...";
 
                 
-                var task = update.CheckForUpdatesAsync(this.Version, 3);
+                var task = update.GetLastestVersionAsync();
 
                 var latestVersion = task.Result;
-                btnCheckUpdate.Text = latestVersion == null? "no updates" : "there is an update!";
+                
                 if(latestVersion != null)
                 {
-                    lblLatestVersion.Visible = false;
-                    linkLatestVersion.Text = "v" + latestVersion.ToString();
-                    linkLatestVersion.Top = lblLatestVersion.Top;
-                    linkLatestVersion.Left = lblLatestVersion.Left;
-                    linkLatestVersion.Visible = true;
+                    if (latestVersion.CompareTo(this.Version) > 0)
+                    {
+                        btnCheckUpdate.Text = "there is an update!";
+                        lblLatestVersion.Visible = false;
+                        linkLatestVersion.Text = "v" + latestVersion.ToString();
+                        linkLatestVersion.Top = lblLatestVersion.Top;
+                        linkLatestVersion.Left = lblLatestVersion.Left;
+                        linkLatestVersion.Visible = true;
+                    }
+                    else
+                    {
+                        btnCheckUpdate.Text = "no updates";
+                        lblLatestVersion.Text = "v" + latestVersion.ToString();
+                    }
                 }
+                
                 btnCheckUpdate.Enabled = true;
             }
             

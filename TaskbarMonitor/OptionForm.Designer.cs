@@ -28,6 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            TaskbarMonitor.Options options3 = new TaskbarMonitor.Options();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OptionForm));
             this.panel1 = new System.Windows.Forms.Panel();
             this.labelTitle = new System.Windows.Forms.Label();
@@ -41,6 +43,10 @@
             this.label2 = new System.Windows.Forms.Label();
             this.listCounters = new System.Windows.Forms.ListBox();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.buttonReplicateSettings = new TaskbarMonitor.Controls.MenuButton();
+            this.contextMenuStripReplicateSettings = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.checkValueShadowHover = new System.Windows.Forms.CheckBox();
             this.label22 = new System.Windows.Forms.Label();
@@ -66,6 +72,7 @@
             this.label21 = new System.Windows.Forms.Label();
             this.checkInvertOrder = new System.Windows.Forms.CheckBox();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.swcPreview = new TaskbarMonitor.SystemWatcherControl();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.label8 = new System.Windows.Forms.Label();
@@ -89,6 +96,7 @@
             this.btnColorBar = new System.Windows.Forms.Button();
             this.label24 = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.linkLatestVersion = new System.Windows.Forms.LinkLabel();
             this.btnCheckUpdate = new System.Windows.Forms.Button();
             this.lblLatestVersion = new System.Windows.Forms.Label();
             this.label18 = new System.Windows.Forms.Label();
@@ -104,11 +112,11 @@
             this.label9 = new System.Windows.Forms.Label();
             this.panelFooter = new System.Windows.Forms.Panel();
             this.buttonResetDefaults = new System.Windows.Forms.Button();
-            this.linkLatestVersion = new System.Windows.Forms.LinkLabel();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editHistorySize)).BeginInit();
             this.panelMenu.SuspendLayout();
             this.panel3.SuspendLayout();
+            this.contextMenuStripReplicateSettings.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -194,7 +202,7 @@
             this.panelMenu.Location = new System.Drawing.Point(0, 45);
             this.panelMenu.Margin = new System.Windows.Forms.Padding(2);
             this.panelMenu.Name = "panelMenu";
-            this.panelMenu.Size = new System.Drawing.Size(164, 516);
+            this.panelMenu.Size = new System.Drawing.Size(164, 560);
             this.panelMenu.TabIndex = 1;
             // 
             // button1
@@ -242,7 +250,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(15, 21);
+            this.label2.Location = new System.Drawing.Point(3, 6);
             this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(49, 14);
@@ -253,7 +261,7 @@
             // 
             this.listCounters.FormattingEnabled = true;
             this.listCounters.ItemHeight = 14;
-            this.listCounters.Location = new System.Drawing.Point(4, 50);
+            this.listCounters.Location = new System.Drawing.Point(6, 29);
             this.listCounters.Margin = new System.Windows.Forms.Padding(2);
             this.listCounters.Name = "listCounters";
             this.listCounters.Size = new System.Drawing.Size(156, 228);
@@ -263,6 +271,7 @@
             // panel3
             // 
             this.panel3.BackColor = System.Drawing.Color.Transparent;
+            this.panel3.Controls.Add(this.buttonReplicateSettings);
             this.panel3.Controls.Add(this.groupBox4);
             this.panel3.Controls.Add(this.groupBox3);
             this.panel3.Controls.Add(this.groupBox2);
@@ -270,8 +279,39 @@
             this.panel3.Location = new System.Drawing.Point(173, 2);
             this.panel3.Margin = new System.Windows.Forms.Padding(2);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(415, 342);
+            this.panel3.Size = new System.Drawing.Size(415, 386);
             this.panel3.TabIndex = 2;
+            // 
+            // buttonReplicateSettings
+            // 
+            this.buttonReplicateSettings.Location = new System.Drawing.Point(249, 340);
+            this.buttonReplicateSettings.Menu = this.contextMenuStripReplicateSettings;
+            this.buttonReplicateSettings.Name = "buttonReplicateSettings";
+            this.buttonReplicateSettings.ShowMenuUnderCursor = true;
+            this.buttonReplicateSettings.Size = new System.Drawing.Size(154, 23);
+            this.buttonReplicateSettings.TabIndex = 2;
+            this.buttonReplicateSettings.Text = "Replicate Settings";
+            this.buttonReplicateSettings.UseVisualStyleBackColor = true;
+            // 
+            // contextMenuStripReplicateSettings
+            // 
+            this.contextMenuStripReplicateSettings.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem1,
+            this.toolStripSeparator1});
+            this.contextMenuStripReplicateSettings.Name = "contextMenuStripReplicateSettings";
+            this.contextMenuStripReplicateSettings.Size = new System.Drawing.Size(159, 32);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(158, 22);
+            this.toolStripMenuItem1.Text = "All other graphs";
+            this.toolStripMenuItem1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(155, 6);
             // 
             // groupBox4
             // 
@@ -284,7 +324,7 @@
             this.groupBox4.Controls.Add(this.listSummaryPosition);
             this.groupBox4.Controls.Add(this.label20);
             this.groupBox4.Controls.Add(this.checkShowSummary);
-            this.groupBox4.Location = new System.Drawing.Point(8, 218);
+            this.groupBox4.Location = new System.Drawing.Point(8, 203);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(403, 121);
             this.groupBox4.TabIndex = 9;
@@ -304,7 +344,7 @@
             // label22
             // 
             this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(5, 90);
+            this.label22.Location = new System.Drawing.Point(6, 93);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(358, 28);
             this.label22.TabIndex = 8;
@@ -391,7 +431,7 @@
             this.groupBox3.Controls.Add(this.label7);
             this.groupBox3.Controls.Add(this.label3);
             this.groupBox3.Controls.Add(this.listShowTitle);
-            this.groupBox3.Location = new System.Drawing.Point(8, 117);
+            this.groupBox3.Location = new System.Drawing.Point(8, 102);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(403, 95);
             this.groupBox3.TabIndex = 7;
@@ -468,7 +508,7 @@
             this.groupBox2.Controls.Add(this.listGraphType);
             this.groupBox2.Controls.Add(this.label21);
             this.groupBox2.Controls.Add(this.checkInvertOrder);
-            this.groupBox2.Location = new System.Drawing.Point(5, 22);
+            this.groupBox2.Location = new System.Drawing.Point(5, 7);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(404, 89);
             this.groupBox2.TabIndex = 6;
@@ -539,14 +579,28 @@
             // panel4
             // 
             this.panel4.BackColor = System.Drawing.Color.Transparent;
+            this.panel4.Controls.Add(this.swcPreview);
             this.panel4.Controls.Add(this.label2);
             this.panel4.Controls.Add(this.listCounters);
             this.panel4.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel4.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.panel4.Location = new System.Drawing.Point(3, 3);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(169, 341);
+            this.panel4.Size = new System.Drawing.Size(169, 385);
             this.panel4.TabIndex = 3;
+            // 
+            // swcPreview
+            // 
+            this.swcPreview.BackColor = System.Drawing.Color.Black;
+            this.swcPreview.Location = new System.Drawing.Point(6, 295);
+            this.swcPreview.Name = "swcPreview";
+            options3.HistorySize = 50;
+            options3.PollTime = 3;
+            this.swcPreview.Options = options3;
+            this.swcPreview.PreviewMode = true;
+            this.swcPreview.Size = new System.Drawing.Size(240, 30);
+            this.swcPreview.TabIndex = 2;
+            this.swcPreview.Version = ((System.Version)(resources.GetObject("swcPreview.Version")));
             // 
             // tabControl1
             // 
@@ -560,7 +614,7 @@
             this.tabControl1.Margin = new System.Windows.Forms.Padding(0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(598, 516);
+            this.tabControl1.Size = new System.Drawing.Size(598, 560);
             this.tabControl1.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.tabControl1.TabIndex = 5;
             // 
@@ -574,7 +628,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 5);
             this.tabPage1.Margin = new System.Windows.Forms.Padding(0);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(590, 507);
+            this.tabPage1.Size = new System.Drawing.Size(590, 551);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "tabPage1";
             // 
@@ -645,7 +699,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 5);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(590, 507);
+            this.tabPage2.Size = new System.Drawing.Size(590, 551);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
             // 
@@ -667,7 +721,7 @@
             this.groupBox5.Controls.Add(this.label24);
             this.groupBox5.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.groupBox5.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox5.Location = new System.Drawing.Point(3, 344);
+            this.groupBox5.Location = new System.Drawing.Point(3, 388);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(584, 160);
             this.groupBox5.TabIndex = 10;
@@ -803,9 +857,9 @@
             this.label24.AutoSize = true;
             this.label24.Location = new System.Drawing.Point(14, 21);
             this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(59, 14);
+            this.label24.Size = new System.Drawing.Size(58, 14);
             this.label24.TabIndex = 0;
-            this.label24.Text = "Bar Color:";
+            this.label24.Text = "Bar color:";
             // 
             // tabPage3
             // 
@@ -829,9 +883,21 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 5);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(590, 507);
+            this.tabPage3.Size = new System.Drawing.Size(590, 551);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "tabPage3";
+            // 
+            // linkLatestVersion
+            // 
+            this.linkLatestVersion.AutoSize = true;
+            this.linkLatestVersion.Location = new System.Drawing.Point(282, 107);
+            this.linkLatestVersion.Name = "linkLatestVersion";
+            this.linkLatestVersion.Size = new System.Drawing.Size(14, 14);
+            this.linkLatestVersion.TabIndex = 13;
+            this.linkLatestVersion.TabStop = true;
+            this.linkLatestVersion.Text = "a";
+            this.linkLatestVersion.Visible = false;
+            this.linkLatestVersion.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLatestVersion_LinkClicked);
             // 
             // btnCheckUpdate
             // 
@@ -968,7 +1034,7 @@
             this.panelFooter.BackColor = System.Drawing.Color.Transparent;
             this.panelFooter.Controls.Add(this.buttonResetDefaults);
             this.panelFooter.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelFooter.Location = new System.Drawing.Point(164, 511);
+            this.panelFooter.Location = new System.Drawing.Point(164, 555);
             this.panelFooter.Name = "panelFooter";
             this.panelFooter.Size = new System.Drawing.Size(598, 50);
             this.panelFooter.TabIndex = 6;
@@ -983,25 +1049,13 @@
             this.buttonResetDefaults.Text = "Reset to defaults";
             this.buttonResetDefaults.UseVisualStyleBackColor = true;
             // 
-            // linkLatestVersion
-            // 
-            this.linkLatestVersion.AutoSize = true;
-            this.linkLatestVersion.Location = new System.Drawing.Point(282, 107);
-            this.linkLatestVersion.Name = "linkLatestVersion";
-            this.linkLatestVersion.Size = new System.Drawing.Size(14, 14);
-            this.linkLatestVersion.TabIndex = 13;
-            this.linkLatestVersion.TabStop = true;
-            this.linkLatestVersion.Text = "a";
-            this.linkLatestVersion.Visible = false;
-            this.linkLatestVersion.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLatestVersion_LinkClicked);
-            // 
             // OptionForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-            this.ClientSize = new System.Drawing.Size(762, 561);
+            this.ClientSize = new System.Drawing.Size(762, 605);
             this.Controls.Add(this.panelFooter);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.panelMenu);
@@ -1019,6 +1073,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.editHistorySize)).EndInit();
             this.panelMenu.ResumeLayout(false);
             this.panel3.ResumeLayout(false);
+            this.contextMenuStripReplicateSettings.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.groupBox3.ResumeLayout(false);
@@ -1121,5 +1176,10 @@
         private System.Windows.Forms.Label label31;
         private System.Windows.Forms.CheckBox checkSeparateScales;
         private System.Windows.Forms.LinkLabel linkLatestVersion;
+        private Controls.MenuButton buttonReplicateSettings;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStripReplicateSettings;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private SystemWatcherControl swcPreview;
     }
 }

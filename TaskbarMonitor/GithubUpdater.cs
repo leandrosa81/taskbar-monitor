@@ -23,7 +23,7 @@ namespace TaskbarMonitor
         {
             return "https://github.com/" + user + "/" + project + "/releases/latest";
         }
-        public async Task<Version> CheckForUpdatesAsync(Version version, int fieldCount)
+        public async Task<Version> GetLastestVersionAsync()
         {
             Version latest = null;
             //https://github.com/leandrosa81/taskbar-monitor/releases    
@@ -41,9 +41,8 @@ namespace TaskbarMonitor
                 var ret = reg.Match(html);
                 if (ret.Success)
                 {
-                    latest = new Version(ret.Groups[1].Captures[0].Value);
-                    if (latest.CompareTo(version) > 0)
-                        return latest;
+                    latest = new Version(ret.Groups[1].Captures[0].Value);                    
+                    return latest;
                 }
                 return null;
             }            

@@ -19,7 +19,46 @@ namespace TaskbarMonitor
         public Deskband()
         {
             //Options.MinHorizontalSize = new Size(200, 30);
-            var ctl = new SystemWatcherControl(this);
+            //TODO: read from file
+            Options opt = new Options
+            {
+                CounterOptions = new Dictionary<string, CounterOptions>
+        {
+            { "CPU", new CounterOptions {
+                GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
+                {
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED
+                }
+            }
+            },
+            { "MEM", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
+                {
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE
+                } } },
+            { "DISK", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
+                {
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED,
+                    TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED
+                } } },
+            { "NET", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
+                {
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED,
+                    TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED
+                } } }
+        }
+        ,
+                HistorySize = 50
+        ,
+                PollTime = 3
+            };
+            var ctl = new SystemWatcherControl(this, opt);
             Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, 30);
             ctl.OnChangeSize += Ctl_OnChangeSize;
             _control = ctl;
