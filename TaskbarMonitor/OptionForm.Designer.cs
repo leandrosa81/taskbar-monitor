@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            TaskbarMonitor.Options options3 = new TaskbarMonitor.Options();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OptionForm));
             this.panel1 = new System.Windows.Forms.Panel();
             this.labelTitle = new System.Windows.Forms.Label();
@@ -594,9 +593,6 @@
             this.swcPreview.BackColor = System.Drawing.Color.Black;
             this.swcPreview.Location = new System.Drawing.Point(6, 295);
             this.swcPreview.Name = "swcPreview";
-            options3.HistorySize = 50;
-            options3.PollTime = 3;
-            this.swcPreview.Options = options3;
             this.swcPreview.PreviewMode = true;
             this.swcPreview.Size = new System.Drawing.Size(240, 30);
             this.swcPreview.TabIndex = 2;

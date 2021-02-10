@@ -18,6 +18,8 @@ namespace TaskbarMonitor
         {
             opt.HistorySize = this.HistorySize;
             opt.PollTime = this.PollTime;
+            if(opt.CounterOptions == null)
+                opt.CounterOptions = new Dictionary<string, CounterOptions>();
 
             foreach (var item in this.CounterOptions)
             {

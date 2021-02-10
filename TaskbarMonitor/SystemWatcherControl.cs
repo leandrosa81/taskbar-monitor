@@ -7,11 +7,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-//using CSDeskBand.Win;
 using CSDeskBand;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
+// control architecture
+
+// Deskband
+//      Options (class holding all options loaded from disk)
+//      SystemWatcherControl(Options) (main control that displays graph and has context menu)
+//      Settings dialog window (receives copy of options)
+//          SystemWatcherControl(CopyOfOptions) (another instance for preview)        
 namespace TaskbarMonitor
 {    
     public partial class SystemWatcherControl: UserControl
@@ -19,6 +25,8 @@ namespace TaskbarMonitor
         public delegate void SizeChangeHandler(Size size);
         public event SizeChangeHandler OnChangeSize;
         public Version Version { get; set; } = new Version("0.2.0");
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Options Options { get; set; }
 
         private bool _previewMode = false;
@@ -47,16 +55,16 @@ namespace TaskbarMonitor
         Font fontTitle;
         int lastSize = 30;
         bool mouseOver = false;
-        GraphTheme defaultTheme;        
+        GraphTheme defaultTheme;
 
-        public SystemWatcherControl(CSDeskBand.CSDeskBandWin w, Options opt)
+        public SystemWatcherControl(Options opt)//CSDeskBand.CSDeskBandWin w, 
         {
-            this.Options = opt;
+            ApplyOptions(opt);            
             Initialize();
         }
         public SystemWatcherControl()
         {
-            this.Options = new Options
+            ApplyOptions(new Options
             {
                 CounterOptions = new Dictionary<string, CounterOptions>
         {
@@ -93,11 +101,12 @@ namespace TaskbarMonitor
                 HistorySize = 50
         ,
                 PollTime = 3
-            };
+            });
             Initialize();
         }
-        public void ApplyOptions()
+        public void ApplyOptions(Options Options)
         {
+            this.Options = Options;
             Counters = new List<Counters.ICounter>();
             if (Options.CounterOptions.ContainsKey("CPU"))
             {
@@ -125,13 +134,12 @@ namespace TaskbarMonitor
             }
              
             AdjustControlSize();
-             
+            UpdateGraphs();
+            this.Invalidate();
+
         }
         private void Initialize()
-        {
-
-            ApplyOptions();
-
+        {             
             _contextMenu = new ContextMenu();
             _contextMenu.MenuItems.Add(new MenuItem("Settings...", MenuItem_Settings_onClick));
             _contextMenu.MenuItems.Add(new MenuItem(String.Format("About taskbar-monitor (v{0})...",Version.ToString(3)), MenuItem_About_onClick));
@@ -200,15 +208,19 @@ namespace TaskbarMonitor
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            
+            UpdateGraphs();
+
+            this.Invalidate();
+        }
+
+        private void UpdateGraphs()
+        {
             foreach (var ct in Counters)
             {
                 ct.Update();
             }
-            if(timer1.Interval != Options.PollTime * 1000)
+            if (timer1 != null && timer1.Interval != Options.PollTime * 1000)
                 timer1.Interval = Options.PollTime * 1000;
-
-            this.Invalidate();
         }
 
         private void SystemWatcherControl_Paint(object sender, PaintEventArgs e)

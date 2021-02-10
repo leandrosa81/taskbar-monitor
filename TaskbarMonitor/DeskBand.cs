@@ -58,7 +58,7 @@ namespace TaskbarMonitor
         ,
                 PollTime = 3
             };
-            var ctl = new SystemWatcherControl(this, opt);
+            var ctl = new SystemWatcherControl(opt);//this
             Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, 30);
             ctl.OnChangeSize += Ctl_OnChangeSize;
             _control = ctl;

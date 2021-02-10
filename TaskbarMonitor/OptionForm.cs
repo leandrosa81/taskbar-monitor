@@ -12,7 +12,7 @@ namespace TaskbarMonitor
 {
     public partial class OptionForm : Form
     {
-        private Options Options { get; set; }
+        public Options Options { get; private set; }
         private Version Version;
         private GraphTheme Theme;
         private CounterOptions ActiveCounter = null;
@@ -21,12 +21,13 @@ namespace TaskbarMonitor
         {
             this.Version = version;
             this.Theme = theme;
-            this.Options = opt;
+            this.Options = new Options();
+            opt.CopyTo(this.Options);
             
             InitializeComponent();
-            this.editHistorySize.Value = opt.HistorySize;
-            this.editPollTime.Value = opt.PollTime;
-            this.listCounters.DataSource = opt.CounterOptions.Keys.AsEnumerable().ToList();
+            this.editHistorySize.Value = this.Options.HistorySize;
+            this.editPollTime.Value = this.Options.PollTime;
+            this.listCounters.DataSource = this.Options.CounterOptions.Keys.AsEnumerable().ToList();
             this.listShowTitle.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayType));            
             this.listShowCurrentValue.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayType));            
             this.listSummaryPosition.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayPosition));
@@ -34,7 +35,7 @@ namespace TaskbarMonitor
 
             lblVersion.Text = "v" + version.ToString(3);
 
-            ActiveCounter = opt.CounterOptions.First().Value;
+            ActiveCounter = this.Options.CounterOptions.First().Value;
             UpdateForm();
             UpdateReplicateSettingsMenu();
             btnColorBar.BackColor = this.Theme.BarColor;
@@ -45,37 +46,36 @@ namespace TaskbarMonitor
             btnColor1.BackColor = this.Theme.StackedColors[0];
             btnColor2.BackColor = this.Theme.StackedColors[1];
 
-            swcPreview.Options = new Options
-            {
-                CounterOptions = new Dictionary<string, CounterOptions>
-        {
-            { "CPU", new CounterOptions {
-                GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
-                {
-                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED
-                }
-            }
-                    }
-                }
-            ,
-                HistorySize = 50
-        ,
-                PollTime = 3
-            };
-            swcPreview.ApplyOptions();
+            UpdatePreview();
 
             initializing = false;
+        }
+
+        private void UpdatePreview()
+        {
+            var previewOptions = new Options();
+            this.Options.CopyTo(previewOptions);
+            for (int i = 0; i < previewOptions.CounterOptions.Keys.Count; i++)
+            {
+                string key = previewOptions.CounterOptions.Keys.ElementAt(i);
+                if (key != this.listCounters.Text)
+                {
+                    previewOptions.CounterOptions.Remove(key);
+                    i--;
+                }
+            }
+            swcPreview.ApplyOptions(previewOptions);
         }
 
         private void EditHistorySize_ValueChanged(object sender, EventArgs e)
         {
             Options.HistorySize = Convert.ToInt32(editHistorySize.Value);
+            UpdatePreview();
         }
         private void editPollTime_ValueChanged(object sender, EventArgs e)
         {
             Options.PollTime = Convert.ToInt32(editPollTime.Value);
+            UpdatePreview();
         }
 
         private void ListCounters_SelectedIndexChanged(object sender, EventArgs e)
@@ -84,6 +84,7 @@ namespace TaskbarMonitor
             ActiveCounter = Options.CounterOptions[listCounters.Text];
             UpdateReplicateSettingsMenu();
             UpdateForm();
+            UpdatePreview();
         }
 
         private void UpdateReplicateSettingsMenu()
@@ -178,6 +179,7 @@ namespace TaskbarMonitor
             if (initializing) return;
             ActiveCounter.ShowTitle = (CounterOptions.DisplayType)Enum.Parse(typeof(CounterOptions.DisplayType), listShowTitle.Text);
             UpdateFormShow();
+            UpdatePreview();
         }
 
         private void listShowCurrentValue_SelectedIndexChanged(object sender, EventArgs e)
@@ -185,6 +187,7 @@ namespace TaskbarMonitor
             if (initializing) return;
             ActiveCounter.ShowCurrentValue = (CounterOptions.DisplayType)Enum.Parse(typeof(CounterOptions.DisplayType), listShowCurrentValue.Text);
             UpdateFormShow();
+            UpdatePreview();
         }
 
         private void listGraphType_SelectedIndexChanged(object sender, EventArgs e)
@@ -193,6 +196,7 @@ namespace TaskbarMonitor
             ActiveCounter.GraphType = (TaskbarMonitor.Counters.ICounter.CounterType)Enum.Parse(typeof(TaskbarMonitor.Counters.ICounter.CounterType), listGraphType.Text);
             UpdateFormScales();
             UpdateFormOrder();
+            UpdatePreview();
         }
 
         private void btnMenu_Click(object sender, EventArgs e)
@@ -236,12 +240,14 @@ namespace TaskbarMonitor
             if (initializing) return;
             ActiveCounter.CurrentValueAsSummary = checkShowSummary.Checked;
             UpdateFormShow();
+            UpdatePreview();
         }
 
         private void checkInvertOrder_CheckedChanged(object sender, EventArgs e)
         {
             if (initializing) return;
             ActiveCounter.InvertOrder = checkInvertOrder.Checked;
+            UpdatePreview();
         }
 
         private void btnCheckUpdate_Click(object sender, EventArgs e)
@@ -347,12 +353,14 @@ namespace TaskbarMonitor
         {
             if (initializing) return;
             ActiveCounter.SeparateScales = checkSeparateScales.Checked;
+            UpdatePreview();
         }
 
         private void checkTitleShadowHover_CheckedChanged(object sender, EventArgs e)
         {
             if (initializing) return;
             ActiveCounter.ShowTitleShadowOnHover = checkTitleShadowHover.Checked;
+            UpdatePreview();
         }
 
         private void listTitlePosition_SelectedIndexChanged(object sender, EventArgs e)
@@ -365,12 +373,14 @@ namespace TaskbarMonitor
                 listSummaryPosition.Text = vals.First().ToString();
                 //ActiveCounter.SummaryPosition = vals.First();
             }
+            UpdatePreview();
         }
 
         private void checkValueShadowHover_CheckedChanged(object sender, EventArgs e)
         {
             if (initializing) return;
             ActiveCounter.ShowCurrentValueShadowOnHover = checkValueShadowHover.Checked;
+            UpdatePreview();
         }
 
         private void listSummaryPosition_SelectedIndexChanged(object sender, EventArgs e)
@@ -383,6 +393,7 @@ namespace TaskbarMonitor
                 listTitlePosition.Text = vals.First().ToString();
                 //ActiveCounter.TitlePosition = vals.First();
             }
+            UpdatePreview();
         }
 
         private void linkLatestVersion_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
