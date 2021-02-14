@@ -143,6 +143,9 @@ namespace TaskbarMonitor
         {             
             _contextMenu = new ContextMenu();
             _contextMenu.MenuItems.Add(new MenuItem("Settings...", MenuItem_Settings_onClick));
+            _contextMenu.MenuItems.Add(new MenuItem("Open Resource Monitor...", (e, a) => {
+                System.Diagnostics.Process.Start("resmon.exe");
+            }));
             _contextMenu.MenuItems.Add(new MenuItem(String.Format("About taskbar-monitor (v{0})...",Version.ToString(3)), MenuItem_About_onClick));
             this.ContextMenu = _contextMenu;
 
