@@ -31,6 +31,7 @@ namespace TaskbarMonitor
 
         private bool _previewMode = false;
         private ContextMenu _contextMenu = null;
+        private bool VerticalTaskbarMode = false;
         public bool PreviewMode { get
             {
                 return _previewMode;
@@ -190,12 +191,19 @@ namespace TaskbarMonitor
         private void AdjustControlSize()
         {
             int taskbarWidth = GetTaskbarWidth();
+            int taskbarHeight = GetTaskbarHeight();
+            int minimumHeight = taskbarHeight;
+            if (minimumHeight < 30)
+                minimumHeight = 30;
+
+            if (taskbarWidth > 0 && taskbarHeight == 0)
+                VerticalTaskbarMode = true;
 
             int counterSize = (Options.HistorySize + 10);
             int controlWidth = counterSize * CountersCount;
-            int controlHeight = 30;
+            int controlHeight = minimumHeight;
 
-            if (taskbarWidth > 0 && taskbarWidth < controlWidth)
+            if (VerticalTaskbarMode && taskbarWidth < controlWidth)
             {
                 int countersPerLine = Convert.ToInt32(Math.Floor((float)taskbarWidth / (float)counterSize));
                 controlWidth = counterSize * countersPerLine;
