@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -18,8 +19,6 @@ namespace TaskbarMonitor
 
         public Deskband()
         {
-            //Options.MinHorizontalSize = new Size(200, 30);
-            //TODO: read from file
             Options opt = new Options
             {
                 CounterOptions = new Dictionary<string, CounterOptions>
@@ -34,6 +33,14 @@ namespace TaskbarMonitor
         ,
                 PollTime = 3
             };
+
+            var folder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "taskbar-monitor");
+            var origin = System.IO.Path.Combine(folder, "config.json");
+            if (System.IO.File.Exists(origin))
+            {
+                opt = JsonConvert.DeserializeObject<Options>(System.IO.File.ReadAllText(origin));
+            }
+            
             var ctl = new SystemWatcherControl(opt);//this
             Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, 30);
             ctl.OnChangeSize += Ctl_OnChangeSize;

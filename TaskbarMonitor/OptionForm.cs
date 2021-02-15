@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -441,6 +442,11 @@ namespace TaskbarMonitor
         private void buttonResetDefaults_Click(object sender, EventArgs e)
         {
             this.Options.CopyTo(this.OriginalOptions);
+            var folder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "taskbar-monitor");
+            var origin = System.IO.Path.Combine(folder, "config.json");
+            if (!System.IO.Directory.Exists(folder))
+                System.IO.Directory.CreateDirectory(folder);
+            System.IO.File.WriteAllText(origin, JsonConvert.SerializeObject(Options));
             this.Close();
         }
     }

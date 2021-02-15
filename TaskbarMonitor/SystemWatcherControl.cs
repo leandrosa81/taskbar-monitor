@@ -239,27 +239,7 @@ namespace TaskbarMonitor
                 {
                     var info = infos[0];
                     drawGraph(formGraphics, graphPosition, 0 + graphPositionY, maximumHeight, false, info, defaultTheme, opt);
-                    /*
-                    if (showCurrentValue)
-                    {
-                        bool invertido = false;
-                        bool textOnTop = false;
-                        string text = info.CurrentStringValue;
-                        if (info.Name != "default")
-                            text = info.Name + ": " + text;
-                        var sizeString = formGraphics.MeasureString(text, fontCounter);
-                        int offset = invertido ? 2 : -2;
-                        float ypos = textOnTop ? 1 + y : (maxH / 2.0f) - (sizeString.Height / 2) + 1 + y + offset;
-                        Font font = maxH > 20 ? fontCounter : fontCounterMin;
-
-                        SolidBrush BrushText = new SolidBrush(defaultTheme.TextColor);
-                        SolidBrush BrushTextShadow = new SolidBrush(defaultTheme.TextShadowColor);
-                        formGraphics.DrawString(text, font, BrushTextShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, ypos + 1, sizeString.Width, maxH), new StringFormat());
-                        formGraphics.DrawString(text, font, BrushText, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2), ypos, sizeString.Width, maxH), new StringFormat());
-                        BrushText.Dispose();
-                        BrushTextShadow.Dispose();
-                    }*/
-
+                     
                 }
                 else if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED)
                 {
@@ -276,53 +256,65 @@ namespace TaskbarMonitor
                 else if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.STACKED)
                 {
                     drawStackedGraph(formGraphics, graphPosition, 0 + graphPositionY, maximumHeight, opt.InvertOrder, infos, defaultTheme, opt);
-                    /*
                      
-                        if (showText)
-                        {
-                            string text = infos[0].CurrentStringValue;
-                            var sizeString = formGraphics.MeasureString(text, fontCounter);
-                            int offset = -2;
-                            float ypos = textOnTop ? 1 + y : (maxH / 2.0f) - (sizeString.Height / 2) + 1 + y + offset;
-                            Font font = maxH > 20 ? fontCounter : fontCounterMin;
-                
-                            SolidBrush BrushText = new SolidBrush(theme.TextColor);
-                            SolidBrush BrushTextShadow = new SolidBrush(theme.TextShadowColor);
-                            formGraphics.DrawString(text, font, BrushTextShadow, new RectangleF(x + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, ypos + 1, sizeString.Width, maxH), new StringFormat());
-                            formGraphics.DrawString(text, font, BrushText, new RectangleF(x + (Options.HistorySize / 2) - (sizeString.Width / 2), ypos, sizeString.Width, maxH), new StringFormat());
-                            BrushText.Dispose();
-                            BrushTextShadow.Dispose();
-                        }
-                    */
 
                 }
 
                 var sizeTitle = formGraphics.MeasureString(ct.GetName(), fontTitle);
                 Dictionary<CounterOptions.DisplayPosition, float> positions = new Dictionary<CounterOptions.DisplayPosition, float>();
 
-                positions.Add(CounterOptions.DisplayPosition.MIDDLE, (maximumHeight / 2 - sizeTitle.Height / 2) + 2 + graphPositionY);
-                positions.Add(CounterOptions.DisplayPosition.TOP, 2 + graphPositionY);
+                positions.Add(CounterOptions.DisplayPosition.MIDDLE, (maximumHeight / 2 - sizeTitle.Height / 2) + 1 + graphPositionY);
+                positions.Add(CounterOptions.DisplayPosition.TOP, graphPositionY);
                 positions.Add(CounterOptions.DisplayPosition.BOTTOM, (maximumHeight - sizeTitle.Height + 1) + graphPositionY);
 
-                if ((opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW
-                    || (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver))
-                    && opt.CurrentValueAsSummary)
+                if (opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW
+                 || opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER)                   
                 {
-                    string text = infos[0].CurrentStringValue;
-                    
-                    var sizeString = formGraphics.MeasureString(text, fontCounter);                    
-                    float ypos = positions[opt.SummaryPosition];                    
+                    Dictionary<CounterOptions.DisplayPosition, string> texts = new Dictionary<CounterOptions.DisplayPosition, string>();
 
-                    SolidBrush BrushText = new SolidBrush(defaultTheme.TextColor);
-                    SolidBrush BrushTextShadow = new SolidBrush(defaultTheme.TextShadowColor);
-                    formGraphics.DrawString(text, fontCounter, BrushTextShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, ypos + 1, sizeString.Width, maximumHeight), new StringFormat());
-                    formGraphics.DrawString(text, fontCounter, BrushText, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2), ypos, sizeString.Width, maximumHeight), new StringFormat());
-                    BrushText.Dispose();
-                    BrushTextShadow.Dispose();
+                    if (opt.CurrentValueAsSummary || infos.Count > 2)
+                    {
+                        texts.Add(opt.SummaryPosition, infos[0].CurrentStringValue);
+                        
+                    }
+                    else
+                    {
+                        for (int i = 0; i < infos.Count && i < 2; i++)
+                        {
+                            texts.Add(i == 0 ? CounterOptions.DisplayPosition.TOP : CounterOptions.DisplayPosition.BOTTOM, infos[i].CurrentStringValue);
+                        }
+                    }
+                    foreach (var item in texts)
+                    {
+                        string text = item.Value;
+
+                        var sizeString = formGraphics.MeasureString(text, fontCounter);
+                        float ypos = positions[item.Key];
+                        
+                        var titleColor = defaultTheme.TextColor;
+
+                        if (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && !mouseOver)
+                            titleColor = Color.FromArgb(40, titleColor.R, titleColor.G, titleColor.B);
+
+                        System.Drawing.SolidBrush BrushText = new System.Drawing.SolidBrush(titleColor);
+
+                        SolidBrush BrushTextShadow = new SolidBrush(defaultTheme.TextShadowColor);
+                        if (
+                        (opt.ShowCurrentValueShadowOnHover && opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && !mouseOver)
+                        || (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver)
+                        || opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW
+                       )
+                        {
+                            formGraphics.DrawString(text, fontCounter, BrushTextShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, ypos + 1, sizeString.Width, maximumHeight), new StringFormat());
+                            formGraphics.DrawString(text, fontCounter, BrushText, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2), ypos, sizeString.Width, maximumHeight), new StringFormat());
+                        }
+                        BrushText.Dispose();
+                        BrushTextShadow.Dispose();
+                    }
                 }
 
                 if (opt.ShowTitle == CounterOptions.DisplayType.SHOW
-                || (opt.ShowTitle == CounterOptions.DisplayType.HOVER))
+                 || opt.ShowTitle == CounterOptions.DisplayType.HOVER)
                 {
                     System.Drawing.SolidBrush brushShadow = new System.Drawing.SolidBrush(defaultTheme.TitleShadowColor);
                     var titleColor = defaultTheme.TitleColor;
