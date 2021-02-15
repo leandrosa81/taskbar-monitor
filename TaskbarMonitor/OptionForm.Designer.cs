@@ -42,7 +42,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.listCounters = new System.Windows.Forms.ListBox();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.buttonReplicateSettings = new TaskbarMonitor.Controls.MenuButton();
             this.contextMenuStripReplicateSettings = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -71,7 +70,6 @@
             this.label21 = new System.Windows.Forms.Label();
             this.checkInvertOrder = new System.Windows.Forms.CheckBox();
             this.panel4 = new System.Windows.Forms.Panel();
-            this.swcPreview = new TaskbarMonitor.SystemWatcherControl();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.label8 = new System.Windows.Forms.Label();
@@ -111,6 +109,11 @@
             this.label9 = new System.Windows.Forms.Label();
             this.panelFooter = new System.Windows.Forms.Panel();
             this.buttonResetDefaults = new System.Windows.Forms.Button();
+            this.label17 = new System.Windows.Forms.Label();
+            this.button2 = new System.Windows.Forms.Button();
+            this.swcPreview = new TaskbarMonitor.SystemWatcherControl();
+            this.buttonReplicateSettings = new TaskbarMonitor.Controls.MenuButton();
+            this.button3 = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editHistorySize)).BeginInit();
             this.panelMenu.SuspendLayout();
@@ -280,17 +283,6 @@
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(415, 386);
             this.panel3.TabIndex = 2;
-            // 
-            // buttonReplicateSettings
-            // 
-            this.buttonReplicateSettings.Location = new System.Drawing.Point(249, 340);
-            this.buttonReplicateSettings.Menu = this.contextMenuStripReplicateSettings;
-            this.buttonReplicateSettings.Name = "buttonReplicateSettings";
-            this.buttonReplicateSettings.ShowMenuUnderCursor = true;
-            this.buttonReplicateSettings.Size = new System.Drawing.Size(154, 23);
-            this.buttonReplicateSettings.TabIndex = 2;
-            this.buttonReplicateSettings.Text = "Replicate Settings";
-            this.buttonReplicateSettings.UseVisualStyleBackColor = true;
             // 
             // contextMenuStripReplicateSettings
             // 
@@ -578,6 +570,7 @@
             // panel4
             // 
             this.panel4.BackColor = System.Drawing.Color.Transparent;
+            this.panel4.Controls.Add(this.label17);
             this.panel4.Controls.Add(this.swcPreview);
             this.panel4.Controls.Add(this.label2);
             this.panel4.Controls.Add(this.listCounters);
@@ -587,16 +580,6 @@
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(169, 385);
             this.panel4.TabIndex = 3;
-            // 
-            // swcPreview
-            // 
-            this.swcPreview.BackColor = System.Drawing.Color.Black;
-            this.swcPreview.Location = new System.Drawing.Point(6, 295);
-            this.swcPreview.Name = "swcPreview";
-            this.swcPreview.PreviewMode = true;
-            this.swcPreview.Size = new System.Drawing.Size(240, 30);
-            this.swcPreview.TabIndex = 2;
-            this.swcPreview.Version = ((System.Version)(resources.GetObject("swcPreview.Version")));
             // 
             // tabControl1
             // 
@@ -1028,6 +1011,8 @@
             // panelFooter
             // 
             this.panelFooter.BackColor = System.Drawing.Color.Transparent;
+            this.panelFooter.Controls.Add(this.button3);
+            this.panelFooter.Controls.Add(this.button2);
             this.panelFooter.Controls.Add(this.buttonResetDefaults);
             this.panelFooter.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panelFooter.Location = new System.Drawing.Point(164, 555);
@@ -1037,13 +1022,67 @@
             // 
             // buttonResetDefaults
             // 
-            this.buttonResetDefaults.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonResetDefaults.BackColor = System.Drawing.Color.White;
+            this.buttonResetDefaults.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonResetDefaults.Location = new System.Drawing.Point(468, 14);
             this.buttonResetDefaults.Name = "buttonResetDefaults";
             this.buttonResetDefaults.Size = new System.Drawing.Size(120, 23);
             this.buttonResetDefaults.TabIndex = 0;
-            this.buttonResetDefaults.Text = "Reset to defaults";
-            this.buttonResetDefaults.UseVisualStyleBackColor = true;
+            this.buttonResetDefaults.Text = "Apply";
+            this.buttonResetDefaults.UseVisualStyleBackColor = false;
+            this.buttonResetDefaults.Click += new System.EventHandler(this.buttonResetDefaults_Click);
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(3, 265);
+            this.label17.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(52, 14);
+            this.label17.TabIndex = 3;
+            this.label17.Text = "Preview:";
+            // 
+            // button2
+            // 
+            this.button2.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button2.Location = new System.Drawing.Point(4, 14);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(120, 23);
+            this.button2.TabIndex = 1;
+            this.button2.Text = "Reset to defaults";
+            this.button2.UseVisualStyleBackColor = true;
+            // 
+            // swcPreview
+            // 
+            this.swcPreview.BackColor = System.Drawing.Color.Black;
+            this.swcPreview.Location = new System.Drawing.Point(6, 295);
+            this.swcPreview.Name = "swcPreview";
+            this.swcPreview.PreviewMode = true;
+            this.swcPreview.Size = new System.Drawing.Size(240, 30);
+            this.swcPreview.TabIndex = 2;
+            this.swcPreview.Version = ((System.Version)(resources.GetObject("swcPreview.Version")));
+            // 
+            // buttonReplicateSettings
+            // 
+            this.buttonReplicateSettings.Location = new System.Drawing.Point(249, 340);
+            this.buttonReplicateSettings.Menu = this.contextMenuStripReplicateSettings;
+            this.buttonReplicateSettings.Name = "buttonReplicateSettings";
+            this.buttonReplicateSettings.ShowMenuUnderCursor = true;
+            this.buttonReplicateSettings.Size = new System.Drawing.Size(154, 23);
+            this.buttonReplicateSettings.TabIndex = 2;
+            this.buttonReplicateSettings.Text = "Replicate Settings";
+            this.buttonReplicateSettings.UseVisualStyleBackColor = true;
+            // 
+            // button3
+            // 
+            this.button3.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button3.Location = new System.Drawing.Point(340, 14);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(120, 23);
+            this.button3.TabIndex = 2;
+            this.button3.Text = "Cancel";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // OptionForm
             // 
@@ -1177,5 +1216,8 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private SystemWatcherControl swcPreview;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
     }
 }

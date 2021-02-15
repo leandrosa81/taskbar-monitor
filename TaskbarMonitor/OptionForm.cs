@@ -12,18 +12,49 @@ namespace TaskbarMonitor
 {
     public partial class OptionForm : Form
     {
-        public Options Options { get; private set; }
+        private Options OriginalOptions;
+        private Options Options;// { get; private set; }
         private Version Version;
         private GraphTheme Theme;
         private CounterOptions ActiveCounter = null;
         private bool initializing = true;
+        Dictionary<string, IList<TaskbarMonitor.Counters.ICounter.CounterType>> AvailableGraphTypes;
+
         public OptionForm(Options opt, GraphTheme theme, Version version)
         {
             this.Version = version;
             this.Theme = theme;
             this.Options = new Options();
+            this.OriginalOptions = opt;
             opt.CopyTo(this.Options);
-            
+            AvailableGraphTypes = new Dictionary<string, IList<Counters.ICounter.CounterType>>
+            {
+                {"CPU",  new List<TaskbarMonitor.Counters.ICounter.CounterType>
+                {
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED
+                } 
+                },
+                {"MEM",  new List<TaskbarMonitor.Counters.ICounter.CounterType>
+                {
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE
+                }
+                },
+                {"DISK",  new List<TaskbarMonitor.Counters.ICounter.CounterType>
+                {
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED,
+                    TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED
+                }
+                },
+                {"NET",  new List<TaskbarMonitor.Counters.ICounter.CounterType>
+                {
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED,
+                    TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED
+                }
+                }
+            };
             InitializeComponent();
             this.editHistorySize.Value = this.Options.HistorySize;
             this.editPollTime.Value = this.Options.PollTime;
@@ -135,7 +166,7 @@ namespace TaskbarMonitor
         private void UpdateForm()
         {
             initializing = true;
-            this.listGraphType.DataSource = ActiveCounter.AvailableGraphTypes;
+            this.listGraphType.DataSource = this.AvailableGraphTypes[listCounters.Text];
             initializing = false;
             this.listGraphType.Text = ActiveCounter.GraphType.ToString();
             listShowTitle.Text = ActiveCounter.ShowTitle.ToString();
@@ -400,6 +431,17 @@ namespace TaskbarMonitor
         {
             GithubUpdater update = new GithubUpdater("leandrosa81", "taskbar-monitor");
             System.Diagnostics.Process.Start(update.GetURL());
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void buttonResetDefaults_Click(object sender, EventArgs e)
+        {
+            this.Options.CopyTo(this.OriginalOptions);
+            this.Close();
         }
     }
 }

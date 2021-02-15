@@ -63,8 +63,6 @@ namespace TaskbarMonitor
         public DisplayPosition SummaryPosition { get; set; } = DisplayPosition.TOP;
         public bool InvertOrder { get; set; } = false;
         public bool SeparateScales { get; set; } = true;
-        public TaskbarMonitor.Counters.ICounter.CounterType GraphType { get; set; }
-
-        public IList<TaskbarMonitor.Counters.ICounter.CounterType> AvailableGraphTypes { get; set; }
+        public TaskbarMonitor.Counters.ICounter.CounterType GraphType { get; set; }        
     }
 }

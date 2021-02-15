@@ -24,34 +24,10 @@ namespace TaskbarMonitor
             {
                 CounterOptions = new Dictionary<string, CounterOptions>
         {
-            { "CPU", new CounterOptions {
-                GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
-                {
-                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED
-                }
-            }
-            },
-            { "MEM", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
-                {
-                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE
-                } } },
-            { "DISK", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
-                {
-                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED,
-                    TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED
-                } } },
-            { "NET", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
-                {
-                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED,
-                    TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED
-                } } }
+            { "CPU", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
+            { "MEM", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
+            { "DISK", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
+            { "NET", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } }
         }
         ,
                 HistorySize = 50

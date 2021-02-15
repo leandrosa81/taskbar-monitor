@@ -69,34 +69,10 @@ namespace TaskbarMonitor
             {
                 CounterOptions = new Dictionary<string, CounterOptions>
         {
-            { "CPU", new CounterOptions {
-                GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
-                {
-                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED
-                }
-            }
-            },
-            { "MEM", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
-                {
-                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE
-                } } },
-            { "DISK", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
-                {
-                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED,
-                    TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED
-                } } },
-            { "NET", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                AvailableGraphTypes = new List<TaskbarMonitor.Counters.ICounter.CounterType>
-                {
-                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED,
-                    TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED
-                } } }
+            { "CPU", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
+            { "MEM", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
+            { "DISK", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
+            { "NET", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } }
         }
         ,
                 HistorySize = 50
@@ -261,8 +237,28 @@ namespace TaskbarMonitor
 
                 if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.SINGLE)
                 {
+                    var info = infos[0];
+                    drawGraph(formGraphics, graphPosition, 0 + graphPositionY, maximumHeight, false, info, defaultTheme, opt);
+                    /*
+                    if (showCurrentValue)
+                    {
+                        bool invertido = false;
+                        bool textOnTop = false;
+                        string text = info.CurrentStringValue;
+                        if (info.Name != "default")
+                            text = info.Name + ": " + text;
+                        var sizeString = formGraphics.MeasureString(text, fontCounter);
+                        int offset = invertido ? 2 : -2;
+                        float ypos = textOnTop ? 1 + y : (maxH / 2.0f) - (sizeString.Height / 2) + 1 + y + offset;
+                        Font font = maxH > 20 ? fontCounter : fontCounterMin;
 
-                    drawGraph(formGraphics, graphPosition, 0 + graphPositionY, maximumHeight, false, showCurrentValue, true, infos[0], defaultTheme, opt);
+                        SolidBrush BrushText = new SolidBrush(defaultTheme.TextColor);
+                        SolidBrush BrushTextShadow = new SolidBrush(defaultTheme.TextShadowColor);
+                        formGraphics.DrawString(text, font, BrushTextShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, ypos + 1, sizeString.Width, maxH), new StringFormat());
+                        formGraphics.DrawString(text, font, BrushText, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2), ypos, sizeString.Width, maxH), new StringFormat());
+                        BrushText.Dispose();
+                        BrushTextShadow.Dispose();
+                    }*/
 
                 }
                 else if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED)
@@ -272,14 +268,32 @@ namespace TaskbarMonitor
                     for (int z = 0; z < infos.Count; z++)
                     {
                         var info = opt.InvertOrder ? infos[infos.Count - 1 - z] : infos[z];
-                        drawGraph(formGraphics, graphPosition, z * (maximumHeight / 2) + graphPositionY, maximumHeight / 2, z == 1, showCurrentValue, false, info, defaultTheme, opt);
+                        drawGraph(formGraphics, graphPosition, z * (maximumHeight / 2) + graphPositionY, maximumHeight / 2, z == 1, info, defaultTheme, opt);
                     }
 
 
                 }
                 else if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.STACKED)
                 {
-                    drawStackedGraph(formGraphics, graphPosition, 0 + graphPositionY, maximumHeight, opt.InvertOrder, showCurrentValue, true, infos, defaultTheme, opt);
+                    drawStackedGraph(formGraphics, graphPosition, 0 + graphPositionY, maximumHeight, opt.InvertOrder, infos, defaultTheme, opt);
+                    /*
+                     
+                        if (showText)
+                        {
+                            string text = infos[0].CurrentStringValue;
+                            var sizeString = formGraphics.MeasureString(text, fontCounter);
+                            int offset = -2;
+                            float ypos = textOnTop ? 1 + y : (maxH / 2.0f) - (sizeString.Height / 2) + 1 + y + offset;
+                            Font font = maxH > 20 ? fontCounter : fontCounterMin;
+                
+                            SolidBrush BrushText = new SolidBrush(theme.TextColor);
+                            SolidBrush BrushTextShadow = new SolidBrush(theme.TextShadowColor);
+                            formGraphics.DrawString(text, font, BrushTextShadow, new RectangleF(x + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, ypos + 1, sizeString.Width, maxH), new StringFormat());
+                            formGraphics.DrawString(text, font, BrushText, new RectangleF(x + (Options.HistorySize / 2) - (sizeString.Width / 2), ypos, sizeString.Width, maxH), new StringFormat());
+                            BrushText.Dispose();
+                            BrushTextShadow.Dispose();
+                        }
+                    */
 
                 }
 
@@ -325,7 +339,7 @@ namespace TaskbarMonitor
                         || opt.ShowTitle == CounterOptions.DisplayType.SHOW 
                        )
                     {
-                        formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) - 1, positions[opt.TitlePosition] - 1, sizeTitle.Width, maximumHeight), new StringFormat());
+                        formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) + 1, positions[opt.TitlePosition] + 1, sizeTitle.Width, maximumHeight), new StringFormat());
                         formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), positions[opt.TitlePosition], sizeTitle.Width, maximumHeight), new StringFormat());
                     }
                      
@@ -346,7 +360,7 @@ namespace TaskbarMonitor
         }
 
         
-        private void drawGraph (System.Drawing.Graphics formGraphics, int x, int y, int maxH, bool invertido, bool showText, bool textOnTop, TaskbarMonitor.Counters.CounterInfo info, GraphTheme theme, CounterOptions opt)
+        private void drawGraph (System.Drawing.Graphics formGraphics, int x, int y, int maxH, bool invertido, TaskbarMonitor.Counters.CounterInfo info, GraphTheme theme, CounterOptions opt)
         {
             var pos = maxH - ((info.CurrentValue * maxH) / info.MaximumValue);
             if (pos > Int32.MaxValue) pos = Int32.MaxValue;
@@ -396,27 +410,9 @@ namespace TaskbarMonitor
                 formGraphics.FillPolygon(BrushGraph, points);
             }
 
-
-            if (showText)
-            {
-                string text = info.CurrentStringValue;
-                if (info.Name != "default")
-                    text = info.Name + ": " + text;
-                var sizeString = formGraphics.MeasureString(text, fontCounter);
-                int offset = invertido ? 2 : -2;
-                float ypos = textOnTop ? 1 + y : (maxH / 2.0f) - (sizeString.Height / 2) + 1 + y + offset;
-                Font font = maxH > 20 ? fontCounter : fontCounterMin;
-
-                SolidBrush BrushText = new SolidBrush(theme.TextColor);
-                SolidBrush BrushTextShadow = new SolidBrush(theme.TextShadowColor);
-                formGraphics.DrawString(text, font, BrushTextShadow, new RectangleF(x + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, ypos + 1, sizeString.Width, maxH), new StringFormat());
-                formGraphics.DrawString(text, font, BrushText, new RectangleF(x + (Options.HistorySize / 2) - (sizeString.Width / 2), ypos, sizeString.Width, maxH), new StringFormat());
-                BrushText.Dispose();
-                BrushTextShadow.Dispose();
-            }
         }
 
-        private void drawStackedGraph (System.Drawing.Graphics formGraphics, int x, int y, int maxH, bool invertido, bool showText, bool textOnTop, List<TaskbarMonitor.Counters.CounterInfo> infos, GraphTheme theme, CounterOptions opt)
+        private void drawStackedGraph (System.Drawing.Graphics formGraphics, int x, int y, int maxH, bool invertido, List<TaskbarMonitor.Counters.CounterInfo> infos, GraphTheme theme, CounterOptions opt)
         {
             float absMax = 0;
             List<float> lastValue = new List<float>();
@@ -479,23 +475,6 @@ namespace TaskbarMonitor
                 brush.Dispose();
 
 
-            }
-
-
-            if (showText)
-            {
-                string text = infos[0].CurrentStringValue;
-                var sizeString = formGraphics.MeasureString(text, fontCounter);
-                int offset = -2;
-                float ypos = textOnTop ? 1 + y : (maxH / 2.0f) - (sizeString.Height / 2) + 1 + y + offset;
-                Font font = maxH > 20 ? fontCounter : fontCounterMin;
-                
-                SolidBrush BrushText = new SolidBrush(theme.TextColor);
-                SolidBrush BrushTextShadow = new SolidBrush(theme.TextShadowColor);
-                formGraphics.DrawString(text, font, BrushTextShadow, new RectangleF(x + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, ypos + 1, sizeString.Width, maxH), new StringFormat());
-                formGraphics.DrawString(text, font, BrushText, new RectangleF(x + (Options.HistorySize / 2) - (sizeString.Width / 2), ypos, sizeString.Width, maxH), new StringFormat());
-                BrushText.Dispose();
-                BrushTextShadow.Dispose();
             }
         }
 
