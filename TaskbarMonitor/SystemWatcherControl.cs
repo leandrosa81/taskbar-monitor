@@ -24,7 +24,7 @@ namespace TaskbarMonitor
     {
         public delegate void SizeChangeHandler(Size size);
         public event SizeChangeHandler OnChangeSize;
-        public Version Version { get; set; } = new Version("0.2.0");
+        public Version Version { get; set; } = new Version("0.3.0");
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Options Options { get; set; }
@@ -65,20 +65,8 @@ namespace TaskbarMonitor
         }
         public SystemWatcherControl()
         {
-            ApplyOptions(new Options
-            {
-                CounterOptions = new Dictionary<string, CounterOptions>
-        {
-            { "CPU", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
-            { "MEM", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
-            { "DISK", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
-            { "NET", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } }
-        }
-        ,
-                HistorySize = 50
-        ,
-                PollTime = 3
-            });
+            Options opt = TaskbarMonitor.Options.ReadFromDisk();
+            ApplyOptions(opt);
             Initialize();
         }
         public void ApplyOptions(Options Options)
@@ -281,7 +269,7 @@ namespace TaskbarMonitor
                     {
                         for (int i = 0; i < infos.Count && i < 2; i++)
                         {
-                            texts.Add(i == 0 ? CounterOptions.DisplayPosition.TOP : CounterOptions.DisplayPosition.BOTTOM, infos[i].CurrentStringValue);
+                            texts.Add(i == 0 ? CounterOptions.DisplayPosition.TOP : CounterOptions.DisplayPosition.BOTTOM, infos[i].Name + " " + infos[i].CurrentStringValue);
                         }
                     }
                     foreach (var item in texts)
@@ -290,15 +278,19 @@ namespace TaskbarMonitor
 
                         var sizeString = formGraphics.MeasureString(text, fontCounter);
                         float ypos = positions[item.Key];
-                        
+
+                        var titleShadow = defaultTheme.TextShadowColor;
                         var titleColor = defaultTheme.TextColor;
 
                         if (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && !mouseOver)
+                        {
                             titleColor = Color.FromArgb(40, titleColor.R, titleColor.G, titleColor.B);
+                            titleShadow = Color.FromArgb(40, titleShadow.R, titleShadow.G, titleShadow.B);
+                        }
 
-                        System.Drawing.SolidBrush BrushText = new System.Drawing.SolidBrush(titleColor);
+                        SolidBrush BrushText = new SolidBrush(titleColor);
+                        SolidBrush BrushTextShadow = new SolidBrush(titleShadow);
 
-                        SolidBrush BrushTextShadow = new SolidBrush(defaultTheme.TextShadowColor);
                         if (
                         (opt.ShowCurrentValueShadowOnHover && opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && !mouseOver)
                         || (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver)
@@ -316,12 +308,18 @@ namespace TaskbarMonitor
                 if (opt.ShowTitle == CounterOptions.DisplayType.SHOW
                  || opt.ShowTitle == CounterOptions.DisplayType.HOVER)
                 {
-                    System.Drawing.SolidBrush brushShadow = new System.Drawing.SolidBrush(defaultTheme.TitleShadowColor);
+                    
+                    var titleShadow = defaultTheme.TitleShadowColor;
                     var titleColor = defaultTheme.TitleColor;
 
                     if (opt.ShowTitle == CounterOptions.DisplayType.HOVER && !mouseOver)
+                    {
                         titleColor = Color.FromArgb(40, titleColor.R, titleColor.G, titleColor.B);
+                        titleShadow = Color.FromArgb(40, titleShadow.R, titleShadow.G, titleShadow.B);
+                    }
+                        
 
+                    System.Drawing.SolidBrush brushShadow = new System.Drawing.SolidBrush(titleShadow);
                     System.Drawing.SolidBrush brushTitle = new System.Drawing.SolidBrush(titleColor);
 
 

@@ -57,6 +57,20 @@ namespace TaskbarMonitor
                 }
             };
             InitializeComponent();
+
+            float dpiX, dpiY;
+            using (Graphics graphics = this.CreateGraphics())
+            {
+                dpiX = graphics.DpiX;
+                dpiY = graphics.DpiY;
+            }            
+
+            if (dpiX >= 96)
+            {
+                var fontSize = 7.25f;
+                this.Font = new Font("Calibri", fontSize, FontStyle.Regular);
+            }
+
             this.editHistorySize.Value = this.Options.HistorySize;
             this.editPollTime.Value = this.Options.PollTime;
             this.listCounters.DataSource = this.Options.CounterOptions.Keys.AsEnumerable().ToList();
@@ -96,7 +110,7 @@ namespace TaskbarMonitor
                     i--;
                 }
             }
-            swcPreview.ApplyOptions(previewOptions);
+            swcPreview.ApplyOptions(previewOptions);            
         }
 
         private void EditHistorySize_ValueChanged(object sender, EventArgs e)
@@ -442,11 +456,7 @@ namespace TaskbarMonitor
         private void buttonResetDefaults_Click(object sender, EventArgs e)
         {
             this.Options.CopyTo(this.OriginalOptions);
-            var folder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "taskbar-monitor");
-            var origin = System.IO.Path.Combine(folder, "config.json");
-            if (!System.IO.Directory.Exists(folder))
-                System.IO.Directory.CreateDirectory(folder);
-            System.IO.File.WriteAllText(origin, JsonConvert.SerializeObject(Options));
+            Options.SaveToDisk();            
             this.Close();
         }
     }
