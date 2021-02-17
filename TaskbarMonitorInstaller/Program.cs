@@ -39,12 +39,10 @@ namespace TaskbarMonitorInstaller
 
         static void Install(InstallInfo info)
         {
-            Console.Write("Restarting Windows Explorer.. ");
             RestartExplorer restartExplorer = new RestartExplorer();
             //restartExplorer.ReportProgress += Console.WriteLine;
             //restartExplorer.ReportPercentage += (percentage) =>
             //Console.WriteLine($"Percentage: {percentage}");
-            Console.WriteLine("OK.");
 
             // Create directory
             if (!Directory.Exists(info.TargetPath))
