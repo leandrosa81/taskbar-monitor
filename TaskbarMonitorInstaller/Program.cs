@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using TaskbarMonitorInstaller.BLL;
 
@@ -38,10 +39,12 @@ namespace TaskbarMonitorInstaller
 
         static void Install(InstallInfo info)
         {
+            Console.Write("Restarting Windows Explorer.. ");
             RestartExplorer restartExplorer = new RestartExplorer();
             //restartExplorer.ReportProgress += Console.WriteLine;
             //restartExplorer.ReportPercentage += (percentage) =>
             //Console.WriteLine($"Percentage: {percentage}");
+            Console.WriteLine("OK.");
 
             // Create directory
             if (!Directory.Exists(info.TargetPath))
@@ -101,6 +104,7 @@ namespace TaskbarMonitorInstaller
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), @"Microsoft.NET\Framework64\v4.0.30319\regasm.exe") :
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), @"Microsoft.NET\Framework\v4.0.30319\regasm.exe");
             RunProgram(regAsmPath, $@"{args} ""{target}""");
+
             return true;
         }
 
@@ -144,17 +148,18 @@ namespace TaskbarMonitorInstaller
 
         static string RunProgram(string path, string args)
         {
-            using (System.Diagnostics.Process pProcess = new System.Diagnostics.Process())
+            using (Process process = new Process())
             {
-                pProcess.StartInfo.FileName = path;
-                pProcess.StartInfo.Arguments = args; //argument
-                pProcess.StartInfo.UseShellExecute = false;
-                pProcess.StartInfo.RedirectStandardOutput = true;
-                pProcess.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                pProcess.StartInfo.CreateNoWindow = true; //not diplay a windows
-                pProcess.Start();
-                string output = pProcess.StandardOutput.ReadToEnd(); //The output result
-                pProcess.WaitForExit();
+                process.StartInfo.FileName = path;
+                process.StartInfo.Arguments = args;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+                string output = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+
                 return output;
             }
         }
