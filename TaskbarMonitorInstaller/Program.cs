@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using TaskbarMonitorInstaller.BLL;
 
 namespace TaskbarMonitorInstaller
@@ -13,20 +9,22 @@ namespace TaskbarMonitorInstaller
     {
         class InstallInfo
         {
-            public List<String> FilesToCopy { get; set; }
-            public List<String> FilesToRegister { get; set; }
+            public List<string> FilesToCopy { get; set; }
+            public List<string> FilesToRegister { get; set; }
             public string TargetPath { get; set; }
         }
+
         static void Main(string[] args)
         {
-            InstallInfo info = new InstallInfo { 
-                FilesToCopy = new List<string> { "TaskbarMonitor.dll", "Newtonsoft.Json.dll" },                
+            Console.Title = "Taskbar Monitor Installer";
 
-
+            InstallInfo info = new InstallInfo
+            {
+                FilesToCopy = new List<string> { "TaskbarMonitor.dll", "Newtonsoft.Json.dll" },
                 FilesToRegister = new List<string> { "TaskbarMonitor.dll" },
                 //TargetPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "TaskbarMonitor")
-                TargetPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "TaskbarMonitor")
-            };            
+                TargetPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "TaskbarMonitor")
+            };
 
             if (args.Length > 0 && args[0].ToLower() == "/uninstall")
                 RollBack(info);
@@ -34,8 +32,8 @@ namespace TaskbarMonitorInstaller
                 Install(info);
 
             // pause
-            Console.Write("Press any key to close this window...");
-            System.Console.ReadKey();
+            Console.WriteLine("Press any key to close this window...");
+            Console.ReadKey();
         }
 
         static void Install(InstallInfo info)
@@ -45,19 +43,19 @@ namespace TaskbarMonitorInstaller
             //restartExplorer.ReportPercentage += (percentage) =>
             //Console.WriteLine($"Percentage: {percentage}");
 
-            // create directory
-            if (!System.IO.Directory.Exists(info.TargetPath))
+            // Create directory
+            if (!Directory.Exists(info.TargetPath))
             {
                 Console.Write("Creating target directory... ");
-                System.IO.Directory.CreateDirectory(info.TargetPath);
+                Directory.CreateDirectory(info.TargetPath);
                 Console.WriteLine("OK.");
 
-                // first copy files to program files folder          
+                // First copy files to program files folder          
                 foreach (var item in info.FilesToCopy)
                 {
-                    var targetFilePath = System.IO.Path.Combine(info.TargetPath, item);
-                    Console.Write(String.Format("copying {0}... ", item));
-                    System.IO.File.Copy(item, targetFilePath, true);
+                    var targetFilePath = Path.Combine(info.TargetPath, item);
+                    Console.Write(string.Format("Copying {0}... ", item));
+                    File.Copy(item, targetFilePath, true);
                     Console.WriteLine("OK.");
                 }
             }
@@ -74,75 +72,70 @@ namespace TaskbarMonitorInstaller
 
                 restartExplorer.Execute(() =>
                 {
-                    // first copy files to program files folder          
+                    // First copy files to program files folder          
                     foreach (var item in info.FilesToCopy)
                     {
-                        var targetFilePath = System.IO.Path.Combine(info.TargetPath, item);
-                        Console.Write(String.Format("copying {0}... ", item));
-                        System.IO.File.Copy(item, targetFilePath, true);
+                        var targetFilePath = Path.Combine(info.TargetPath, item);
+                        Console.Write($"Copying {item}... ");
+                        File.Copy(item, targetFilePath, true);
                         Console.WriteLine("OK.");
                     }
-
                 });
             }
-            
 
-            // register assemblies
+            // Register assemblies
             //RegistrationServices regAsm = new RegistrationServices();
             foreach (var item in info.FilesToRegister)
             {
-                var targetFilePath = System.IO.Path.Combine(info.TargetPath, item);
-                Console.Write(String.Format("registering {0}... ", item));
+                var targetFilePath = Path.Combine(info.TargetPath, item);
+                Console.Write($"Registering {item}... ");
                 RegisterDLL(targetFilePath, true, false);
                 Console.WriteLine("OK.");
-
             }
-
-
-            
         }
 
         static bool RegisterDLL(string target, bool bit64 = false, bool unregister = false)
         {
             string args = unregister ? "/unregister" : "/nologo /codebase";
-            var regAsmPath = bit64 ? System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), @"Microsoft.NET\Framework64\v4.0.30319\regasm.exe") :
-                System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), @"Microsoft.NET\Framework\v4.0.30319\regasm.exe");            
-            RunProgram(regAsmPath, args + @" """ + target + @"""");            
+            var regAsmPath = bit64 ?
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), @"Microsoft.NET\Framework64\v4.0.30319\regasm.exe") :
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), @"Microsoft.NET\Framework\v4.0.30319\regasm.exe");
+            RunProgram(regAsmPath, $@"{args} ""{target}""");
             return true;
         }
 
         static bool RollBack(InstallInfo info)
-        {            
-            // unregister assembly
+        {
+            // Unregister assembly
             //RegistrationServices regAsm = new RegistrationServices();
             foreach (var item in info.FilesToRegister)
             {
-                var targetFilePath = System.IO.Path.Combine(info.TargetPath, item);
+                var targetFilePath = Path.Combine(info.TargetPath, item);
                 RegisterDLL(targetFilePath, false, true);
                 RegisterDLL(targetFilePath, true, true);
             }
 
-            // delete files
+            // Delete files
             RestartExplorer restartExplorer = new RestartExplorer();
             restartExplorer.Execute(() =>
             {
-                // first copy files to program files folder          
+                // First copy files to program files folder          
                 foreach (var item in info.FilesToCopy)
                 {
-                    var targetFilePath = System.IO.Path.Combine(info.TargetPath, item);
-                    if (System.IO.File.Exists(targetFilePath))
+                    var targetFilePath = Path.Combine(info.TargetPath, item);
+                    if (File.Exists(targetFilePath))
                     {
-                        Console.Write(String.Format("deleting {0}... ", item));
-                        System.IO.File.Delete(targetFilePath);
+                        Console.Write($"Deleting {item}... ");
+                        File.Delete(targetFilePath);
                         Console.WriteLine("OK.");
                     }
                 }
             });
 
-            if (System.IO.Directory.Exists(info.TargetPath))
+            if (Directory.Exists(info.TargetPath))
             {
                 Console.Write("Deleting target directory... ");
-                System.IO.Directory.Delete(info.TargetPath);
+                Directory.Delete(info.TargetPath);
                 Console.WriteLine("OK.");
             }
 
