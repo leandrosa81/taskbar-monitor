@@ -255,6 +255,41 @@ namespace TaskbarMonitor
                 positions.Add(CounterOptions.DisplayPosition.TOP, graphPositionY);
                 positions.Add(CounterOptions.DisplayPosition.BOTTOM, (maximumHeight - sizeTitle.Height + 1) + graphPositionY);
 
+                CounterOptions.DisplayPosition? usedPosition = null;
+                if (opt.ShowTitle == CounterOptions.DisplayType.SHOW
+                 || opt.ShowTitle == CounterOptions.DisplayType.HOVER)
+                {
+
+                    usedPosition = opt.TitlePosition;
+                    var titleShadow = defaultTheme.TitleShadowColor;
+                    var titleColor = defaultTheme.TitleColor;
+
+                    if (opt.ShowTitle == CounterOptions.DisplayType.HOVER && !mouseOver)
+                    {
+                        titleColor = Color.FromArgb(40, titleColor.R, titleColor.G, titleColor.B);
+                        titleShadow = Color.FromArgb(40, titleShadow.R, titleShadow.G, titleShadow.B);
+                    }
+
+
+                    System.Drawing.SolidBrush brushShadow = new System.Drawing.SolidBrush(titleShadow);
+                    System.Drawing.SolidBrush brushTitle = new System.Drawing.SolidBrush(titleColor);
+
+
+                    if (
+                        (opt.ShowTitleShadowOnHover && opt.ShowTitle == CounterOptions.DisplayType.HOVER && !mouseOver)
+                        || (opt.ShowTitle == CounterOptions.DisplayType.HOVER && mouseOver)
+                        || opt.ShowTitle == CounterOptions.DisplayType.SHOW
+                       )
+                    {
+                        formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) + 1, positions[opt.TitlePosition] + 1, sizeTitle.Width, maximumHeight), new StringFormat());
+                        formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), positions[opt.TitlePosition], sizeTitle.Width, maximumHeight), new StringFormat());
+                    }
+
+
+                    brushShadow.Dispose();
+                    brushTitle.Dispose();
+                }
+
                 if (opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW
                  || opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER)                   
                 {
@@ -263,13 +298,16 @@ namespace TaskbarMonitor
                     if (opt.CurrentValueAsSummary || infos.Count > 2)
                     {
                         texts.Add(opt.SummaryPosition, infos[0].CurrentStringValue);
-                        
+
                     }
                     else
                     {
+                        List<CounterOptions.DisplayPosition> positionsAvailable = new List<CounterOptions.DisplayPosition> { CounterOptions.DisplayPosition.TOP, CounterOptions.DisplayPosition.MIDDLE, CounterOptions.DisplayPosition.BOTTOM };
+                        if (usedPosition.HasValue)
+                            positionsAvailable.Remove(usedPosition.Value);
                         for (int i = 0; i < infos.Count && i < 2; i++)
                         {
-                            texts.Add(i == 0 ? CounterOptions.DisplayPosition.TOP : CounterOptions.DisplayPosition.BOTTOM, infos[i].Name + " " + infos[i].CurrentStringValue);
+                            texts.Add(positionsAvailable[i], infos[i].Name + " " + infos[i].CurrentStringValue);
                         }
                     }
                     foreach (var item in texts)
@@ -304,39 +342,7 @@ namespace TaskbarMonitor
                         BrushTextShadow.Dispose();
                     }
                 }
-
-                if (opt.ShowTitle == CounterOptions.DisplayType.SHOW
-                 || opt.ShowTitle == CounterOptions.DisplayType.HOVER)
-                {
-                    
-                    var titleShadow = defaultTheme.TitleShadowColor;
-                    var titleColor = defaultTheme.TitleColor;
-
-                    if (opt.ShowTitle == CounterOptions.DisplayType.HOVER && !mouseOver)
-                    {
-                        titleColor = Color.FromArgb(40, titleColor.R, titleColor.G, titleColor.B);
-                        titleShadow = Color.FromArgb(40, titleShadow.R, titleShadow.G, titleShadow.B);
-                    }
-                        
-
-                    System.Drawing.SolidBrush brushShadow = new System.Drawing.SolidBrush(titleShadow);
-                    System.Drawing.SolidBrush brushTitle = new System.Drawing.SolidBrush(titleColor);
-
-
-                    if (
-                        (opt.ShowTitleShadowOnHover && opt.ShowTitle == CounterOptions.DisplayType.HOVER && !mouseOver)
-                        || (opt.ShowTitle == CounterOptions.DisplayType.HOVER && mouseOver)
-                        || opt.ShowTitle == CounterOptions.DisplayType.SHOW 
-                       )
-                    {
-                        formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) + 1, positions[opt.TitlePosition] + 1, sizeTitle.Width, maximumHeight), new StringFormat());
-                        formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), positions[opt.TitlePosition], sizeTitle.Width, maximumHeight), new StringFormat());
-                    }
-                     
-
-                    brushShadow.Dispose();
-                    brushTitle.Dispose();
-                }
+                
 
                 graphPosition += Options.HistorySize + 10;
                 if(graphPosition >= this.Size.Width)
