@@ -24,7 +24,7 @@ namespace TaskbarMonitor
     {
         public delegate void SizeChangeHandler(Size size);
         public event SizeChangeHandler OnChangeSize;
-        public Version Version { get; set; } = new Version("0.3.1");
+        public Version Version { get; set; } = new Version("0.3.2");
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Options Options { get; set; }
