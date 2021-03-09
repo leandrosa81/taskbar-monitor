@@ -23,14 +23,14 @@ namespace TaskbarMonitor
             GraphTheme theme = GraphTheme.ReadFromDisk();
 
             var ctl = new SystemWatcherControl(opt, theme);
-            Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, 30);
-            ctl.OnChangeSize += Ctl_OnChangeSize;
+            //Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, 30);
+            //ctl.OnChangeSize += Ctl_OnChangeSize;
             _control = ctl;
         }
 
         private void Ctl_OnChangeSize(Size size)
         {
-            Options.MinHorizontalSize = size;
+            //Options.MinHorizontalSize = size;
         }
 
         protected override Control Control => _control;

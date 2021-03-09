@@ -24,7 +24,7 @@ namespace TaskbarMonitor
     {
         public delegate void SizeChangeHandler(Size size);
         public event SizeChangeHandler OnChangeSize;
-        public Version Version { get; set; } = new Version("0.3.0");
+        public Version Version { get; set; } = new Version("0.3.1");
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Options Options { get; set; }
@@ -165,9 +165,12 @@ namespace TaskbarMonitor
                 controlWidth = counterSize * countersPerLine;
                 controlHeight = Convert.ToInt32(Math.Ceiling((float)CountersCount / (float)countersPerLine)) * (30 + 10);
             }
-            this.Size = new Size(controlWidth, controlHeight);
-            if(OnChangeSize != null)
-                OnChangeSize(new Size(controlWidth, controlHeight));            
+            if (this.Size.Width != controlWidth || this.Size.Height != controlHeight)
+            {
+                this.Size = new Size(controlWidth, controlHeight);
+                if (OnChangeSize != null)
+                    OnChangeSize(new Size(controlWidth, controlHeight));
+            }
         }
 
         private void timer1_Tick(object sender, EventArgs e)

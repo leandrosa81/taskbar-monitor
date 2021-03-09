@@ -1037,7 +1037,9 @@
 </value>
   </data>
   <data name="textBox1.Text" xml:space="preserve">
-    <value>Thanks to Brandon Chong for creating the CS DeskBand library, that made this project possible.
+    <value>Thanks to all contributors: @KoalaBear84 (https://github.com/KoalaBear84)
+
+Thanks to Brandon Chong for creating the CS DeskBand library, that made this project possible.
 https://github.com/dsafa/CSDeskBand
 
 Also thanks to Vanco Pavlevski for providing a neat code to restart Windows Explorer, use by the installer.
