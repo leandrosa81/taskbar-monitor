@@ -108,3 +108,4 @@ bower_components
 /TaskbarMonitor/*.pfx
 *.pfx
 build/
+/TaskbarMonitorInstaller/Resources
