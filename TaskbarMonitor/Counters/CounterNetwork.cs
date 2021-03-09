@@ -19,7 +19,7 @@ namespace TaskbarMonitor.Counters
         List<PerformanceCounter> netCountersSent;
         List<PerformanceCounter> netCountersReceived;
          
-        Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
+        //Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
 
         public override void Initialize()
         {
@@ -36,7 +36,7 @@ namespace TaskbarMonitor.Counters
                 netCountersSent.Add(new PerformanceCounter("Network Interface", "Bytes Sent/sec", instance));
                 netCountersReceived.Add(new PerformanceCounter("Network Interface", "Bytes Received/sec", instance));
             }
-
+            /*
             info.Add(CounterType.SINGLE, new List<CounterInfo> {
                 new CounterInfo() { Name = "default", History = new List<float>(), MaximumValue = 1 }
             });
@@ -51,23 +51,29 @@ namespace TaskbarMonitor.Counters
                 new CounterInfo() { Name = "U", History = new List<float>(), MaximumValue = 1 }
 
             });
+            */
+
+            InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = 1 };
+            Infos = new List<CounterInfo>();
+            Infos.Add(new CounterInfo() { Name = "D", History = new List<float>(), MaximumValue = 1 });
+            Infos.Add(new CounterInfo() { Name = "U", History = new List<float>(), MaximumValue = 1 });
         }
 
        
 
         public override void Update()
         {
-            Action<CounterType, int, float> addValue = (counterType, index, value) =>
+            Action<CounterInfo, float> addValue = (info, value) =>
             {
-                info[counterType][index].CurrentValue = value;
-                info[counterType][index].History.Add(value);
-                if (info[counterType][index].History.Count > Options.HistorySize) info[counterType][index].History.RemoveAt(0);
-                info[counterType][index].MaximumValue = Convert.ToInt64(info[counterType][index].History.Max()) + 1;
+                info.CurrentValue = value;
+                info.History.Add(value);
+                if (info.History.Count > Options.HistorySize) info.History.RemoveAt(0);
+                info.MaximumValue = Convert.ToInt64(info.History.Max()) + 1;
 
-                if (info[counterType][index].CurrentValue > (1024 * 1024))
-                    info[counterType][index].CurrentStringValue = (info[counterType][index].CurrentValue / 1024 / 1024).ToString("0.0") + "MB/s";
+                if (info.CurrentValue > (1024 * 1024))
+                    info.CurrentStringValue = (info.CurrentValue / 1024 / 1024).ToString("0.0") + "MB/s";
                 else
-                    info[counterType][index].CurrentStringValue = (info[counterType][index].CurrentValue / 1024).ToString("0.0") + "KB/s";
+                    info.CurrentStringValue = (info.CurrentValue / 1024).ToString("0.0") + "KB/s";
             };
 
             float currentSent = 0;
@@ -80,27 +86,21 @@ namespace TaskbarMonitor.Counters
             {
                 currentReceived += netCounter.NextValue();
             }
-            addValue(CounterType.SINGLE, 0, currentSent + currentReceived);
-
-            addValue(CounterType.MIRRORED, 0, currentReceived);
-            addValue(CounterType.MIRRORED, 1, currentSent);
-
-            addValue(CounterType.STACKED, 0, currentReceived);
-            addValue(CounterType.STACKED, 1, currentSent);
-
+            addValue(InfoSummary, currentSent + currentReceived);
+            addValue(Infos.Where(x => x.Name == "D").Single(), currentReceived);
+            addValue(Infos.Where(x => x.Name == "U").Single(), currentSent);
+            
             // if locks down same scale for both counters is on
             if (!Options.CounterOptions["NET"].SeparateScales)
             {
-                float max = info[GetCounterType()][0].MaximumValue > info[GetCounterType()][1].MaximumValue ? info[GetCounterType()][0].MaximumValue : info[GetCounterType()][1].MaximumValue;
-                info[GetCounterType()][0].MaximumValue = info[GetCounterType()][1].MaximumValue = max;
+                var info1 = Infos.Where(x => x.Name == "D").Single();
+                var info2 = Infos.Where(x => x.Name == "U").Single();
+
+                float max = info1.MaximumValue > info2.MaximumValue ? info1.MaximumValue : info2.MaximumValue;
+                info1.MaximumValue = info2.MaximumValue = max;
             }
 
 
-        }
-
-        public override List<CounterInfo> GetValues()
-        {            
-            return info[GetCounterType()];
         }
 
         public override string GetName()

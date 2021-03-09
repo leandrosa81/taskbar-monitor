@@ -18,6 +18,11 @@ namespace TaskbarMonitor.Counters
     {
         public Options Options { get; private set; }
 
+        public CounterInfo InfoSummary { get; protected set; }
+
+        public List<CounterInfo> Infos { get; protected set; }
+
+
         public ICounter(Options options)
         {
             this.Options = options;
@@ -33,8 +38,8 @@ namespace TaskbarMonitor.Counters
 
         public abstract void Update();
 
-        public abstract CounterType GetCounterType();        
+        public abstract CounterType GetCounterType();
 
-        public abstract List<CounterInfo> GetValues();
+        //public abstract List<CounterInfo> GetValues();
     }
 }

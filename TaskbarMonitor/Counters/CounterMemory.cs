@@ -21,33 +21,44 @@ namespace TaskbarMonitor.Counters
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool GetPhysicallyInstalledSystemMemory(out long TotalMemoryInKilobytes);
 
-        PerformanceCounter ramCounter;
-        float currentValue = 0;
+        PerformanceCounter ramCounter;        
         long totalMemory = 0;
-        Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
+        //Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
 
         public override void Initialize()
         {
             ramCounter = new PerformanceCounter("Memory", "Available MBytes");
             
             GetPhysicallyInstalledSystemMemory(out totalMemory);
+
+            InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = totalMemory / 1024 };
+            Infos = new List<CounterInfo>();
+            Infos.Add(new CounterInfo() { Name = "U", History = new List<float>(), MaximumValue = totalMemory / 1024 });
+            /*
             info.Add(CounterType.SINGLE, new List<CounterInfo> {
                 new CounterInfo() { Name = "default", History = new List<float>(), MaximumValue = totalMemory / 1024 }
-            });
+            });*/
         }
         public override void Update()
         {
-            currentValue = (totalMemory / 1024) - ramCounter.NextValue();
-            info[GetCounterType()][0].CurrentValue = currentValue;
-            info[GetCounterType()][0].History.Add(currentValue);
-            if (info[GetCounterType()][0].History.Count > Options.HistorySize) info[GetCounterType()][0].History.RemoveAt(0);
-            
-            info[GetCounterType()][0].CurrentStringValue = (info[GetCounterType()][0].CurrentValue / 1024).ToString("0.0") + "GB";
+            float currentValue = (totalMemory / 1024) - ramCounter.NextValue();
 
-        }
-        public override List<CounterInfo> GetValues()
-        {            
-            return info[GetCounterType()];
+            InfoSummary.CurrentValue = currentValue;
+            InfoSummary.History.Add(currentValue);
+            if (InfoSummary.History.Count > Options.HistorySize) InfoSummary.History.RemoveAt(0);
+            
+            InfoSummary.CurrentStringValue = (InfoSummary.CurrentValue / 1024).ToString("0.0") + "GB";
+
+            {
+                var info = Infos.Where(x => x.Name == "U").Single();
+                info.CurrentValue = currentValue;
+                info.History.Add(currentValue);
+                if (info.History.Count > Options.HistorySize) info.History.RemoveAt(0);
+
+                info.CurrentStringValue = (info.CurrentValue / 1024).ToString("0.0") + "GB";
+            }
+            
+
         }
        
 

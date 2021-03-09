@@ -20,8 +20,9 @@ namespace TaskbarMonitor
         public Deskband()
         {             
             Options opt = TaskbarMonitor.Options.ReadFromDisk();
-             
-            var ctl = new SystemWatcherControl(opt);
+            GraphTheme theme = GraphTheme.ReadFromDisk();
+
+            var ctl = new SystemWatcherControl(opt, theme);
             Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, 30);
             ctl.OnChangeSize += Ctl_OnChangeSize;
             _control = ctl;

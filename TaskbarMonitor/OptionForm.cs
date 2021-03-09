@@ -14,20 +14,36 @@ namespace TaskbarMonitor
     public partial class OptionForm : Form
     {
         private Options OriginalOptions;
-        private Options Options;// { get; private set; }
-        private Version Version;
+        private GraphTheme OriginalTheme;
+
+        private Options Options;
         private GraphTheme Theme;
+
+        private Version Version;
+
         private CounterOptions ActiveCounter = null;
         private bool initializing = true;
         Dictionary<string, IList<TaskbarMonitor.Counters.ICounter.CounterType>> AvailableGraphTypes;
 
-        public OptionForm(Options opt, GraphTheme theme, Version version)
+        SystemWatcherControl originalControl = null;
+
+        private Font ChosenTitleFont;
+        private Font ChosenCurrentValueFont;
+
+        public OptionForm(Options opt, GraphTheme theme, Version version, SystemWatcherControl originalControl)
         {
             this.Version = version;
-            this.Theme = theme;
+            
+            this.Theme = new GraphTheme();
+            this.OriginalTheme = theme;
+            theme.CopyTo(this.Theme);
+
             this.Options = new Options();
             this.OriginalOptions = opt;
             opt.CopyTo(this.Options);
+
+            this.originalControl = originalControl;
+
             AvailableGraphTypes = new Dictionary<string, IList<Counters.ICounter.CounterType>>
             {
                 {"CPU",  new List<TaskbarMonitor.Counters.ICounter.CounterType>
@@ -71,15 +87,20 @@ namespace TaskbarMonitor
                 this.Font = new Font("Calibri", fontSize, FontStyle.Regular);
             }
 
+            Initialize();
+        }
+        private void Initialize()
+        {
+            initializing = true;
             this.editHistorySize.Value = this.Options.HistorySize;
             this.editPollTime.Value = this.Options.PollTime;
             this.listCounters.DataSource = this.Options.CounterOptions.Keys.AsEnumerable().ToList();
-            this.listShowTitle.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayType));            
-            this.listShowCurrentValue.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayType));            
+            this.listShowTitle.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayType));
+            this.listShowCurrentValue.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayType));
             this.listSummaryPosition.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayPosition));
             this.listTitlePosition.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayPosition));
 
-            lblVersion.Text = "v" + version.ToString(3);
+            lblVersion.Text = "v" + Version.ToString(3);
 
             ActiveCounter = this.Options.CounterOptions.First().Value;
             UpdateForm();
@@ -89,6 +110,13 @@ namespace TaskbarMonitor
             btnColorCurrentValueShadow.BackColor = this.Theme.TextShadowColor;
             btnColorTitle.BackColor = this.Theme.TitleColor;
             btnColorTitleShadow.BackColor = this.Theme.TitleShadowColor;
+            
+            ChosenTitleFont = new Font(this.Theme.TitleFont, this.Theme.TitleSize, FontStyle.Bold);
+            linkTitleFont.Text = ChosenTitleFont.Name + ", " + ChosenTitleFont.Size + "pt";
+
+            ChosenCurrentValueFont = new Font(this.Theme.CurrentValueFont, this.Theme.CurrentValueSize, FontStyle.Bold);
+            linkCurrentValueFont.Text = ChosenCurrentValueFont.Name + ", " + Math.Round(ChosenCurrentValueFont.Size) + "pt";
+
             btnColor1.BackColor = this.Theme.StackedColors[0];
             btnColor2.BackColor = this.Theme.StackedColors[1];
 
@@ -101,6 +129,7 @@ namespace TaskbarMonitor
         {
             var previewOptions = new Options();
             this.Options.CopyTo(previewOptions);
+            /*
             for (int i = 0; i < previewOptions.CounterOptions.Keys.Count; i++)
             {
                 string key = previewOptions.CounterOptions.Keys.ElementAt(i);
@@ -109,8 +138,11 @@ namespace TaskbarMonitor
                     previewOptions.CounterOptions.Remove(key);
                     i--;
                 }
-            }
-            swcPreview.ApplyOptions(previewOptions);            
+            }*/
+            var previewTheme = new GraphTheme();
+            this.Theme.CopyTo(previewTheme);
+
+            swcPreview.ApplyOptions(previewOptions, previewTheme);            
         }
 
         private void EditHistorySize_ValueChanged(object sender, EventArgs e)
@@ -184,6 +216,7 @@ namespace TaskbarMonitor
             this.listGraphType.DataSource = this.AvailableGraphTypes[listCounters.Text];
             initializing = false;
             this.listGraphType.Text = ActiveCounter.GraphType.ToString();
+            checkEnabled.Checked = ActiveCounter.Enabled;
             listShowTitle.Text = ActiveCounter.ShowTitle.ToString();
             listShowCurrentValue.Text = ActiveCounter.ShowCurrentValue.ToString();
             checkShowSummary.Checked = ActiveCounter.CurrentValueAsSummary;            
@@ -352,47 +385,82 @@ namespace TaskbarMonitor
             }
             return false;
         }
-         
+
+        private bool ChooseFont(LinkLabel sender, ref Font font)
+        {
+            FontDialog MyDialog = new FontDialog();
+            MyDialog.ShowColor = false;
+            MyDialog.ShowEffects = false;            
+            MyDialog.ShowApply = false;
+            MyDialog.ShowHelp = false;
+            MyDialog.FontMustExist = true;
+            MyDialog.MaxSize = 16;
+            MyDialog.Font = font;
+
+            // Update the text box color if the user clicks OK 
+            if (MyDialog.ShowDialog() == DialogResult.OK)
+            {
+                font = MyDialog.Font;
+                sender.Text = font.Name + ", " + Math.Round(font.Size) + "pt";
+                return true;
+            }
+            return false;
+        }
+
         private void btnColorBar_Click(object sender, EventArgs e)
         {
             if(ChooseColor(sender as Button))
                 this.Theme.BarColor = (sender as Button).BackColor;
+
+            UpdatePreview();
         }
 
         private void btnColorCurrentValue_Click(object sender, EventArgs e)
         {
             if (ChooseColor(sender as Button))
                 this.Theme.TextColor = (sender as Button).BackColor;
+
+            UpdatePreview();
         }
 
         private void btnColorCurrentValueShadow_Click(object sender, EventArgs e)
         {
             if (ChooseColor(sender as Button))
                 this.Theme.TextShadowColor = (sender as Button).BackColor;
+
+            UpdatePreview();
         }
 
         private void btnColorTitle_Click(object sender, EventArgs e)
         {
             if (ChooseColor(sender as Button))
                 this.Theme.TitleColor = (sender as Button).BackColor;
+
+            UpdatePreview();
         }
 
         private void btnColorTitleShadow_Click(object sender, EventArgs e)
         {
             if (ChooseColor(sender as Button))
                 this.Theme.TitleShadowColor = (sender as Button).BackColor;
+
+            UpdatePreview();
         }
 
         private void btnColor1_Click(object sender, EventArgs e)
         {
             if (ChooseColor(sender as Button))
                 this.Theme.StackedColors[0] = (sender as Button).BackColor;
+
+            UpdatePreview();
         }
 
         private void btnColor2_Click(object sender, EventArgs e)
         {
             if (ChooseColor(sender as Button))
                 this.Theme.StackedColors[1] = (sender as Button).BackColor;
+
+            UpdatePreview();
         }
 
         private void checkSeparateScales_CheckedChanged(object sender, EventArgs e)
@@ -455,9 +523,50 @@ namespace TaskbarMonitor
 
         private void buttonResetDefaults_Click(object sender, EventArgs e)
         {
+            Options.DefaultOptions().CopyTo(this.Options);
+            GraphTheme.DefaultTheme().CopyTo(this.Theme);
+            Initialize();
+        }
+
+        private void checkEnabled_CheckedChanged(object sender, EventArgs e)
+        {
+            if (initializing) return;
+            ActiveCounter.Enabled = checkEnabled.Checked;
+            UpdatePreview();
+        }
+
+        private void buttonApply_Click(object sender, EventArgs e)
+        {
             this.Options.CopyTo(this.OriginalOptions);
-            Options.SaveToDisk();            
+            this.Options.SaveToDisk();
+
+            this.Theme.CopyTo(this.OriginalTheme);
+            this.Theme.SaveToDisk();
             this.Close();
+
+            originalControl.ApplyOptions(this.OriginalOptions, this.OriginalTheme);
+        }
+
+        private void linkTitleFont_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            if (ChooseFont(sender as LinkLabel, ref ChosenTitleFont))
+            {                
+                this.Theme.TitleFont = ChosenTitleFont.Name;
+                this.Theme.TitleSize = ChosenTitleFont.Size;
+            }
+
+            UpdatePreview();
+        }
+
+        private void linkCurrentValueFont_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            if (ChooseFont(sender as LinkLabel, ref ChosenCurrentValueFont))
+            {
+                this.Theme.CurrentValueFont = ChosenCurrentValueFont.Name;
+                this.Theme.CurrentValueSize = ChosenCurrentValueFont.Size;
+            }
+
+            UpdatePreview();
         }
     }
 }

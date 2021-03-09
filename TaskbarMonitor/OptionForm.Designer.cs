@@ -42,6 +42,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.listCounters = new System.Windows.Forms.ListBox();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.buttonReplicateSettings = new TaskbarMonitor.Controls.MenuButton();
             this.contextMenuStripReplicateSettings = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -63,6 +64,8 @@
             this.label3 = new System.Windows.Forms.Label();
             this.listShowTitle = new System.Windows.Forms.ComboBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.checkEnabled = new System.Windows.Forms.CheckBox();
+            this.label32 = new System.Windows.Forms.Label();
             this.label31 = new System.Windows.Forms.Label();
             this.checkSeparateScales = new System.Windows.Forms.CheckBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -77,21 +80,6 @@
             this.editPollTime = new System.Windows.Forms.NumericUpDown();
             this.label16 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.btnColor2 = new System.Windows.Forms.Button();
-            this.label30 = new System.Windows.Forms.Label();
-            this.btnColor1 = new System.Windows.Forms.Button();
-            this.label29 = new System.Windows.Forms.Label();
-            this.btnColorCurrentValueShadow = new System.Windows.Forms.Button();
-            this.label27 = new System.Windows.Forms.Label();
-            this.btnColorCurrentValue = new System.Windows.Forms.Button();
-            this.label28 = new System.Windows.Forms.Label();
-            this.btnColorTitleShadow = new System.Windows.Forms.Button();
-            this.label26 = new System.Windows.Forms.Label();
-            this.btnColorTitle = new System.Windows.Forms.Button();
-            this.label25 = new System.Windows.Forms.Label();
-            this.btnColorBar = new System.Windows.Forms.Button();
-            this.label24 = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.linkLatestVersion = new System.Windows.Forms.LinkLabel();
             this.btnCheckUpdate = new System.Windows.Forms.Button();
@@ -108,12 +96,30 @@
             this.label10 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.panelFooter = new System.Windows.Forms.Panel();
-            this.buttonResetDefaults = new System.Windows.Forms.Button();
-            this.label17 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
-            this.swcPreview = new TaskbarMonitor.SystemWatcherControl();
-            this.buttonReplicateSettings = new TaskbarMonitor.Controls.MenuButton();
             this.button3 = new System.Windows.Forms.Button();
+            this.buttonResetDefaults = new System.Windows.Forms.Button();
+            this.buttonApply = new System.Windows.Forms.Button();
+            this.label17 = new System.Windows.Forms.Label();
+            this.swcPreview = new TaskbarMonitor.SystemWatcherControl();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.btnColor2 = new System.Windows.Forms.Button();
+            this.label30 = new System.Windows.Forms.Label();
+            this.btnColor1 = new System.Windows.Forms.Button();
+            this.label29 = new System.Windows.Forms.Label();
+            this.btnColorCurrentValueShadow = new System.Windows.Forms.Button();
+            this.label27 = new System.Windows.Forms.Label();
+            this.btnColorCurrentValue = new System.Windows.Forms.Button();
+            this.label28 = new System.Windows.Forms.Label();
+            this.btnColorTitleShadow = new System.Windows.Forms.Button();
+            this.label26 = new System.Windows.Forms.Label();
+            this.btnColorTitle = new System.Windows.Forms.Button();
+            this.label25 = new System.Windows.Forms.Label();
+            this.btnColorBar = new System.Windows.Forms.Button();
+            this.label24 = new System.Windows.Forms.Label();
+            this.label33 = new System.Windows.Forms.Label();
+            this.label34 = new System.Windows.Forms.Label();
+            this.linkTitleFont = new System.Windows.Forms.LinkLabel();
+            this.linkCurrentValueFont = new System.Windows.Forms.LinkLabel();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editHistorySize)).BeginInit();
             this.panelMenu.SuspendLayout();
@@ -128,9 +134,9 @@
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editPollTime)).BeginInit();
             this.tabPage2.SuspendLayout();
-            this.groupBox5.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.panelFooter.SuspendLayout();
+            this.groupBox5.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -283,6 +289,17 @@
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(415, 386);
             this.panel3.TabIndex = 2;
+            // 
+            // buttonReplicateSettings
+            // 
+            this.buttonReplicateSettings.Location = new System.Drawing.Point(249, 340);
+            this.buttonReplicateSettings.Menu = this.contextMenuStripReplicateSettings;
+            this.buttonReplicateSettings.Name = "buttonReplicateSettings";
+            this.buttonReplicateSettings.ShowMenuUnderCursor = true;
+            this.buttonReplicateSettings.Size = new System.Drawing.Size(154, 23);
+            this.buttonReplicateSettings.TabIndex = 2;
+            this.buttonReplicateSettings.Text = "Replicate Settings";
+            this.buttonReplicateSettings.UseVisualStyleBackColor = true;
             // 
             // contextMenuStripReplicateSettings
             // 
@@ -493,6 +510,8 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.checkEnabled);
+            this.groupBox2.Controls.Add(this.label32);
             this.groupBox2.Controls.Add(this.label31);
             this.groupBox2.Controls.Add(this.checkSeparateScales);
             this.groupBox2.Controls.Add(this.label6);
@@ -505,6 +524,26 @@
             this.groupBox2.TabIndex = 6;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Main settings";
+            // 
+            // checkEnabled
+            // 
+            this.checkEnabled.AutoSize = true;
+            this.checkEnabled.Location = new System.Drawing.Point(383, 30);
+            this.checkEnabled.Name = "checkEnabled";
+            this.checkEnabled.Size = new System.Drawing.Size(15, 14);
+            this.checkEnabled.TabIndex = 13;
+            this.checkEnabled.UseVisualStyleBackColor = true;
+            this.checkEnabled.CheckedChanged += new System.EventHandler(this.checkEnabled_CheckedChanged);
+            // 
+            // label32
+            // 
+            this.label32.AutoSize = true;
+            this.label32.Location = new System.Drawing.Point(207, 29);
+            this.label32.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(55, 14);
+            this.label32.TabIndex = 12;
+            this.label32.Text = "Enabled:";
             // 
             // label31
             // 
@@ -550,17 +589,17 @@
             // label21
             // 
             this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(207, 28);
+            this.label21.Location = new System.Drawing.Point(207, 63);
             this.label21.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(98, 14);
+            this.label21.Size = new System.Drawing.Size(73, 14);
             this.label21.TabIndex = 8;
-            this.label21.Text = "Invert info order:";
+            this.label21.Text = "Invert order:";
             // 
             // checkInvertOrder
             // 
             this.checkInvertOrder.AutoSize = true;
-            this.checkInvertOrder.Location = new System.Drawing.Point(383, 29);
+            this.checkInvertOrder.Location = new System.Drawing.Point(383, 62);
             this.checkInvertOrder.Name = "checkInvertOrder";
             this.checkInvertOrder.Size = new System.Drawing.Size(15, 14);
             this.checkInvertOrder.TabIndex = 9;
@@ -570,15 +609,13 @@
             // panel4
             // 
             this.panel4.BackColor = System.Drawing.Color.Transparent;
-            this.panel4.Controls.Add(this.label17);
-            this.panel4.Controls.Add(this.swcPreview);
             this.panel4.Controls.Add(this.label2);
             this.panel4.Controls.Add(this.listCounters);
             this.panel4.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel4.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.panel4.Location = new System.Drawing.Point(3, 3);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(169, 385);
+            this.panel4.Size = new System.Drawing.Size(169, 545);
             this.panel4.TabIndex = 3;
             // 
             // tabControl1
@@ -601,6 +638,7 @@
             // 
             this.tabPage1.BackColor = System.Drawing.Color.Transparent;
             this.tabPage1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("tabPage1.BackgroundImage")));
+            this.tabPage1.Controls.Add(this.groupBox5);
             this.tabPage1.Controls.Add(this.label8);
             this.tabPage1.Controls.Add(this.groupBox1);
             this.tabPage1.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -662,7 +700,7 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(327, 20);
+            this.label16.Location = new System.Drawing.Point(299, 23);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(243, 28);
             this.label16.TabIndex = 5;
@@ -673,7 +711,6 @@
             this.tabPage2.BackColor = System.Drawing.Color.Transparent;
             this.tabPage2.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("tabPage2.BackgroundImage")));
             this.tabPage2.Controls.Add(this.panel4);
-            this.tabPage2.Controls.Add(this.groupBox5);
             this.tabPage2.Controls.Add(this.panel3);
             this.tabPage2.Location = new System.Drawing.Point(4, 5);
             this.tabPage2.Name = "tabPage2";
@@ -681,164 +718,6 @@
             this.tabPage2.Size = new System.Drawing.Size(590, 551);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
-            // 
-            // groupBox5
-            // 
-            this.groupBox5.Controls.Add(this.btnColor2);
-            this.groupBox5.Controls.Add(this.label30);
-            this.groupBox5.Controls.Add(this.btnColor1);
-            this.groupBox5.Controls.Add(this.label29);
-            this.groupBox5.Controls.Add(this.btnColorCurrentValueShadow);
-            this.groupBox5.Controls.Add(this.label27);
-            this.groupBox5.Controls.Add(this.btnColorCurrentValue);
-            this.groupBox5.Controls.Add(this.label28);
-            this.groupBox5.Controls.Add(this.btnColorTitleShadow);
-            this.groupBox5.Controls.Add(this.label26);
-            this.groupBox5.Controls.Add(this.btnColorTitle);
-            this.groupBox5.Controls.Add(this.label25);
-            this.groupBox5.Controls.Add(this.btnColorBar);
-            this.groupBox5.Controls.Add(this.label24);
-            this.groupBox5.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.groupBox5.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox5.Location = new System.Drawing.Point(3, 388);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(584, 160);
-            this.groupBox5.TabIndex = 10;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "Visual";
-            // 
-            // btnColor2
-            // 
-            this.btnColor2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColor2.Location = new System.Drawing.Point(120, 81);
-            this.btnColor2.Name = "btnColor2";
-            this.btnColor2.Size = new System.Drawing.Size(75, 23);
-            this.btnColor2.TabIndex = 13;
-            this.btnColor2.UseVisualStyleBackColor = true;
-            this.btnColor2.Click += new System.EventHandler(this.btnColor2_Click);
-            // 
-            // label30
-            // 
-            this.label30.AutoSize = true;
-            this.label30.Location = new System.Drawing.Point(14, 85);
-            this.label30.Name = "label30";
-            this.label30.Size = new System.Drawing.Size(88, 14);
-            this.label30.TabIndex = 12;
-            this.label30.Text = "Graph color #2:";
-            // 
-            // btnColor1
-            // 
-            this.btnColor1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColor1.Location = new System.Drawing.Point(120, 49);
-            this.btnColor1.Name = "btnColor1";
-            this.btnColor1.Size = new System.Drawing.Size(75, 23);
-            this.btnColor1.TabIndex = 11;
-            this.btnColor1.UseVisualStyleBackColor = true;
-            this.btnColor1.Click += new System.EventHandler(this.btnColor1_Click);
-            // 
-            // label29
-            // 
-            this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(14, 53);
-            this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(88, 14);
-            this.label29.TabIndex = 10;
-            this.label29.Text = "Graph color #1:";
-            // 
-            // btnColorCurrentValueShadow
-            // 
-            this.btnColorCurrentValueShadow.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColorCurrentValueShadow.Location = new System.Drawing.Point(500, 17);
-            this.btnColorCurrentValueShadow.Name = "btnColorCurrentValueShadow";
-            this.btnColorCurrentValueShadow.Size = new System.Drawing.Size(75, 23);
-            this.btnColorCurrentValueShadow.TabIndex = 9;
-            this.btnColorCurrentValueShadow.UseVisualStyleBackColor = true;
-            this.btnColorCurrentValueShadow.Click += new System.EventHandler(this.btnColorCurrentValueShadow_Click);
-            // 
-            // label27
-            // 
-            this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(407, 14);
-            this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(83, 28);
-            this.label27.TabIndex = 8;
-            this.label27.Text = "Current value\r\nshadow color:";
-            // 
-            // btnColorCurrentValue
-            // 
-            this.btnColorCurrentValue.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColorCurrentValue.Location = new System.Drawing.Point(318, 17);
-            this.btnColorCurrentValue.Name = "btnColorCurrentValue";
-            this.btnColorCurrentValue.Size = new System.Drawing.Size(75, 23);
-            this.btnColorCurrentValue.TabIndex = 7;
-            this.btnColorCurrentValue.UseVisualStyleBackColor = true;
-            this.btnColorCurrentValue.Click += new System.EventHandler(this.btnColorCurrentValue_Click);
-            // 
-            // label28
-            // 
-            this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(224, 14);
-            this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(79, 28);
-            this.label28.TabIndex = 6;
-            this.label28.Text = "Current value\r\ncolor:";
-            // 
-            // btnColorTitleShadow
-            // 
-            this.btnColorTitleShadow.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColorTitleShadow.Location = new System.Drawing.Point(500, 49);
-            this.btnColorTitleShadow.Name = "btnColorTitleShadow";
-            this.btnColorTitleShadow.Size = new System.Drawing.Size(75, 23);
-            this.btnColorTitleShadow.TabIndex = 5;
-            this.btnColorTitleShadow.UseVisualStyleBackColor = true;
-            this.btnColorTitleShadow.Click += new System.EventHandler(this.btnColorTitleShadow_Click);
-            // 
-            // label26
-            // 
-            this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(407, 46);
-            this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(78, 28);
-            this.label26.TabIndex = 4;
-            this.label26.Text = "Title shadow\r\ncolor:";
-            // 
-            // btnColorTitle
-            // 
-            this.btnColorTitle.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColorTitle.Location = new System.Drawing.Point(318, 49);
-            this.btnColorTitle.Name = "btnColorTitle";
-            this.btnColorTitle.Size = new System.Drawing.Size(75, 23);
-            this.btnColorTitle.TabIndex = 3;
-            this.btnColorTitle.UseVisualStyleBackColor = true;
-            this.btnColorTitle.Click += new System.EventHandler(this.btnColorTitle_Click);
-            // 
-            // label25
-            // 
-            this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(224, 53);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(65, 14);
-            this.label25.TabIndex = 2;
-            this.label25.Text = "Title color:";
-            // 
-            // btnColorBar
-            // 
-            this.btnColorBar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColorBar.Location = new System.Drawing.Point(120, 17);
-            this.btnColorBar.Name = "btnColorBar";
-            this.btnColorBar.Size = new System.Drawing.Size(75, 23);
-            this.btnColorBar.TabIndex = 1;
-            this.btnColorBar.UseVisualStyleBackColor = true;
-            this.btnColorBar.Click += new System.EventHandler(this.btnColorBar_Click);
-            // 
-            // label24
-            // 
-            this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(14, 21);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(58, 14);
-            this.label24.TabIndex = 0;
-            this.label24.Text = "Bar color:";
             // 
             // tabPage3
             // 
@@ -1011,78 +890,270 @@
             // panelFooter
             // 
             this.panelFooter.BackColor = System.Drawing.Color.Transparent;
+            this.panelFooter.Controls.Add(this.label17);
+            this.panelFooter.Controls.Add(this.swcPreview);
             this.panelFooter.Controls.Add(this.button3);
-            this.panelFooter.Controls.Add(this.button2);
             this.panelFooter.Controls.Add(this.buttonResetDefaults);
+            this.panelFooter.Controls.Add(this.buttonApply);
             this.panelFooter.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelFooter.Location = new System.Drawing.Point(164, 555);
+            this.panelFooter.Location = new System.Drawing.Point(164, 483);
             this.panelFooter.Name = "panelFooter";
-            this.panelFooter.Size = new System.Drawing.Size(598, 50);
+            this.panelFooter.Size = new System.Drawing.Size(598, 122);
             this.panelFooter.TabIndex = 6;
-            // 
-            // buttonResetDefaults
-            // 
-            this.buttonResetDefaults.BackColor = System.Drawing.Color.White;
-            this.buttonResetDefaults.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonResetDefaults.Location = new System.Drawing.Point(468, 14);
-            this.buttonResetDefaults.Name = "buttonResetDefaults";
-            this.buttonResetDefaults.Size = new System.Drawing.Size(120, 23);
-            this.buttonResetDefaults.TabIndex = 0;
-            this.buttonResetDefaults.Text = "Apply";
-            this.buttonResetDefaults.UseVisualStyleBackColor = false;
-            this.buttonResetDefaults.Click += new System.EventHandler(this.buttonResetDefaults_Click);
-            // 
-            // label17
-            // 
-            this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(3, 265);
-            this.label17.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(52, 14);
-            this.label17.TabIndex = 3;
-            this.label17.Text = "Preview:";
-            // 
-            // button2
-            // 
-            this.button2.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button2.Location = new System.Drawing.Point(4, 14);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(120, 23);
-            this.button2.TabIndex = 1;
-            this.button2.Text = "Reset to defaults";
-            this.button2.UseVisualStyleBackColor = true;
-            // 
-            // swcPreview
-            // 
-            this.swcPreview.BackColor = System.Drawing.Color.Black;
-            this.swcPreview.Location = new System.Drawing.Point(6, 295);
-            this.swcPreview.Name = "swcPreview";
-            this.swcPreview.PreviewMode = true;
-            this.swcPreview.Size = new System.Drawing.Size(240, 30);
-            this.swcPreview.TabIndex = 2;
-            this.swcPreview.Version = ((System.Version)(resources.GetObject("swcPreview.Version")));
-            // 
-            // buttonReplicateSettings
-            // 
-            this.buttonReplicateSettings.Location = new System.Drawing.Point(249, 340);
-            this.buttonReplicateSettings.Menu = this.contextMenuStripReplicateSettings;
-            this.buttonReplicateSettings.Name = "buttonReplicateSettings";
-            this.buttonReplicateSettings.ShowMenuUnderCursor = true;
-            this.buttonReplicateSettings.Size = new System.Drawing.Size(154, 23);
-            this.buttonReplicateSettings.TabIndex = 2;
-            this.buttonReplicateSettings.Text = "Replicate Settings";
-            this.buttonReplicateSettings.UseVisualStyleBackColor = true;
             // 
             // button3
             // 
             this.button3.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button3.Location = new System.Drawing.Point(340, 14);
+            this.button3.Location = new System.Drawing.Point(343, 85);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(120, 23);
             this.button3.TabIndex = 2;
             this.button3.Text = "Cancel";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // buttonResetDefaults
+            // 
+            this.buttonResetDefaults.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonResetDefaults.Location = new System.Drawing.Point(471, 10);
+            this.buttonResetDefaults.Name = "buttonResetDefaults";
+            this.buttonResetDefaults.Size = new System.Drawing.Size(120, 23);
+            this.buttonResetDefaults.TabIndex = 1;
+            this.buttonResetDefaults.Text = "Reset to defaults";
+            this.buttonResetDefaults.UseVisualStyleBackColor = true;
+            this.buttonResetDefaults.Click += new System.EventHandler(this.buttonResetDefaults_Click);
+            // 
+            // buttonApply
+            // 
+            this.buttonApply.BackColor = System.Drawing.Color.White;
+            this.buttonApply.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonApply.Location = new System.Drawing.Point(471, 85);
+            this.buttonApply.Name = "buttonApply";
+            this.buttonApply.Size = new System.Drawing.Size(120, 23);
+            this.buttonApply.TabIndex = 0;
+            this.buttonApply.Text = "Apply";
+            this.buttonApply.UseVisualStyleBackColor = false;
+            this.buttonApply.Click += new System.EventHandler(this.buttonApply_Click);
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(14, 15);
+            this.label17.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(48, 13);
+            this.label17.TabIndex = 5;
+            this.label17.Text = "Preview:";
+            // 
+            // swcPreview
+            // 
+            this.swcPreview.BackColor = System.Drawing.Color.Black;
+            this.swcPreview.Location = new System.Drawing.Point(15, 39);
+            this.swcPreview.Name = "swcPreview";
+            this.swcPreview.PreviewMode = true;
+            this.swcPreview.Size = new System.Drawing.Size(240, 61);
+            this.swcPreview.TabIndex = 4;
+            this.swcPreview.Version = ((System.Version)(resources.GetObject("swcPreview.Version")));
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.linkCurrentValueFont);
+            this.groupBox5.Controls.Add(this.linkTitleFont);
+            this.groupBox5.Controls.Add(this.label34);
+            this.groupBox5.Controls.Add(this.label33);
+            this.groupBox5.Controls.Add(this.btnColor2);
+            this.groupBox5.Controls.Add(this.label30);
+            this.groupBox5.Controls.Add(this.btnColor1);
+            this.groupBox5.Controls.Add(this.label29);
+            this.groupBox5.Controls.Add(this.btnColorCurrentValueShadow);
+            this.groupBox5.Controls.Add(this.label27);
+            this.groupBox5.Controls.Add(this.btnColorCurrentValue);
+            this.groupBox5.Controls.Add(this.label28);
+            this.groupBox5.Controls.Add(this.btnColorTitleShadow);
+            this.groupBox5.Controls.Add(this.label26);
+            this.groupBox5.Controls.Add(this.btnColorTitle);
+            this.groupBox5.Controls.Add(this.label25);
+            this.groupBox5.Controls.Add(this.btnColorBar);
+            this.groupBox5.Controls.Add(this.label24);
+            this.groupBox5.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox5.Location = new System.Drawing.Point(0, 195);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(590, 146);
+            this.groupBox5.TabIndex = 12;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Visual";
+            // 
+            // btnColor2
+            // 
+            this.btnColor2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnColor2.Location = new System.Drawing.Point(508, 21);
+            this.btnColor2.Name = "btnColor2";
+            this.btnColor2.Size = new System.Drawing.Size(75, 23);
+            this.btnColor2.TabIndex = 13;
+            this.btnColor2.UseVisualStyleBackColor = true;
+            // 
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.Location = new System.Drawing.Point(402, 25);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(88, 14);
+            this.label30.TabIndex = 12;
+            this.label30.Text = "Graph color #2:";
+            // 
+            // btnColor1
+            // 
+            this.btnColor1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnColor1.Location = new System.Drawing.Point(316, 21);
+            this.btnColor1.Name = "btnColor1";
+            this.btnColor1.Size = new System.Drawing.Size(75, 23);
+            this.btnColor1.TabIndex = 11;
+            this.btnColor1.UseVisualStyleBackColor = true;
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(210, 25);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(88, 14);
+            this.label29.TabIndex = 10;
+            this.label29.Text = "Graph color #1:";
+            // 
+            // btnColorCurrentValueShadow
+            // 
+            this.btnColorCurrentValueShadow.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnColorCurrentValueShadow.Location = new System.Drawing.Point(507, 87);
+            this.btnColorCurrentValueShadow.Name = "btnColorCurrentValueShadow";
+            this.btnColorCurrentValueShadow.Size = new System.Drawing.Size(75, 23);
+            this.btnColorCurrentValueShadow.TabIndex = 9;
+            this.btnColorCurrentValueShadow.UseVisualStyleBackColor = true;
+            // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.Location = new System.Drawing.Point(402, 91);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(83, 28);
+            this.label27.TabIndex = 8;
+            this.label27.Text = "Current value\r\nshadow color:";
+            // 
+            // btnColorCurrentValue
+            // 
+            this.btnColorCurrentValue.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnColorCurrentValue.Location = new System.Drawing.Point(316, 87);
+            this.btnColorCurrentValue.Name = "btnColorCurrentValue";
+            this.btnColorCurrentValue.Size = new System.Drawing.Size(75, 23);
+            this.btnColorCurrentValue.TabIndex = 7;
+            this.btnColorCurrentValue.UseVisualStyleBackColor = true;
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Location = new System.Drawing.Point(210, 91);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(79, 28);
+            this.label28.TabIndex = 6;
+            this.label28.Text = "Current value\r\ncolor:";
+            // 
+            // btnColorTitleShadow
+            // 
+            this.btnColorTitleShadow.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnColorTitleShadow.Location = new System.Drawing.Point(507, 50);
+            this.btnColorTitleShadow.Name = "btnColorTitleShadow";
+            this.btnColorTitleShadow.Size = new System.Drawing.Size(75, 23);
+            this.btnColorTitleShadow.TabIndex = 5;
+            this.btnColorTitleShadow.UseVisualStyleBackColor = true;
+            // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Location = new System.Drawing.Point(402, 55);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(78, 28);
+            this.label26.TabIndex = 4;
+            this.label26.Text = "Title shadow\r\ncolor:";
+            // 
+            // btnColorTitle
+            // 
+            this.btnColorTitle.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnColorTitle.Location = new System.Drawing.Point(316, 51);
+            this.btnColorTitle.Name = "btnColorTitle";
+            this.btnColorTitle.Size = new System.Drawing.Size(75, 23);
+            this.btnColorTitle.TabIndex = 3;
+            this.btnColorTitle.UseVisualStyleBackColor = true;
+            // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(210, 55);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(65, 14);
+            this.label25.TabIndex = 2;
+            this.label25.Text = "Title color:";
+            // 
+            // btnColorBar
+            // 
+            this.btnColorBar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnColorBar.Location = new System.Drawing.Point(112, 21);
+            this.btnColorBar.Name = "btnColorBar";
+            this.btnColorBar.Size = new System.Drawing.Size(75, 23);
+            this.btnColorBar.TabIndex = 1;
+            this.btnColorBar.UseVisualStyleBackColor = true;
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(14, 21);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(58, 14);
+            this.label24.TabIndex = 0;
+            this.label24.Text = "Bar color:";
+            // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(14, 55);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(63, 14);
+            this.label33.TabIndex = 14;
+            this.label33.Text = "Title font: ";
+            // 
+            // label34
+            // 
+            this.label34.AutoSize = true;
+            this.label34.Location = new System.Drawing.Point(14, 91);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(79, 28);
+            this.label34.TabIndex = 15;
+            this.label34.Text = "Current value\r\nfont:";
+            // 
+            // linkTitleFont
+            // 
+            this.linkTitleFont.AutoSize = true;
+            this.linkTitleFont.Font = new System.Drawing.Font("Calibri", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.linkTitleFont.LinkColor = System.Drawing.Color.Black;
+            this.linkTitleFont.Location = new System.Drawing.Point(110, 55);
+            this.linkTitleFont.Name = "linkTitleFont";
+            this.linkTitleFont.Size = new System.Drawing.Size(66, 13);
+            this.linkTitleFont.TabIndex = 16;
+            this.linkTitleFont.TabStop = true;
+            this.linkTitleFont.Text = "linkTitleFont";
+            this.linkTitleFont.VisitedLinkColor = System.Drawing.Color.Black;
+            this.linkTitleFont.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkTitleFont_LinkClicked);
+            // 
+            // linkCurrentValueFont
+            // 
+            this.linkCurrentValueFont.AutoSize = true;
+            this.linkCurrentValueFont.Font = new System.Drawing.Font("Calibri", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.linkCurrentValueFont.LinkColor = System.Drawing.Color.Black;
+            this.linkCurrentValueFont.Location = new System.Drawing.Point(110, 91);
+            this.linkCurrentValueFont.Name = "linkCurrentValueFont";
+            this.linkCurrentValueFont.Size = new System.Drawing.Size(26, 13);
+            this.linkCurrentValueFont.TabIndex = 17;
+            this.linkCurrentValueFont.TabStop = true;
+            this.linkCurrentValueFont.Text = "text";
+            this.linkCurrentValueFont.VisitedLinkColor = System.Drawing.Color.Black;
+            this.linkCurrentValueFont.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkCurrentValueFont_LinkClicked);
             // 
             // OptionForm
             // 
@@ -1124,11 +1195,12 @@
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editPollTime)).EndInit();
             this.tabPage2.ResumeLayout(false);
-            this.groupBox5.ResumeLayout(false);
-            this.groupBox5.PerformLayout();
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
             this.panelFooter.ResumeLayout(false);
+            this.panelFooter.PerformLayout();
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1173,7 +1245,7 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Panel panelFooter;
-        private System.Windows.Forms.Button buttonResetDefaults;
+        private System.Windows.Forms.Button buttonApply;
         private System.Windows.Forms.Label lblLatestVersion;
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.Button btnCheckUpdate;
@@ -1193,6 +1265,17 @@
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.CheckBox checkTitleShadowHover;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label label31;
+        private System.Windows.Forms.CheckBox checkSeparateScales;
+        private System.Windows.Forms.LinkLabel linkLatestVersion;
+        private Controls.MenuButton buttonReplicateSettings;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStripReplicateSettings;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.Button buttonResetDefaults;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.CheckBox checkEnabled;
+        private System.Windows.Forms.Label label32;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.Button btnColor2;
         private System.Windows.Forms.Label label30;
@@ -1208,16 +1291,11 @@
         private System.Windows.Forms.Label label25;
         private System.Windows.Forms.Button btnColorBar;
         private System.Windows.Forms.Label label24;
-        private System.Windows.Forms.Label label31;
-        private System.Windows.Forms.CheckBox checkSeparateScales;
-        private System.Windows.Forms.LinkLabel linkLatestVersion;
-        private Controls.MenuButton buttonReplicateSettings;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStripReplicateSettings;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private SystemWatcherControl swcPreview;
         private System.Windows.Forms.Label label17;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button3;
+        private SystemWatcherControl swcPreview;
+        private System.Windows.Forms.Label label34;
+        private System.Windows.Forms.Label label33;
+        private System.Windows.Forms.LinkLabel linkTitleFont;
+        private System.Windows.Forms.LinkLabel linkCurrentValueFont;
     }
 }

@@ -13,7 +13,7 @@ namespace TaskbarMonitor.Counters
         List<PerformanceCounter> cpuCounterCores;
         float currentValue = 0;
         
-        Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
+        //Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
         public CounterCPU(Options options)
             : base(options)
         {
@@ -25,7 +25,7 @@ namespace TaskbarMonitor.Counters
             cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
             PerformanceCounterCategory cat = new PerformanceCounterCategory("Processor");
             var instances = cat.GetInstanceNames();
-            
+            /*
             info.Add(CounterType.SINGLE, new List<CounterInfo> {
                 new CounterInfo() { Name = "default", History = new List<float>(), MaximumValue = 100.0f }
             });
@@ -33,42 +33,44 @@ namespace TaskbarMonitor.Counters
             info.Add(CounterType.STACKED, new List<CounterInfo> {
                 
             });
+            
+             */
+            InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = 100.0f };
+            Infos = new List<CounterInfo>();
             cpuCounterCores = new List<PerformanceCounter>();
             foreach (var item in instances.OrderBy(x => x))
             {
                 if (item.ToLower().Contains("_total")) continue;
 
-                info[CounterType.STACKED].Add(new CounterInfo() { Name = item, History = new List<float>(), MaximumValue = 100.0f });
+                // info[CounterType.STACKED].Add(new CounterInfo() { Name = item, History = new List<float>(), MaximumValue = 100.0f });
+                Infos.Add(new CounterInfo() { Name = item, History = new List<float>(), MaximumValue = 100.0f });
                 cpuCounterCores.Add(new PerformanceCounter("Processor", "% Processor Time", item));
             }
-             
+            
         }
         public override void Update()
         {
             currentValue = cpuCounter.NextValue();
-            info[CounterType.SINGLE][0].CurrentValue = currentValue;
-            info[CounterType.SINGLE][0].History.Add(currentValue);
-            if (info[CounterType.SINGLE][0].History.Count > Options.HistorySize) info[CounterType.SINGLE][0].History.RemoveAt(0);            
-            info[CounterType.SINGLE][0].CurrentStringValue = info[CounterType.SINGLE][0].CurrentValue.ToString("0") + "%";
+
+            InfoSummary.CurrentValue = currentValue;
+            InfoSummary.History.Add(currentValue);
+            if (InfoSummary.History.Count > Options.HistorySize) InfoSummary.History.RemoveAt(0);
+            InfoSummary.CurrentStringValue = InfoSummary.CurrentValue.ToString("0") + "%";
 
             foreach (var item in cpuCounterCores)
             {
-                var ct = info[CounterType.STACKED].Find(x => x.Name == item.InstanceName);
+                var ct = Infos.Where(x => x.Name == item.InstanceName).Single();
+
+                //var ct = info[CounterType.STACKED].Find(x => x.Name == item.InstanceName);
                 ct.CurrentValue = item.NextValue();                
                 ct.History.Add(ct.CurrentValue);
                 if (ct.History.Count > Options.HistorySize) ct.History.RemoveAt(0);
 
-                ct.CurrentStringValue = info[CounterType.SINGLE][0].CurrentStringValue;// same string value from SINGLE
+                ct.CurrentStringValue = InfoSummary.CurrentStringValue;// same string value from summary
             }
 
         }
-        public override List<CounterInfo> GetValues()
-        {
-             
-            return info[GetCounterType()];
-        }
        
-
         public override string GetName()
         {
             return "CPU";

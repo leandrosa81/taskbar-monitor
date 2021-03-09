@@ -17,14 +17,16 @@ namespace TaskbarMonitor.Counters
         }
         PerformanceCounter diskReadCounter;
         PerformanceCounter diskWriteCounter;
-                 
-        Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
+
+        //Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
+        
 
         public override void Initialize()
         {
             diskReadCounter = new PerformanceCounter("PhysicalDisk", "Disk Read Bytes/sec", "_Total");
             diskWriteCounter = new PerformanceCounter("PhysicalDisk", "Disk Write Bytes/sec", "_Total");
 
+            /*
             info.Add(CounterType.SINGLE, new List<CounterInfo> {
                 new CounterInfo() { Name = "default", History = new List<float>(), MaximumValue = 1 }
             });
@@ -37,44 +39,41 @@ namespace TaskbarMonitor.Counters
             info.Add(CounterType.STACKED, new List<CounterInfo> {
                 new CounterInfo() { Name = "R", History = new List<float>(), MaximumValue = 1 },
                 new CounterInfo() { Name = "W", History = new List<float>(), MaximumValue = 1 }
-            });
+            });*/
+            InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = 1 };
+            Infos = new List<CounterInfo>();
+            Infos.Add(new CounterInfo() { Name = "R", History = new List<float>(), MaximumValue = 1 });
+            Infos.Add(new CounterInfo() { Name = "W", History = new List<float>(), MaximumValue = 1 });
         }
         public override void Update()
         {
-            Action<CounterType, int, float> addValue = (counterType, index, value) =>
+            Action<CounterInfo, float> addValue = (info, value) =>
             {
-                info[counterType][index].CurrentValue = value;
-                info[counterType][index].History.Add(value);
-                if (info[counterType][index].History.Count > Options.HistorySize) info[counterType][index].History.RemoveAt(0);
-                info[counterType][index].MaximumValue = Convert.ToInt64(info[counterType][index].History.Max()) + 1;
+                info.CurrentValue = value;
+                info.History.Add(value);
+                if (info.History.Count > Options.HistorySize) info.History.RemoveAt(0);
+                info.MaximumValue = Convert.ToInt64(info.History.Max()) + 1;
 
-                info[counterType][index].CurrentStringValue = (info[counterType][index].CurrentValue / 1024 / 1024).ToString("0.0") + "MB/s";
+                info.CurrentStringValue = (info.CurrentValue / 1024 / 1024).ToString("0.0") + "MB/s";
             };
 
             float currentRead = diskReadCounter.NextValue();
             float currentWritten = diskWriteCounter.NextValue();
 
-            addValue(CounterType.SINGLE, 0, currentRead + currentWritten);
-
-            addValue(CounterType.MIRRORED, 0, currentRead);
-            addValue(CounterType.MIRRORED, 1, currentWritten);
-
-            addValue(CounterType.STACKED, 0, currentRead);
-            addValue(CounterType.STACKED, 1, currentWritten);
+            addValue(InfoSummary, currentRead + currentWritten);
+            addValue(Infos.Where(x => x.Name == "R").Single(), currentRead);
+            addValue(Infos.Where(x => x.Name == "W").Single(), currentWritten);
 
             // if locks down same scale for both counters is on
             if (!Options.CounterOptions["DISK"].SeparateScales)
             {
-                float max = info[GetCounterType()][0].MaximumValue > info[GetCounterType()][1].MaximumValue ? info[GetCounterType()][0].MaximumValue : info[GetCounterType()][1].MaximumValue;
-                info[GetCounterType()][0].MaximumValue = info[GetCounterType()][1].MaximumValue = max;
+                var info1 = Infos.Where(x => x.Name == "R").Single();
+                var info2 = Infos.Where(x => x.Name == "W").Single();
+
+                float max = info1.MaximumValue > info2.MaximumValue ? info1.MaximumValue : info2.MaximumValue;
+                info1.MaximumValue = info2.MaximumValue = max;
             }
 
-        }
-
-        public override List<CounterInfo> GetValues()
-        {                        
-            
-            return info[GetCounterType()];
         }
          
         public override string GetName()

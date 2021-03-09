@@ -28,6 +28,7 @@ namespace TaskbarMonitor
                     opt.CounterOptions.Add(item.Key, new TaskbarMonitor.CounterOptions());
 
                 opt.CounterOptions[item.Key].ShowTitle = item.Value.ShowTitle;
+                opt.CounterOptions[item.Key].Enabled = item.Value.Enabled;
                 opt.CounterOptions[item.Key].TitlePosition = item.Value.TitlePosition;
                 opt.CounterOptions[item.Key].ShowTitleShadowOnHover = item.Value.ShowTitleShadowOnHover;
                 opt.CounterOptions[item.Key].ShowCurrentValue = item.Value.ShowCurrentValue;
@@ -114,6 +115,7 @@ namespace TaskbarMonitor
             BOTTOM,
             MIDDLE
         }
+        public bool Enabled { get; set; } = true;
         public DisplayType ShowTitle { get; set; } = DisplayType.HOVER;
         public DisplayPosition TitlePosition { get; set; } = DisplayPosition.MIDDLE;
         public bool ShowTitleShadowOnHover { get; set; } = true;

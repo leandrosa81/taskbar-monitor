@@ -10,7 +10,7 @@ namespace TaskbarMonitorInstaller
     {
         class InstallInfo
         {
-            public List<string> FilesToCopy { get; set; }
+            public Dictionary<string, byte[]> FilesToCopy { get; set; }
             public List<string> FilesToRegister { get; set; }
             public string TargetPath { get; set; }
         }
@@ -21,7 +21,10 @@ namespace TaskbarMonitorInstaller
 
             InstallInfo info = new InstallInfo
             {
-                FilesToCopy = new List<string> { "TaskbarMonitor.dll", "Newtonsoft.Json.dll" },
+                FilesToCopy = new Dictionary<string, byte[]> { 
+                    { "TaskbarMonitor.dll", Properties.Resources.TaskbarMonitor }, 
+                    { "Newtonsoft.Json.dll", Properties.Resources.Newtonsoft_Json } 
+                },
                 FilesToRegister = new List<string> { "TaskbarMonitor.dll" },
                 //TargetPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "TaskbarMonitor")
                 TargetPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "TaskbarMonitor")
@@ -52,13 +55,16 @@ namespace TaskbarMonitorInstaller
                 Console.WriteLine("OK.");
 
                 // First copy files to program files folder          
-                foreach (var item in info.FilesToCopy)
+                foreach (var file in info.FilesToCopy)
                 {
+                    var item = file.Key;
+
                     var targetFilePath = Path.Combine(info.TargetPath, item);
                     Console.Write(string.Format("Copying {0}... ", item));
-                    File.Copy(item, targetFilePath, true);
+                    File.WriteAllBytes(targetFilePath, file.Value);
+                    //File.Copy(item, targetFilePath, true);
                     Console.WriteLine("OK.");
-                }
+                }                
             }
             else
             {
@@ -74,11 +80,14 @@ namespace TaskbarMonitorInstaller
                 restartExplorer.Execute(() =>
                 {
                     // First copy files to program files folder          
-                    foreach (var item in info.FilesToCopy)
+                    foreach (var file in info.FilesToCopy)
                     {
+                        var item = file.Key;
+
                         var targetFilePath = Path.Combine(info.TargetPath, item);
                         Console.Write($"Copying {item}... ");
-                        File.Copy(item, targetFilePath, true);
+                        File.WriteAllBytes(targetFilePath, file.Value);
+                        //File.Copy(item, targetFilePath, true);
                         Console.WriteLine("OK.");
                     }
                 });
@@ -122,8 +131,9 @@ namespace TaskbarMonitorInstaller
             restartExplorer.Execute(() =>
             {
                 // First copy files to program files folder          
-                foreach (var item in info.FilesToCopy)
+                foreach (var file in info.FilesToCopy)
                 {
+                    var item = file.Key;
                     var targetFilePath = Path.Combine(info.TargetPath, item);
                     if (File.Exists(targetFilePath))
                     {
