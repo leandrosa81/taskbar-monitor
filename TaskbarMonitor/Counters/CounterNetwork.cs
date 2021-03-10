@@ -23,11 +23,19 @@ namespace TaskbarMonitor.Counters
 
         public override void Initialize()
         {
+
+            ReadCounters();
+
+            InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = 1 };
+            Infos = new List<CounterInfo>();
+            Infos.Add(new CounterInfo() { Name = "D", History = new List<float>(), MaximumValue = 1 });
+            Infos.Add(new CounterInfo() { Name = "U", History = new List<float>(), MaximumValue = 1 });
+        }
+
+        private void ReadCounters()
+        {
             PerformanceCounterCategory pcg = new PerformanceCounterCategory("Network Interface");
             string[] instances = pcg.GetInstanceNames();
-            //string instance = pcg.GetInstanceNames()[0];
-            //PerformanceCounter pcsent = new PerformanceCounter("Network Interface", "Bytes Sent/sec", instance);
-            //PerformanceCounter pcreceived = new PerformanceCounter("Network Interface", "Bytes Received/sec", instance);
 
             netCountersSent = new List<PerformanceCounter>();
             netCountersReceived = new List<PerformanceCounter>();
@@ -36,29 +44,7 @@ namespace TaskbarMonitor.Counters
                 netCountersSent.Add(new PerformanceCounter("Network Interface", "Bytes Sent/sec", instance));
                 netCountersReceived.Add(new PerformanceCounter("Network Interface", "Bytes Received/sec", instance));
             }
-            /*
-            info.Add(CounterType.SINGLE, new List<CounterInfo> {
-                new CounterInfo() { Name = "default", History = new List<float>(), MaximumValue = 1 }
-            });
-
-            info.Add(CounterType.MIRRORED, new List<CounterInfo> {
-                new CounterInfo() { Name = "D", History = new List<float>(), MaximumValue = 1 },
-                new CounterInfo() { Name = "U", History = new List<float>(), MaximumValue = 1 }
-
-            });
-            info.Add(CounterType.STACKED, new List<CounterInfo> {
-                new CounterInfo() { Name = "D", History = new List<float>(), MaximumValue = 1 },
-                new CounterInfo() { Name = "U", History = new List<float>(), MaximumValue = 1 }
-
-            });
-            */
-
-            InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = 1 };
-            Infos = new List<CounterInfo>();
-            Infos.Add(new CounterInfo() { Name = "D", History = new List<float>(), MaximumValue = 1 });
-            Infos.Add(new CounterInfo() { Name = "U", History = new List<float>(), MaximumValue = 1 });
         }
-
        
 
         public override void Update()
@@ -75,29 +61,45 @@ namespace TaskbarMonitor.Counters
                 else
                     info.CurrentStringValue = (info.CurrentValue / 1024).ToString("0.0") + "KB/s";
             };
+            bool success = false;
+            int maxRetries = 1;
+            int retries = 0;
+            while (!success && retries <= maxRetries)
+            {
+                try
+                {
+                    float currentSent = 0;
+                    float currentReceived = 0;
+                    foreach (var netCounter in netCountersSent)
+                    {
+                        currentSent += netCounter.NextValue();
+                    }
+                    foreach (var netCounter in netCountersReceived)
+                    {
+                        currentReceived += netCounter.NextValue();
+                    }
 
-            float currentSent = 0;
-            float currentReceived = 0;
-            foreach (var netCounter in netCountersSent)
-            {
-                currentSent += netCounter.NextValue();                
-            }
-            foreach (var netCounter in netCountersReceived)
-            {
-                currentReceived += netCounter.NextValue();
-            }
-            addValue(InfoSummary, currentSent + currentReceived);
-            addValue(Infos.Where(x => x.Name == "D").Single(), currentReceived);
-            addValue(Infos.Where(x => x.Name == "U").Single(), currentSent);
-            
-            // if locks down same scale for both counters is on
-            if (!Options.CounterOptions["NET"].SeparateScales)
-            {
-                var info1 = Infos.Where(x => x.Name == "D").Single();
-                var info2 = Infos.Where(x => x.Name == "U").Single();
+                    addValue(InfoSummary, currentSent + currentReceived);
+                    addValue(Infos.Where(x => x.Name == "D").Single(), currentReceived);
+                    addValue(Infos.Where(x => x.Name == "U").Single(), currentSent);
 
-                float max = info1.MaximumValue > info2.MaximumValue ? info1.MaximumValue : info2.MaximumValue;
-                info1.MaximumValue = info2.MaximumValue = max;
+                    // if locks down same scale for both counters is on
+                    if (!Options.CounterOptions["NET"].SeparateScales)
+                    {
+                        var info1 = Infos.Where(x => x.Name == "D").Single();
+                        var info2 = Infos.Where(x => x.Name == "U").Single();
+
+                        float max = info1.MaximumValue > info2.MaximumValue ? info1.MaximumValue : info2.MaximumValue;
+                        info1.MaximumValue = info2.MaximumValue = max;
+                    }
+                    success = true;
+                }
+                catch (InvalidOperationException e)
+                {
+                    // in this case we have to reevaluate the counters
+                    ReadCounters();
+                    retries++;
+                }
             }
 
 
