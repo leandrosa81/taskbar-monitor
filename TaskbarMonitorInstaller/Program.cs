@@ -148,18 +148,32 @@ namespace TaskbarMonitorInstaller
             {
                 var item = "TaskbarMonitorInstaller.exe";
                 Console.Write($"Deleting {item}... ");
-                //Win32Api.DeleteFile(Path.Combine(info.TargetPath, item));
-                //Console.WriteLine("Scheduled for deletion after uninstall completes.");
-                Win32Api.MoveFileEx(Path.Combine(info.TargetPath, item), null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
-                Console.WriteLine("Scheduled for deletion after next reboot.");
+                try
+                {
+                    Win32Api.DeleteFile(Path.Combine(info.TargetPath, item));
+                    Console.WriteLine("OK.");
+                }
+                catch
+                {
+                    Win32Api.MoveFileEx(Path.Combine(info.TargetPath, item), null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
+                    Console.WriteLine("Scheduled for deletion after next reboot.");
+                }
+                
             }
             
             if (Directory.Exists(info.TargetPath))
             {
                 Console.Write("Deleting target directory... ");
-                //Directory.Delete(info.TargetPath);
-                Win32Api.MoveFileEx(info.TargetPath, null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
-                Console.WriteLine("Scheduled for deletion after next reboot.");
+                try
+                {
+                    Directory.Delete(info.TargetPath);
+                    Console.WriteLine("OK.");
+                }
+                catch
+                {
+                    Win32Api.MoveFileEx(info.TargetPath, null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
+                    Console.WriteLine("Scheduled for deletion after next reboot.");
+                }
             }
             Console.Write("Removing uninstall info from registry... "); 
             DeleteUninstaller();
