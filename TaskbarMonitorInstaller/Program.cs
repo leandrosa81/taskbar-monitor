@@ -8,6 +8,8 @@ namespace TaskbarMonitorInstaller
 {
     class Program
     {
+
+        static Guid UninstallGuid = new Guid(@"c7f3d760-a8d1-4fdc-9c74-41bf9112e835");
         class InstallInfo
         {
             public Dictionary<string, byte[]> FilesToCopy { get; set; }
@@ -64,19 +66,13 @@ namespace TaskbarMonitorInstaller
                     File.WriteAllBytes(targetFilePath, file.Value);
                     //File.Copy(item, targetFilePath, true);
                     Console.WriteLine("OK.");
-                }                
+                }
+                // copy the uninstaller too
+                File.Copy("TaskbarMonitorInstaller.exe", Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"));
             }
             else
             {
-                //foreach (var item in info.FilesToRegister)
-                //{
-                //    var targetFilePath = System.IO.Path.Combine(info.TargetPath, item);                    
-                //    RegisterDLL(targetFilePath, false, true);
-                //    RegisterDLL(targetFilePath, true, true);
-                //    Console.WriteLine("OK.");
-
-                //}
-
+                
                 restartExplorer.Execute(() =>
                 {
                     // First copy files to program files folder          
@@ -90,6 +86,8 @@ namespace TaskbarMonitorInstaller
                         //File.Copy(item, targetFilePath, true);
                         Console.WriteLine("OK.");
                     }
+                    // copy the uninstaller too
+                    File.Copy("TaskbarMonitorInstaller.exe", Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"), true);
                 });
             }
 
@@ -102,6 +100,8 @@ namespace TaskbarMonitorInstaller
                 RegisterDLL(targetFilePath, true, false);
                 Console.WriteLine("OK.");
             }
+
+            CreateUninstaller(Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"));
         }
 
         static bool RegisterDLL(string target, bool bit64 = false, bool unregister = false)
@@ -142,14 +142,28 @@ namespace TaskbarMonitorInstaller
                         Console.WriteLine("OK.");
                     }
                 }
+                
             });
 
+            {
+                var item = "TaskbarMonitorInstaller.exe";
+                Console.Write($"Deleting {item}... ");
+                //Win32Api.DeleteFile(Path.Combine(info.TargetPath, item));
+                //Console.WriteLine("Scheduled for deletion after uninstall completes.");
+                Win32Api.MoveFileEx(Path.Combine(info.TargetPath, item), null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
+                Console.WriteLine("Scheduled for deletion after next reboot.");
+            }
+            
             if (Directory.Exists(info.TargetPath))
             {
                 Console.Write("Deleting target directory... ");
-                Directory.Delete(info.TargetPath);
-                Console.WriteLine("OK.");
+                //Directory.Delete(info.TargetPath);
+                Win32Api.MoveFileEx(info.TargetPath, null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
+                Console.WriteLine("Scheduled for deletion after next reboot.");
             }
+            Console.Write("Removing uninstall info from registry... "); 
+            DeleteUninstaller();
+            Console.WriteLine("OK.");
 
             return true;
         }
@@ -169,6 +183,76 @@ namespace TaskbarMonitorInstaller
                 process.WaitForExit();
 
                 return output;
+            }
+        }
+        static private void DeleteUninstaller()
+        {
+            var UninstallRegKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+            using (Microsoft.Win32.RegistryKey parent = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
+                        UninstallRegKeyPath, true))
+            {
+                if (parent == null)
+                {
+                    throw new Exception("Uninstall registry key not found.");
+                }
+                string guidText = UninstallGuid.ToString("B");
+                parent.DeleteSubKeyTree(guidText, false);
+            }
+        
+        }
+        static private void CreateUninstaller(string pathToUninstaller)
+        {
+            var UninstallRegKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+            using (Microsoft.Win32.RegistryKey parent = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
+                        UninstallRegKeyPath, true))
+            {
+                if (parent == null)
+                {
+                    throw new Exception("Uninstall registry key not found.");
+                }
+                try
+                {
+                    Microsoft.Win32.RegistryKey key = null;
+
+                    try
+                    {
+                        string guidText = UninstallGuid.ToString("B");
+                        key = parent.OpenSubKey(guidText, true) ??
+                              parent.CreateSubKey(guidText);
+
+                        if (key == null)
+                        {
+                            throw new Exception(String.Format("Unable to create uninstaller '{0}\\{1}'", UninstallRegKeyPath, guidText));
+                        }
+
+                        Version v = new Version(Properties.Resources.Version);
+                         
+                        string exe = pathToUninstaller;
+
+                        key.SetValue("DisplayName", "taskbar-monitor");
+                        key.SetValue("ApplicationVersion", v.ToString());
+                        key.SetValue("Publisher", "Leandro Lugarinho");
+                        key.SetValue("DisplayIcon", exe);
+                        key.SetValue("DisplayVersion", v.ToString(3));
+                        key.SetValue("URLInfoAbout", "https://lugarinho.tech/tools/taskbar-monitor");
+                        key.SetValue("Contact", "leandrosa81@gmail.com");
+                        key.SetValue("InstallDate", DateTime.Now.ToString("yyyyMMdd"));
+                        key.SetValue("UninstallString", exe + " /uninstall");
+                    }
+                    finally
+                    {
+                        if (key != null)
+                        {
+                            key.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(
+                        "An error occurred writing uninstall information to the registry.  The service is fully installed but can only be uninstalled manually through the command line.",
+                        ex);
+                }
             }
         }
     }
