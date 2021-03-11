@@ -128,7 +128,7 @@ namespace TaskbarMonitor
             AdjustControlSize();
             
 
-
+            /*
             float dpiX, dpiY;
             using (Graphics graphics = this.CreateGraphics())
             {
@@ -138,10 +138,7 @@ namespace TaskbarMonitor
             float fontSize = 7f;
             if (dpiX > 96)
                 fontSize = 6f;
-
-                        
-
-            
+            */
         }
 
         private void AdjustControlSize()

@@ -73,7 +73,7 @@ namespace TaskbarMonitor
                 }
             };
             InitializeComponent();
-
+            /*
             float dpiX, dpiY;
             using (Graphics graphics = this.CreateGraphics())
             {
@@ -86,7 +86,7 @@ namespace TaskbarMonitor
                 var fontSize = 7.25f;
                 this.Font = new Font("Calibri", fontSize, FontStyle.Regular);
             }
-
+            */
             Initialize();
         }
         private void Initialize()
