@@ -61,53 +61,67 @@ namespace TaskbarMonitor
 
         public SystemWatcherControl(Options opt, GraphTheme theme)//CSDeskBand.CSDeskBandWin w, 
         {
-            ApplyOptions(opt, theme);
-
-            Counters = new List<Counters.ICounter>();
-            if (opt.CounterOptions.ContainsKey("CPU"))
-            {
-                var ct = new Counters.CounterCPU(opt);
-                ct.Initialize();
-                Counters.Add(ct);
-            }
-            if (opt.CounterOptions.ContainsKey("MEM"))
-            {
-                var ct = new Counters.CounterMemory(opt);
-                ct.Initialize();
-                Counters.Add(ct);
-            }
-            if (opt.CounterOptions.ContainsKey("DISK"))
-            {
-                var ct = new Counters.CounterDisk(opt);
-                ct.Initialize();
-                Counters.Add(ct);
-            }
-            if (opt.CounterOptions.ContainsKey("NET"))
-            {
-                var ct = new Counters.CounterNetwork(opt);
-                ct.Initialize();
-                Counters.Add(ct);
-
-            }
-            //Initialize();            
-            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-            SetStyle(ControlStyles.DoubleBuffer, true);
-            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-            SetStyle(ControlStyles.UserPaint, true);
-
-            InitializeComponent();
-            AdjustControlSize();
-
-            pollingTimer = new System.Timers.Timer(opt.PollTime * 1000);
-            pollingTimer.Enabled = true;
-            pollingTimer.Elapsed += PollingTimer_Elapsed;
-            pollingTimer.Start();
+            Initialize(opt, theme);
         }
          
         public SystemWatcherControl()
         {
             Options opt = TaskbarMonitor.Options.ReadFromDisk();
             GraphTheme theme = GraphTheme.ReadFromDisk();
+            
+            Initialize(opt, theme);            
+        }
+
+        private void PollingTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            UpdateGraphs();
+
+            this.Invalidate();
+        }
+
+        public void ApplyOptions(Options Options, GraphTheme theme)
+        {
+            this.Options = Options;
+            this.defaultTheme = theme;
+
+            fontTitle = new Font(defaultTheme.TitleFont, defaultTheme.TitleSize, FontStyle.Bold);
+            fontCounter = new Font(defaultTheme.CurrentValueFont, defaultTheme.CurrentValueSize, FontStyle.Bold);
+
+            _contextMenu = new ContextMenu();
+            _contextMenu.MenuItems.Add(new MenuItem("Settings...", MenuItem_Settings_onClick));
+            _contextMenu.MenuItems.Add(new MenuItem("Open Resource Monitor...", (e, a) => {
+                System.Diagnostics.Process.Start("resmon.exe");
+            }));
+            _contextMenu.MenuItems.Add(new MenuItem(String.Format("About taskbar-monitor (v{0})...", Version.ToString(3)), MenuItem_About_onClick));
+            this.ContextMenu = _contextMenu;
+
+
+            if (PreviewMode)
+            {
+                Color taskBarColour = BLL.Win32Api.GetColourAt(BLL.Win32Api.GetTaskbarPosition().Location);
+                this.BackColor = taskBarColour;
+
+            }
+             
+            /*
+                float dpiX, dpiY;
+                using (Graphics graphics = this.CreateGraphics())
+                {
+                    dpiX = graphics.DpiX;
+                    dpiY = graphics.DpiY;
+                }
+                float fontSize = 7f;
+                if (dpiX > 96)
+                    fontSize = 6f;
+                */
+
+            AdjustControlSize();
+            UpdateGraphs();
+            this.Invalidate();
+
+        }
+        private void Initialize(Options opt, GraphTheme theme)
+        {
 
             Counters = new List<Counters.ICounter>();
             if (opt.CounterOptions.ContainsKey("CPU"))
@@ -149,59 +163,8 @@ namespace TaskbarMonitor
             pollingTimer.Enabled = true;
             pollingTimer.Elapsed += PollingTimer_Elapsed;
             pollingTimer.Start();
-        }
-
-        private void PollingTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            UpdateGraphs();
-
-            this.Invalidate();
-        }
-
-        public void ApplyOptions(Options Options, GraphTheme theme)
-        {
-            this.Options = Options;
-            this.defaultTheme = theme;
-
-            fontTitle = new Font(defaultTheme.TitleFont, defaultTheme.TitleSize, FontStyle.Bold);
-            fontCounter = new Font(defaultTheme.CurrentValueFont, defaultTheme.CurrentValueSize, FontStyle.Bold);
-
-            Initialize();
-            AdjustControlSize();
-            UpdateGraphs();
-            this.Invalidate();
 
         }
-        private void Initialize()
-        {             
-            _contextMenu = new ContextMenu();
-            _contextMenu.MenuItems.Add(new MenuItem("Settings...", MenuItem_Settings_onClick));
-            _contextMenu.MenuItems.Add(new MenuItem("Open Resource Monitor...", (e, a) => {
-                System.Diagnostics.Process.Start("resmon.exe");
-            }));
-            _contextMenu.MenuItems.Add(new MenuItem(String.Format("About taskbar-monitor (v{0})...",Version.ToString(3)), MenuItem_About_onClick));
-            this.ContextMenu = _contextMenu;            
-
-            
-            if (PreviewMode)
-            {
-                Color taskBarColour = BLL.Win32Api.GetColourAt(BLL.Win32Api.GetTaskbarPosition().Location);
-                this.BackColor = taskBarColour;
-
-            }
-
-                /*
-                float dpiX, dpiY;
-                using (Graphics graphics = this.CreateGraphics())
-                {
-                    dpiX = graphics.DpiX;
-                    dpiY = graphics.DpiY;
-                }
-                float fontSize = 7f;
-                if (dpiX > 96)
-                    fontSize = 6f;
-                */
-            }
 
         private void AdjustControlSize()
         {
