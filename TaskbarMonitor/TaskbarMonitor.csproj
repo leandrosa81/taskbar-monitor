@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BLL\Win32Api.cs" />
     <Compile Include="Controls\MenuButton.cs">
       <SubType>Component</SubType>
     </Compile>

@@ -720,6 +720,7 @@
             this.btnColor2.Size = new System.Drawing.Size(75, 23);
             this.btnColor2.TabIndex = 13;
             this.btnColor2.UseVisualStyleBackColor = true;
+            this.btnColor2.Click += new System.EventHandler(this.btnColor2_Click);
             // 
             // label30
             // 
@@ -738,6 +739,7 @@
             this.btnColor1.Size = new System.Drawing.Size(75, 23);
             this.btnColor1.TabIndex = 11;
             this.btnColor1.UseVisualStyleBackColor = true;
+            this.btnColor1.Click += new System.EventHandler(this.btnColor1_Click);
             // 
             // label29
             // 
@@ -756,6 +758,7 @@
             this.btnColorCurrentValueShadow.Size = new System.Drawing.Size(75, 23);
             this.btnColorCurrentValueShadow.TabIndex = 9;
             this.btnColorCurrentValueShadow.UseVisualStyleBackColor = true;
+            this.btnColorCurrentValueShadow.Click += new System.EventHandler(this.btnColorCurrentValueShadow_Click);
             // 
             // label27
             // 
@@ -774,6 +777,7 @@
             this.btnColorCurrentValue.Size = new System.Drawing.Size(75, 23);
             this.btnColorCurrentValue.TabIndex = 7;
             this.btnColorCurrentValue.UseVisualStyleBackColor = true;
+            this.btnColorCurrentValue.Click += new System.EventHandler(this.btnColorCurrentValue_Click);
             // 
             // label28
             // 
@@ -792,6 +796,7 @@
             this.btnColorTitleShadow.Size = new System.Drawing.Size(75, 23);
             this.btnColorTitleShadow.TabIndex = 5;
             this.btnColorTitleShadow.UseVisualStyleBackColor = true;
+            this.btnColorTitleShadow.Click += new System.EventHandler(this.btnColorTitleShadow_Click);
             // 
             // label26
             // 
@@ -810,6 +815,7 @@
             this.btnColorTitle.Size = new System.Drawing.Size(75, 23);
             this.btnColorTitle.TabIndex = 3;
             this.btnColorTitle.UseVisualStyleBackColor = true;
+            this.btnColorTitle.Click += new System.EventHandler(this.btnColorTitle_Click);
             // 
             // label25
             // 
@@ -828,6 +834,7 @@
             this.btnColorBar.Size = new System.Drawing.Size(75, 23);
             this.btnColorBar.TabIndex = 1;
             this.btnColorBar.UseVisualStyleBackColor = true;
+            this.btnColorBar.Click += new System.EventHandler(this.btnColorBar_Click);
             // 
             // label24
             // 
@@ -1136,7 +1143,8 @@
             // 
             // swcPreview
             // 
-            this.swcPreview.BackColor = System.Drawing.Color.Black;
+            this.swcPreview.BackColor = System.Drawing.Color.Transparent;
+            this.swcPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.swcPreview.Location = new System.Drawing.Point(15, 39);
             this.swcPreview.Name = "swcPreview";
             this.swcPreview.PreviewMode = true;

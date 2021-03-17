@@ -360,7 +360,10 @@ namespace TaskbarMonitor
                         lblLatestVersion.Text = "v" + latestVersion.ToString();
                     }
                 }
-                
+                else
+                {
+                    btnCheckUpdate.Text = "check failed";
+                }
                 btnCheckUpdate.Enabled = true;
             }
             

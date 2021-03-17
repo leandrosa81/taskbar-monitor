@@ -32,6 +32,7 @@ namespace TaskbarMonitor
         private bool _previewMode = false;
         private ContextMenu _contextMenu = null;
         private bool VerticalTaskbarMode = false;
+        private System.Timers.Timer pollingTimer;
         public bool PreviewMode { get
             {
                 return _previewMode;
@@ -60,16 +61,103 @@ namespace TaskbarMonitor
 
         public SystemWatcherControl(Options opt, GraphTheme theme)//CSDeskBand.CSDeskBandWin w, 
         {
-            ApplyOptions(opt, theme);            
-            Initialize();
+            ApplyOptions(opt, theme);
+
+            Counters = new List<Counters.ICounter>();
+            if (opt.CounterOptions.ContainsKey("CPU"))
+            {
+                var ct = new Counters.CounterCPU(opt);
+                ct.Initialize();
+                Counters.Add(ct);
+            }
+            if (opt.CounterOptions.ContainsKey("MEM"))
+            {
+                var ct = new Counters.CounterMemory(opt);
+                ct.Initialize();
+                Counters.Add(ct);
+            }
+            if (opt.CounterOptions.ContainsKey("DISK"))
+            {
+                var ct = new Counters.CounterDisk(opt);
+                ct.Initialize();
+                Counters.Add(ct);
+            }
+            if (opt.CounterOptions.ContainsKey("NET"))
+            {
+                var ct = new Counters.CounterNetwork(opt);
+                ct.Initialize();
+                Counters.Add(ct);
+
+            }
+            //Initialize();            
+            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+            SetStyle(ControlStyles.DoubleBuffer, true);
+            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+            SetStyle(ControlStyles.UserPaint, true);
+
+            InitializeComponent();
+            AdjustControlSize();
+
+            pollingTimer = new System.Timers.Timer(opt.PollTime * 1000);
+            pollingTimer.Enabled = true;
+            pollingTimer.Elapsed += PollingTimer_Elapsed;
+            pollingTimer.Start();
         }
+         
         public SystemWatcherControl()
         {
             Options opt = TaskbarMonitor.Options.ReadFromDisk();
             GraphTheme theme = GraphTheme.ReadFromDisk();
+
+            Counters = new List<Counters.ICounter>();
+            if (opt.CounterOptions.ContainsKey("CPU"))
+            {
+                var ct = new Counters.CounterCPU(opt);
+                ct.Initialize();
+                Counters.Add(ct);
+            }
+            if (opt.CounterOptions.ContainsKey("MEM"))
+            {
+                var ct = new Counters.CounterMemory(opt);
+                ct.Initialize();
+                Counters.Add(ct);
+            }
+            if (opt.CounterOptions.ContainsKey("DISK"))
+            {
+                var ct = new Counters.CounterDisk(opt);
+                ct.Initialize();
+                Counters.Add(ct);
+            }
+            if (opt.CounterOptions.ContainsKey("NET"))
+            {
+                var ct = new Counters.CounterNetwork(opt);
+                ct.Initialize();
+                Counters.Add(ct);
+            }
+
             ApplyOptions(opt, theme);
-            Initialize();
+            //Initialize();
+            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+            SetStyle(ControlStyles.DoubleBuffer, true);
+            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+            SetStyle(ControlStyles.UserPaint, true);
+
+            InitializeComponent();
+            AdjustControlSize();
+
+            pollingTimer = new System.Timers.Timer(opt.PollTime * 1000);
+            pollingTimer.Enabled = true;
+            pollingTimer.Elapsed += PollingTimer_Elapsed;
+            pollingTimer.Start();
         }
+
+        private void PollingTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            UpdateGraphs();
+
+            this.Invalidate();
+        }
+
         public void ApplyOptions(Options Options, GraphTheme theme)
         {
             this.Options = Options;
@@ -78,32 +166,7 @@ namespace TaskbarMonitor
             fontTitle = new Font(defaultTheme.TitleFont, defaultTheme.TitleSize, FontStyle.Bold);
             fontCounter = new Font(defaultTheme.CurrentValueFont, defaultTheme.CurrentValueSize, FontStyle.Bold);
 
-            Counters = new List<Counters.ICounter>();
-            if (Options.CounterOptions.ContainsKey("CPU"))
-            {
-                var ct = new Counters.CounterCPU(Options);
-                ct.Initialize();
-                Counters.Add(ct);
-            }
-            if (Options.CounterOptions.ContainsKey("MEM"))
-            {
-                var ct = new Counters.CounterMemory(Options);
-                ct.Initialize();
-                Counters.Add(ct);
-            }
-            if (Options.CounterOptions.ContainsKey("DISK"))
-            {
-                var ct = new Counters.CounterDisk(Options);
-                ct.Initialize();
-                Counters.Add(ct);
-            }
-            if (Options.CounterOptions.ContainsKey("NET"))
-            {
-                var ct = new Counters.CounterNetwork(Options);
-                ct.Initialize();
-                Counters.Add(ct);
-            }
-             
+            Initialize();
             AdjustControlSize();
             UpdateGraphs();
             this.Invalidate();
@@ -119,27 +182,26 @@ namespace TaskbarMonitor
             _contextMenu.MenuItems.Add(new MenuItem(String.Format("About taskbar-monitor (v{0})...",Version.ToString(3)), MenuItem_About_onClick));
             this.ContextMenu = _contextMenu;            
 
-            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-            SetStyle(ControlStyles.DoubleBuffer, true);
-            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-            SetStyle(ControlStyles.UserPaint, true);
-
-            InitializeComponent();
-            AdjustControlSize();
             
-
-            /*
-            float dpiX, dpiY;
-            using (Graphics graphics = this.CreateGraphics())
+            if (PreviewMode)
             {
-                dpiX = graphics.DpiX;
-                dpiY = graphics.DpiY;
+                Color taskBarColour = BLL.Win32Api.GetColourAt(BLL.Win32Api.GetTaskbarPosition().Location);
+                this.BackColor = taskBarColour;
+
             }
-            float fontSize = 7f;
-            if (dpiX > 96)
-                fontSize = 6f;
-            */
-        }
+
+                /*
+                float dpiX, dpiY;
+                using (Graphics graphics = this.CreateGraphics())
+                {
+                    dpiX = graphics.DpiX;
+                    dpiY = graphics.DpiY;
+                }
+                float fontSize = 7f;
+                if (dpiX > 96)
+                    fontSize = 6f;
+                */
+            }
 
         private void AdjustControlSize()
         {
@@ -169,22 +231,15 @@ namespace TaskbarMonitor
                     OnChangeSize(new Size(controlWidth, controlHeight));
             }
         }
-
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            UpdateGraphs();
-
-            this.Invalidate();
-        }
-
+         
         private void UpdateGraphs()
         {
             foreach (var ct in Counters)
             {
                 ct.Update();
             }
-            if (timer1 != null && timer1.Interval != Options.PollTime * 1000)
-                timer1.Interval = Options.PollTime * 1000;
+            if (pollingTimer != null && pollingTimer.Interval != Options.PollTime * 1000)
+                pollingTimer.Interval = Options.PollTime * 1000;
         }
 
         private void SystemWatcherControl_Paint(object sender, PaintEventArgs e)

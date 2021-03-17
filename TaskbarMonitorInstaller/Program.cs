@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -44,10 +45,8 @@ namespace TaskbarMonitorInstaller
 
         static void Install(InstallInfo info)
         {
-            RestartExplorer restartExplorer = new RestartExplorer();
-            //restartExplorer.ReportProgress += Console.WriteLine;
-            //restartExplorer.ReportPercentage += (percentage) =>
-            //Console.WriteLine($"Percentage: {percentage}");
+            Console.WriteLine("Installing taskbar-monitor on your computer, please wait.");
+            RestartExplorer restartExplorer = new RestartExplorer();                        
 
             // Create directory
             if (!Directory.Exists(info.TargetPath))
@@ -101,7 +100,18 @@ namespace TaskbarMonitorInstaller
                 Console.WriteLine("OK.");
             }
 
+            Console.Write("Registering uninstaller... ");
             CreateUninstaller(Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"));
+            Console.WriteLine("OK.");
+
+            // remove pending delete operations
+            {
+                Console.Write("Cleaning up previous pending uninstalls... ");
+                if (CleanUpPendingDeleteOperations(info.TargetPath, out string errorMessage))
+                    Console.WriteLine("OK.");
+                else
+                    Console.WriteLine("ERROR: " + errorMessage);
+            }
         }
 
         static bool RegisterDLL(string target, bool bit64 = false, bool unregister = false)
@@ -150,8 +160,15 @@ namespace TaskbarMonitorInstaller
                 Console.Write($"Deleting {item}... ");
                 try
                 {
-                    Win32Api.DeleteFile(Path.Combine(info.TargetPath, item));
-                    Console.WriteLine("OK.");
+                    if (Win32Api.DeleteFile(Path.Combine(info.TargetPath, item)))
+                    {
+                        Console.WriteLine("OK.");
+                    }
+                    else
+                    {
+                        Win32Api.MoveFileEx(Path.Combine(info.TargetPath, item), null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
+                        Console.WriteLine("Scheduled for deletion after next reboot.");
+                    }
                 }
                 catch
                 {
@@ -267,6 +284,46 @@ namespace TaskbarMonitorInstaller
                         "An error occurred writing uninstall information to the registry.  The service is fully installed but can only be uninstalled manually through the command line.",
                         ex);
                 }
+            }
+        }
+
+        static bool CleanUpPendingDeleteOperations(string basepath, out string errorMessage)
+        {
+            // here we check the registry for pending operations on the program files (previous pending uninstall)
+            try
+            {
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Session Manager\", true))
+                {
+                    if (key != null)
+                    {
+                        Object o = key.GetValue("PendingFileRenameOperations");
+                        if (o != null)
+                        {
+                            var values = o as String[];
+                            List<string> dest = new List<string>();
+                            for (int i = 0; i < values.Length; i+=2)
+                            {
+                                if(!values[i].Contains(basepath))
+                                {
+                                    dest.Add(values[i]);
+                                    dest.Add(values[i+1]);
+                                }
+                            }
+                            //if (dest.Count > 0)
+                                key.SetValue("PendingFileRenameOperations", dest.ToArray());
+                            //else
+                                //key.DeleteValue("PendingFileRenameOperations");
+                        }
+                    }
+                }
+                errorMessage = "";
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                errorMessage = "An error occurred cleaning up previous uninstall information to the registry. The program might be partially uninstalled on the next reboot.";                
+                return false;                
             }
         }
     }

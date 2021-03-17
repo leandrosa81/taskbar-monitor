@@ -61,7 +61,7 @@ namespace TaskbarMonitor.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 0.3.3.
+        ///   Looks up a localized string similar to 0.3.4.
         /// </summary>
         internal static string Version {
             get {

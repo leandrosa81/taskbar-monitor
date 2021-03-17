@@ -18,7 +18,10 @@ namespace TaskbarMonitor
         private static Control _control;
 
         public Deskband()
-        {             
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
             Options opt = TaskbarMonitor.Options.ReadFromDisk();
             GraphTheme theme = GraphTheme.ReadFromDisk();
 
