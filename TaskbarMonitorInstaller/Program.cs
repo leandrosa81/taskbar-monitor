@@ -25,8 +25,7 @@ namespace TaskbarMonitorInstaller
             InstallInfo info = new InstallInfo
             {
                 FilesToCopy = new Dictionary<string, byte[]> { 
-                    { "TaskbarMonitor.dll", Properties.Resources.TaskbarMonitor }, 
-                    { "Newtonsoft.Json.dll", Properties.Resources.Newtonsoft_Json } 
+                    { "TaskbarMonitor.dll", Properties.Resources.TaskbarMonitor }
                 },
                 FilesToRegister = new List<string> { "TaskbarMonitor.dll" },
                 //TargetPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "TaskbarMonitor")

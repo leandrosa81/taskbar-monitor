@@ -1,0 +1,43 @@
+name: Continuous Integration
+
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Get version info
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
+      
+    - name: Build with msbuild
+      run: MSBuild.exe -t:restore,build,ILMerge -p:Configuration=Release -p:OutputPath=../TaskbarMonitor-win-x64/ -p:VersionAssembly=${{ steps.get_version.outputs.VERSION }}
+
+    - name: Create release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.tag_info.outputs.SOURCE_TAG }}
+        name: TaskbarMonitor ${{ steps.get_version.outputs.VERSION }}
+        draft: false
+        prerelease: false
+        body: ${{ github.event.head_commit.message }}
+        files: |
+          ./TaskbarMonitor-win-x64/*.*

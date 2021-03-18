@@ -41,10 +41,17 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <Target Name="ILMerge">
+    <!-- the ILMergePath property points to the location of ILMerge.exe console application -->
+    <Exec Command="$(ILMergeConsolePath) /out:$(OutDir)TaskbarMonitor-merged.dll $(OutDir)TaskbarMonitor.dll $(OutDir)Newtonsoft.Json.dll" />
+    <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitor.dll&quot;" />
+    <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitor.dll.config&quot;" />
+    <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitor.pdb&quot;" />
+    <Exec Command="del /F /Q &quot;$(OutDir)Newtonsoft.Json.dll&quot;" />
+    <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitor-merged.pdb&quot;" />
+    <Exec Command="ren &quot;$(OutDir)TaskbarMonitor-merged.dll&quot; &quot;$(OutDir)TaskbarMonitor.dll&quot;" />
+  </Target>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -107,7 +114,6 @@
     <None Include="App.config" />
     <None Include="app.manifest" />
     <None Include="leandro.pfx" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controls\NewFolder1\" />
@@ -115,5 +121,14 @@
   <ItemGroup>
     <Content Include="icon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ILMerge">
+      <Version>3.0.41</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>12.0.3</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\BuildCommon.targets" />
 </Project>
