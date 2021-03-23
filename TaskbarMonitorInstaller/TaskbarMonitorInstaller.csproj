@@ -40,14 +40,10 @@
   </PropertyGroup>
   <Target Name="ILMerge">
     <!-- the ILMergePath property points to the location of ILMerge.exe console application -->
-    <Exec Command="$(ILMergeConsolePath) /out:$(OutDir)TaskbarMonitorInstaller-merged.exe $(OutDir)TaskbarMonitorInstaller.exe $(OutDir)TaskbarMonitor.dll" />
+    <!-- Replaced with Embedded Resource -->
     <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitor.dll&quot;" />
     <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitorInstaller.pdb&quot;" />
-    <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitorInstaller-merged.pdb&quot;" />
     <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitorInstaller.exe.config&quot;" />
-    <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitorInstaller.exe.config&quot;" />
-    <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitorInstaller.exe&quot;" />
-    <Exec Command="ren &quot;$(OutDir)TaskbarMonitorInstaller-merged.exe&quot; &quot;$(OutDir)TaskbarMonitorInstaller.exe&quot;" />
   </Target>
   <ItemGroup>
     <Reference Include="System" />
@@ -71,13 +67,8 @@
     <None Include="app.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Newtonsoft.Json.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\TaskbarMonitor.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="icon.ico" />
+    <EmbeddedResource Include="Resources\TaskbarMonitor.dll" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ILMerge">
@@ -89,6 +80,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\BuildCommon.targets" />
 </Project>

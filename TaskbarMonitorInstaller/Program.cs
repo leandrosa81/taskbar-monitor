@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using TaskbarMonitorInstaller.BLL;
 
 namespace TaskbarMonitorInstaller
@@ -13,7 +14,7 @@ namespace TaskbarMonitorInstaller
         static Guid UninstallGuid = new Guid(@"c7f3d760-a8d1-4fdc-9c74-41bf9112e835");
         class InstallInfo
         {
-            public Dictionary<string, byte[]> FilesToCopy { get; set; }
+            public List<string> FilesToCopy { get; set; }
             public List<string> FilesToRegister { get; set; }
             public string TargetPath { get; set; }
         }
@@ -24,9 +25,7 @@ namespace TaskbarMonitorInstaller
 
             InstallInfo info = new InstallInfo
             {
-                FilesToCopy = new Dictionary<string, byte[]> { 
-                    { "TaskbarMonitor.dll", Properties.Resources.TaskbarMonitor }
-                },
+                FilesToCopy = new List<string> { "TaskbarMonitor.dll" },
                 FilesToRegister = new List<string> { "TaskbarMonitor.dll" },
                 //TargetPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "TaskbarMonitor")
                 TargetPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "TaskbarMonitor")
@@ -42,6 +41,19 @@ namespace TaskbarMonitorInstaller
             Console.ReadKey();
         }
 
+        public static void WriteEmbeddedResourceToFile(string resourceName, string fileName)
+        {
+            string fullResourceName = $"{Assembly.GetExecutingAssembly().GetName().Name}.Resources.{resourceName}";
+
+            using (Stream manifestResourceSTream = Assembly.GetExecutingAssembly().GetManifestResourceStream(fullResourceName))
+            {
+                using (FileStream fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+                {
+                    manifestResourceSTream.CopyTo(fileStream);
+                }
+            }
+        }
+
         static void Install(InstallInfo info)
         {
             Console.WriteLine("Installing taskbar-monitor on your computer, please wait.");
@@ -55,13 +67,11 @@ namespace TaskbarMonitorInstaller
                 Console.WriteLine("OK.");
 
                 // First copy files to program files folder          
-                foreach (var file in info.FilesToCopy)
+                foreach (var item in info.FilesToCopy)
                 {
-                    var item = file.Key;
-
                     var targetFilePath = Path.Combine(info.TargetPath, item);
                     Console.Write(string.Format("Copying {0}... ", item));
-                    File.WriteAllBytes(targetFilePath, file.Value);
+                    WriteEmbeddedResourceToFile(item, targetFilePath);
                     //File.Copy(item, targetFilePath, true);
                     Console.WriteLine("OK.");
                 }
@@ -74,13 +84,11 @@ namespace TaskbarMonitorInstaller
                 restartExplorer.Execute(() =>
                 {
                     // First copy files to program files folder          
-                    foreach (var file in info.FilesToCopy)
+                    foreach (var item in info.FilesToCopy)
                     {
-                        var item = file.Key;
-
                         var targetFilePath = Path.Combine(info.TargetPath, item);
                         Console.Write($"Copying {item}... ");
-                        File.WriteAllBytes(targetFilePath, file.Value);
+                        WriteEmbeddedResourceToFile(item, targetFilePath);
                         //File.Copy(item, targetFilePath, true);
                         Console.WriteLine("OK.");
                     }
@@ -140,10 +148,10 @@ namespace TaskbarMonitorInstaller
             restartExplorer.Execute(() =>
             {
                 // First copy files to program files folder          
-                foreach (var file in info.FilesToCopy)
+                foreach (var item in info.FilesToCopy)
                 {
-                    var item = file.Key;
                     var targetFilePath = Path.Combine(info.TargetPath, item);
+
                     if (File.Exists(targetFilePath))
                     {
                         Console.Write($"Deleting {item}... ");
