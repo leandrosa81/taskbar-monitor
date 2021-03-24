@@ -32,12 +32,16 @@ namespace TaskbarMonitorInstaller
             };
 
             if (args.Length > 0 && args[0].ToLower() == "/uninstall")
+            {
                 RollBack(info);
+            }
             else
+            {
                 Install(info);
+            }
 
             // pause
-            Console.WriteLine("Press any key to close this window...");
+            Console.WriteLine("Press any key to close this window..");
             Console.ReadKey();
         }
 
@@ -184,7 +188,7 @@ namespace TaskbarMonitorInstaller
                 }
                 
             }
-            
+
             if (Directory.Exists(info.TargetPath))
             {
                 Console.Write("Deleting target directory... ");
@@ -199,6 +203,7 @@ namespace TaskbarMonitorInstaller
                     Console.WriteLine("Scheduled for deletion after next reboot.");
                 }
             }
+
             Console.Write("Removing uninstall info from registry... "); 
             DeleteUninstaller();
             Console.WriteLine("OK.");

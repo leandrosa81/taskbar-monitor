@@ -27,7 +27,7 @@ jobs:
       run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
       
     - name: Build with msbuild
-      run: MSBuild.exe -t:restore,build,ILMerge -p:Configuration=Release -p:OutputPath=../TaskbarMonitor-win-x64/ -p:VersionAssembly=${{ steps.get_version.outputs.VERSION }}
+      run: MSBuild.exe -t:restore,build -p:Configuration=Release -p:OutputPath=../TaskbarMonitor-win-x64/ -p:VersionAssembly=${{ steps.get_version.outputs.VERSION }}
 
     - name: Create release
       uses: softprops/action-gh-release@v1

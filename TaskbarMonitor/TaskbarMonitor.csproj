@@ -24,7 +24,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\TaskbarMonitor-win-x64\</OutputPath>
     <DefineConstants>TRACE;DESKBAND_WINFORMS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -35,16 +35,6 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
-  <Target Name="ILMerge">
-    <!-- the ILMergePath property points to the location of ILMerge.exe console application -->
-    <Exec Command="$(ILMergeConsolePath) /out:$(OutDir)TaskbarMonitor-merged.dll $(OutDir)TaskbarMonitor.dll $(OutDir)Newtonsoft.Json.dll" />
-    <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitor.dll&quot;" />
-    <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitor.dll.config&quot;" />
-    <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitor.pdb&quot;" />
-    <Exec Command="del /F /Q &quot;$(OutDir)Newtonsoft.Json.dll&quot;" />
-    <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitor-merged.pdb&quot;" />
-    <Exec Command="ren &quot;$(OutDir)TaskbarMonitor-merged.dll&quot; &quot;$(OutDir)TaskbarMonitor.dll&quot;" />
-  </Target>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -124,4 +114,16 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\BuildCommon.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if $(ConfigurationName) == Release (
+	$(ILMergeConsolePath) /out:$(OutDir)TaskbarMonitor-merged.dll $(OutDir)TaskbarMonitor.dll $(OutDir)Newtonsoft.Json.dll
+	del /F /Q "$(OutDir)TaskbarMonitor.dll"
+	del /F /Q "$(OutDir)TaskbarMonitor.dll.config"
+	del /F /Q "$(OutDir)TaskbarMonitor.pdb"
+	del /F /Q "$(OutDir)Newtonsoft.Json.dll"
+	del /F /Q "$(OutDir)TaskbarMonitor-merged.pdb"
+	copy /Y "$(OutDir)TaskbarMonitor-merged.dll" "$(OutDir)TaskbarMonitor.dll"
+	del /F /Q "$(OutDir)TaskbarMonitor-merged.dll"
+)</PostBuildEvent>
+  </PropertyGroup>
 </Project>

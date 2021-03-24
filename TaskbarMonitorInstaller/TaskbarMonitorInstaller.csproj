@@ -27,7 +27,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\TaskbarMonitor-win-x64\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -38,13 +38,6 @@
   <PropertyGroup>
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
-  <Target Name="ILMerge">
-    <!-- the ILMergePath property points to the location of ILMerge.exe console application -->
-    <!-- Replaced with Embedded Resource -->
-    <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitor.dll&quot;" />
-    <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitorInstaller.pdb&quot;" />
-    <Exec Command="del /F /Q &quot;$(OutDir)TaskbarMonitorInstaller.exe.config&quot;" />
-  </Target>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -67,20 +60,32 @@
     <None Include="app.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="..\TaskbarMonitor-win-x64\TaskbarMonitor.dll">
+      <Link>Resources\TaskbarMonitor.dll</Link>
+    </EmbeddedResource>
     <Content Include="icon.ico" />
-    <EmbeddedResource Include="Resources\TaskbarMonitor.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="ILMerge">
-      <Version>3.0.41</Version>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TaskbarMonitor\TaskbarMonitor.csproj">
+      <Project>{076ffca7-af74-42c4-a836-6130b96a7a26}</Project>
+      <Name>TaskbarMonitor</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\BuildCommon.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if $(ConfigurationName) == Release (
+	del /F /Q "$(OutDir)TaskbarMonitor.dll"
+	del /F /Q "$(OutDir)TaskbarMonitor.pdb"
+	del /F /Q "$(OutDir)Newtonsoft.Json.dll"
+	del /F /Q "$(OutDir)TaskbarMonitorInstaller.exe.config"
+	del /F /Q "$(OutDir)TaskbarMonitorInstaller.pdb"
+)</PostBuildEvent>
+  </PropertyGroup>
 </Project>
