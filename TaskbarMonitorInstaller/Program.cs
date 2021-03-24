@@ -112,7 +112,8 @@ namespace TaskbarMonitorInstaller
             }
 
             Console.Write("Registering uninstaller... ");
-            CreateUninstaller(Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"));
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.dll"));
+            CreateUninstaller(Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"), Version.Parse(fileVersionInfo.FileVersion));
             Console.WriteLine("OK.");
 
             // remove pending delete operations
@@ -243,7 +244,7 @@ namespace TaskbarMonitorInstaller
             }
         
         }
-        static private void CreateUninstaller(string pathToUninstaller)
+        static private void CreateUninstaller(string pathToUninstaller, Version version)
         {
             var UninstallRegKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
             using (Microsoft.Win32.RegistryKey parent = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
@@ -268,15 +269,13 @@ namespace TaskbarMonitorInstaller
                             throw new Exception(String.Format("Unable to create uninstaller '{0}\\{1}'", UninstallRegKeyPath, guidText));
                         }
 
-                        Version v = new Version(Properties.Resources.Version);
-                         
                         string exe = pathToUninstaller;
 
                         key.SetValue("DisplayName", "taskbar-monitor");
-                        key.SetValue("ApplicationVersion", v.ToString());
+                        key.SetValue("ApplicationVersion", version.ToString());
                         key.SetValue("Publisher", "Leandro Lugarinho");
                         key.SetValue("DisplayIcon", exe);
-                        key.SetValue("DisplayVersion", v.ToString(3));
+                        key.SetValue("DisplayVersion", version.ToString(3));
                         key.SetValue("URLInfoAbout", "https://lugarinho.tech/tools/taskbar-monitor");
                         key.SetValue("Contact", "leandrosa81@gmail.com");
                         key.SetValue("InstallDate", DateTime.Now.ToString("yyyyMMdd"));
