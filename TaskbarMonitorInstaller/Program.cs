@@ -79,8 +79,9 @@ namespace TaskbarMonitorInstaller
                     //File.Copy(item, targetFilePath, true);
                     Console.WriteLine("OK.");
                 }
-                // copy the uninstaller too
-                File.Copy("TaskbarMonitorInstaller.exe", Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"));
+
+                // Copy the uninstaller too
+                File.Copy(Assembly.GetExecutingAssembly().Location, Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"), true);
             }
             else
             {
@@ -96,8 +97,9 @@ namespace TaskbarMonitorInstaller
                         //File.Copy(item, targetFilePath, true);
                         Console.WriteLine("OK.");
                     }
-                    // copy the uninstaller too
-                    File.Copy("TaskbarMonitorInstaller.exe", Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"), true);
+
+                    // Copy the uninstaller too
+                    File.Copy(Assembly.GetExecutingAssembly().Location, Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"), true);
                 });
             }
 
