@@ -19,13 +19,19 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
 
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
+    - name: Setup NuGet.exe
+      uses: nuget/setup-nuget@v1
+
+    - name: Run nuget restore
+      run: nuget restore
 
     - name: Get version info
       id: get_version
       run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
       
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+
     - name: Build with msbuild
       run: MSBuild.exe -t:restore,build -p:Configuration=Release -p:OutputPath=../TaskbarMonitor-win-x64/ -p:VersionAssembly=${{ steps.get_version.outputs.VERSION }}
 
