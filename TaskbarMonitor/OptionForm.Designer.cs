@@ -42,6 +42,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.listCounters = new System.Windows.Forms.ListBox();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.buttonReplicateSettings = new TaskbarMonitor.Controls.MenuButton();
             this.contextMenuStripReplicateSettings = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -115,11 +116,12 @@
             this.label9 = new System.Windows.Forms.Label();
             this.panelFooter = new System.Windows.Forms.Panel();
             this.label17 = new System.Windows.Forms.Label();
+            this.swcPreview = new TaskbarMonitor.SystemWatcherControl();
             this.button3 = new System.Windows.Forms.Button();
             this.buttonResetDefaults = new System.Windows.Forms.Button();
             this.buttonApply = new System.Windows.Forms.Button();
-            this.swcPreview = new TaskbarMonitor.SystemWatcherControl();
-            this.buttonReplicateSettings = new TaskbarMonitor.Controls.MenuButton();
+            this.label35 = new System.Windows.Forms.Label();
+            this.listThemeType = new System.Windows.Forms.ComboBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editHistorySize)).BeginInit();
             this.panelMenu.SuspendLayout();
@@ -289,6 +291,17 @@
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(415, 426);
             this.panel3.TabIndex = 2;
+            // 
+            // buttonReplicateSettings
+            // 
+            this.buttonReplicateSettings.Location = new System.Drawing.Point(249, 355);
+            this.buttonReplicateSettings.Menu = this.contextMenuStripReplicateSettings;
+            this.buttonReplicateSettings.Name = "buttonReplicateSettings";
+            this.buttonReplicateSettings.ShowMenuUnderCursor = true;
+            this.buttonReplicateSettings.Size = new System.Drawing.Size(154, 23);
+            this.buttonReplicateSettings.TabIndex = 2;
+            this.buttonReplicateSettings.Text = "Replicate Settings";
+            this.buttonReplicateSettings.UseVisualStyleBackColor = true;
             // 
             // contextMenuStripReplicateSettings
             // 
@@ -640,6 +653,8 @@
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.listThemeType);
+            this.groupBox5.Controls.Add(this.label35);
             this.groupBox5.Controls.Add(this.linkCurrentValueFont);
             this.groupBox5.Controls.Add(this.linkTitleFont);
             this.groupBox5.Controls.Add(this.label34);
@@ -661,7 +676,7 @@
             this.groupBox5.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox5.Location = new System.Drawing.Point(0, 195);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(590, 146);
+            this.groupBox5.Size = new System.Drawing.Size(590, 187);
             this.groupBox5.TabIndex = 12;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Visual";
@@ -671,7 +686,7 @@
             this.linkCurrentValueFont.AutoSize = true;
             this.linkCurrentValueFont.Font = new System.Drawing.Font("Calibri", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.linkCurrentValueFont.LinkColor = System.Drawing.Color.Black;
-            this.linkCurrentValueFont.Location = new System.Drawing.Point(110, 91);
+            this.linkCurrentValueFont.Location = new System.Drawing.Point(110, 137);
             this.linkCurrentValueFont.Name = "linkCurrentValueFont";
             this.linkCurrentValueFont.Size = new System.Drawing.Size(26, 13);
             this.linkCurrentValueFont.TabIndex = 17;
@@ -685,7 +700,7 @@
             this.linkTitleFont.AutoSize = true;
             this.linkTitleFont.Font = new System.Drawing.Font("Calibri", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.linkTitleFont.LinkColor = System.Drawing.Color.Black;
-            this.linkTitleFont.Location = new System.Drawing.Point(110, 55);
+            this.linkTitleFont.Location = new System.Drawing.Point(110, 101);
             this.linkTitleFont.Name = "linkTitleFont";
             this.linkTitleFont.Size = new System.Drawing.Size(66, 13);
             this.linkTitleFont.TabIndex = 16;
@@ -697,7 +712,7 @@
             // label34
             // 
             this.label34.AutoSize = true;
-            this.label34.Location = new System.Drawing.Point(14, 91);
+            this.label34.Location = new System.Drawing.Point(14, 137);
             this.label34.Name = "label34";
             this.label34.Size = new System.Drawing.Size(79, 28);
             this.label34.TabIndex = 15;
@@ -706,7 +721,7 @@
             // label33
             // 
             this.label33.AutoSize = true;
-            this.label33.Location = new System.Drawing.Point(14, 55);
+            this.label33.Location = new System.Drawing.Point(14, 101);
             this.label33.Name = "label33";
             this.label33.Size = new System.Drawing.Size(63, 14);
             this.label33.TabIndex = 14;
@@ -715,7 +730,7 @@
             // btnColor2
             // 
             this.btnColor2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColor2.Location = new System.Drawing.Point(508, 21);
+            this.btnColor2.Location = new System.Drawing.Point(508, 67);
             this.btnColor2.Name = "btnColor2";
             this.btnColor2.Size = new System.Drawing.Size(75, 23);
             this.btnColor2.TabIndex = 13;
@@ -725,7 +740,7 @@
             // label30
             // 
             this.label30.AutoSize = true;
-            this.label30.Location = new System.Drawing.Point(402, 25);
+            this.label30.Location = new System.Drawing.Point(402, 71);
             this.label30.Name = "label30";
             this.label30.Size = new System.Drawing.Size(88, 14);
             this.label30.TabIndex = 12;
@@ -734,7 +749,7 @@
             // btnColor1
             // 
             this.btnColor1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColor1.Location = new System.Drawing.Point(316, 21);
+            this.btnColor1.Location = new System.Drawing.Point(316, 67);
             this.btnColor1.Name = "btnColor1";
             this.btnColor1.Size = new System.Drawing.Size(75, 23);
             this.btnColor1.TabIndex = 11;
@@ -744,7 +759,7 @@
             // label29
             // 
             this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(210, 25);
+            this.label29.Location = new System.Drawing.Point(210, 71);
             this.label29.Name = "label29";
             this.label29.Size = new System.Drawing.Size(88, 14);
             this.label29.TabIndex = 10;
@@ -753,7 +768,7 @@
             // btnColorCurrentValueShadow
             // 
             this.btnColorCurrentValueShadow.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColorCurrentValueShadow.Location = new System.Drawing.Point(507, 87);
+            this.btnColorCurrentValueShadow.Location = new System.Drawing.Point(507, 133);
             this.btnColorCurrentValueShadow.Name = "btnColorCurrentValueShadow";
             this.btnColorCurrentValueShadow.Size = new System.Drawing.Size(75, 23);
             this.btnColorCurrentValueShadow.TabIndex = 9;
@@ -763,7 +778,7 @@
             // label27
             // 
             this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(402, 91);
+            this.label27.Location = new System.Drawing.Point(402, 137);
             this.label27.Name = "label27";
             this.label27.Size = new System.Drawing.Size(83, 28);
             this.label27.TabIndex = 8;
@@ -772,7 +787,7 @@
             // btnColorCurrentValue
             // 
             this.btnColorCurrentValue.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColorCurrentValue.Location = new System.Drawing.Point(316, 87);
+            this.btnColorCurrentValue.Location = new System.Drawing.Point(316, 133);
             this.btnColorCurrentValue.Name = "btnColorCurrentValue";
             this.btnColorCurrentValue.Size = new System.Drawing.Size(75, 23);
             this.btnColorCurrentValue.TabIndex = 7;
@@ -782,7 +797,7 @@
             // label28
             // 
             this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(210, 91);
+            this.label28.Location = new System.Drawing.Point(210, 137);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(79, 28);
             this.label28.TabIndex = 6;
@@ -791,7 +806,7 @@
             // btnColorTitleShadow
             // 
             this.btnColorTitleShadow.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColorTitleShadow.Location = new System.Drawing.Point(507, 50);
+            this.btnColorTitleShadow.Location = new System.Drawing.Point(507, 96);
             this.btnColorTitleShadow.Name = "btnColorTitleShadow";
             this.btnColorTitleShadow.Size = new System.Drawing.Size(75, 23);
             this.btnColorTitleShadow.TabIndex = 5;
@@ -801,7 +816,7 @@
             // label26
             // 
             this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(402, 55);
+            this.label26.Location = new System.Drawing.Point(402, 101);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(78, 28);
             this.label26.TabIndex = 4;
@@ -810,7 +825,7 @@
             // btnColorTitle
             // 
             this.btnColorTitle.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColorTitle.Location = new System.Drawing.Point(316, 51);
+            this.btnColorTitle.Location = new System.Drawing.Point(316, 97);
             this.btnColorTitle.Name = "btnColorTitle";
             this.btnColorTitle.Size = new System.Drawing.Size(75, 23);
             this.btnColorTitle.TabIndex = 3;
@@ -820,7 +835,7 @@
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(210, 55);
+            this.label25.Location = new System.Drawing.Point(210, 101);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(65, 14);
             this.label25.TabIndex = 2;
@@ -829,7 +844,7 @@
             // btnColorBar
             // 
             this.btnColorBar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColorBar.Location = new System.Drawing.Point(112, 21);
+            this.btnColorBar.Location = new System.Drawing.Point(112, 67);
             this.btnColorBar.Name = "btnColorBar";
             this.btnColorBar.Size = new System.Drawing.Size(75, 23);
             this.btnColorBar.TabIndex = 1;
@@ -839,7 +854,7 @@
             // label24
             // 
             this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(14, 21);
+            this.label24.Location = new System.Drawing.Point(14, 67);
             this.label24.Name = "label24";
             this.label24.Size = new System.Drawing.Size(58, 14);
             this.label24.TabIndex = 0;
@@ -1107,6 +1122,17 @@
             this.label17.TabIndex = 5;
             this.label17.Text = "Preview:";
             // 
+            // swcPreview
+            // 
+            this.swcPreview.BackColor = System.Drawing.Color.Transparent;
+            this.swcPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.swcPreview.Location = new System.Drawing.Point(15, 39);
+            this.swcPreview.Name = "swcPreview";
+            this.swcPreview.PreviewMode = true;
+            this.swcPreview.Size = new System.Drawing.Size(240, 30);
+            this.swcPreview.TabIndex = 4;
+            this.swcPreview.Version = ((System.Version)(resources.GetObject("swcPreview.Version")));
+            // 
             // button3
             // 
             this.button3.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -1141,27 +1167,30 @@
             this.buttonApply.UseVisualStyleBackColor = false;
             this.buttonApply.Click += new System.EventHandler(this.buttonApply_Click);
             // 
-            // swcPreview
+            // label35
             // 
-            this.swcPreview.BackColor = System.Drawing.Color.Transparent;
-            this.swcPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.swcPreview.Location = new System.Drawing.Point(15, 39);
-            this.swcPreview.Name = "swcPreview";
-            this.swcPreview.PreviewMode = true;
-            this.swcPreview.Size = new System.Drawing.Size(240, 30);
-            this.swcPreview.TabIndex = 4;
-            this.swcPreview.Version = ((System.Version)(resources.GetObject("swcPreview.Version")));
+            this.label35.AutoSize = true;
+            this.label35.Location = new System.Drawing.Point(14, 36);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(73, 14);
+            this.label35.TabIndex = 18;
+            this.label35.Text = "Theme type:";
             // 
-            // buttonReplicateSettings
+            // listThemeType
             // 
-            this.buttonReplicateSettings.Location = new System.Drawing.Point(249, 355);
-            this.buttonReplicateSettings.Menu = this.contextMenuStripReplicateSettings;
-            this.buttonReplicateSettings.Name = "buttonReplicateSettings";
-            this.buttonReplicateSettings.ShowMenuUnderCursor = true;
-            this.buttonReplicateSettings.Size = new System.Drawing.Size(154, 23);
-            this.buttonReplicateSettings.TabIndex = 2;
-            this.buttonReplicateSettings.Text = "Replicate Settings";
-            this.buttonReplicateSettings.UseVisualStyleBackColor = true;
+            this.listThemeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.listThemeType.FormattingEnabled = true;
+            this.listThemeType.Items.AddRange(new object[] {
+            "AUTOMATIC",
+            "DARK",
+            "LIGHT",
+            "CUSTOM"});
+            this.listThemeType.Location = new System.Drawing.Point(112, 33);
+            this.listThemeType.Margin = new System.Windows.Forms.Padding(2);
+            this.listThemeType.Name = "listThemeType";
+            this.listThemeType.Size = new System.Drawing.Size(92, 22);
+            this.listThemeType.TabIndex = 19;
+            this.listThemeType.SelectedIndexChanged += new System.EventHandler(this.listThemeType_SelectedIndexChanged);
             // 
             // OptionForm
             // 
@@ -1306,5 +1335,7 @@
         private System.Windows.Forms.Label label33;
         private System.Windows.Forms.LinkLabel linkTitleFont;
         private System.Windows.Forms.LinkLabel linkCurrentValueFont;
+        private System.Windows.Forms.ComboBox listThemeType;
+        private System.Windows.Forms.Label label35;
     }
 }

@@ -40,10 +40,13 @@ namespace TaskbarMonitor.Counters
                 new CounterInfo() { Name = "R", History = new List<float>(), MaximumValue = 1 },
                 new CounterInfo() { Name = "W", History = new List<float>(), MaximumValue = 1 }
             });*/
-            InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = 1 };
-            Infos = new List<CounterInfo>();
-            Infos.Add(new CounterInfo() { Name = "R", History = new List<float>(), MaximumValue = 1 });
-            Infos.Add(new CounterInfo() { Name = "W", History = new List<float>(), MaximumValue = 1 });
+            lock (ThreadLock)
+            {
+                InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = 1 };
+                Infos = new List<CounterInfo>();
+                Infos.Add(new CounterInfo() { Name = "R", History = new List<float>(), MaximumValue = 1 });
+                Infos.Add(new CounterInfo() { Name = "W", History = new List<float>(), MaximumValue = 1 });
+            }
         }
         public override void Update()
         {
@@ -60,20 +63,22 @@ namespace TaskbarMonitor.Counters
             float currentRead = diskReadCounter.NextValue();
             float currentWritten = diskWriteCounter.NextValue();
 
-            addValue(InfoSummary, currentRead + currentWritten);
-            addValue(Infos.Where(x => x.Name == "R").Single(), currentRead);
-            addValue(Infos.Where(x => x.Name == "W").Single(), currentWritten);
-
-            // if locks down same scale for both counters is on
-            if (!Options.CounterOptions["DISK"].SeparateScales)
+            lock (ThreadLock)
             {
-                var info1 = Infos.Where(x => x.Name == "R").Single();
-                var info2 = Infos.Where(x => x.Name == "W").Single();
+                addValue(InfoSummary, currentRead + currentWritten);
+                addValue(Infos.Where(x => x.Name == "R").Single(), currentRead);
+                addValue(Infos.Where(x => x.Name == "W").Single(), currentWritten);
 
-                float max = info1.MaximumValue > info2.MaximumValue ? info1.MaximumValue : info2.MaximumValue;
-                info1.MaximumValue = info2.MaximumValue = max;
+                // if locks down same scale for both counters is on
+                if (!Options.CounterOptions["DISK"].SeparateScales)
+                {
+                    var info1 = Infos.Where(x => x.Name == "R").Single();
+                    var info2 = Infos.Where(x => x.Name == "W").Single();
+
+                    float max = info1.MaximumValue > info2.MaximumValue ? info1.MaximumValue : info2.MaximumValue;
+                    info1.MaximumValue = info2.MaximumValue = max;
+                }
             }
-
         }
          
         public override string GetName()

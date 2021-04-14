@@ -22,10 +22,13 @@ namespace TaskbarMonitor.Counters
 
         public List<CounterInfo> Infos { get; protected set; }
 
+        public object ThreadLock { get; protected set; }
+
 
         public ICounter(Options options)
         {
             this.Options = options;
+            this.ThreadLock = new object();
         }
         public enum CounterType
         {

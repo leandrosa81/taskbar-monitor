@@ -9,16 +9,25 @@ namespace TaskbarMonitor
 {    
     public class Options
     {
-        public static readonly int LATESTOPTIONSVERSION = 1;
+        public enum ThemeList
+        {
+            AUTOMATIC,
+            DARK,
+            LIGHT,
+            CUSTOM            
+        }
+        public static readonly int LATESTOPTIONSVERSION = 2;
         public int OptionsVersion = LATESTOPTIONSVERSION;
         public Dictionary<string, CounterOptions> CounterOptions { get; set; }
         public int HistorySize { get; set; } = 50;
         public int PollTime { get; set; } = 3;
+        public ThemeList ThemeType { get; set; } = ThemeList.DARK;
 
         public void CopyTo(Options opt)
         {
             opt.HistorySize = this.HistorySize;
             opt.PollTime = this.PollTime;
+            opt.ThemeType = this.ThemeType;
             if(opt.CounterOptions == null)
                 opt.CounterOptions = new Dictionary<string, CounterOptions>();
 
@@ -45,16 +54,15 @@ namespace TaskbarMonitor
             return new Options
             {
                 CounterOptions = new Dictionary<string, CounterOptions>
-        {
-            { "CPU", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
-            { "MEM", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
-            { "DISK", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
-            { "NET", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } }
-        }
-        ,
-                HistorySize = 50
-        ,
-                PollTime = 3
+                {
+                    { "CPU", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
+                    { "MEM", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
+                    { "DISK", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
+                    { "NET", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } }
+                },
+                HistorySize = 50,
+                PollTime = 3,
+                ThemeType = ThemeList.DARK
             };
         }
         public static Options ReadFromDisk()
@@ -66,12 +74,17 @@ namespace TaskbarMonitor
             if (System.IO.File.Exists(origin))
             {
                 opt = JsonConvert.DeserializeObject<Options>(System.IO.File.ReadAllText(origin));
-                if (opt.Upgrade()) // do a inplace upgrade
-                {
-                    opt.SaveToDisk();
-                }
+                
             }
             return opt;
+        }
+        public bool Upgrade(GraphTheme graphTheme)
+        {
+            if (_Upgrade(graphTheme)) // do a inplace upgrade
+            {
+                return SaveToDisk();
+            }
+            return false;
         }
         public bool SaveToDisk()
         {
@@ -83,16 +96,22 @@ namespace TaskbarMonitor
             System.IO.File.WriteAllText(origin, JsonConvert.SerializeObject(this));
             return true;
         }
-        private bool Upgrade()
+        private bool _Upgrade(GraphTheme graphTheme)
         {
             if (Options.LATESTOPTIONSVERSION > this.OptionsVersion)
             {
                 switch (this.OptionsVersion)
                 {
                     case 0:
+                        //this.OptionsVersion = LATESTOPTIONSVERSION;
+                        //return true;
+                    case 1:
+                        if (GraphTheme.IsCustom(graphTheme))
+                            this.ThemeType = ThemeList.CUSTOM;
+                        else
+                            this.ThemeType = ThemeList.AUTOMATIC;
                         this.OptionsVersion = LATESTOPTIONSVERSION;
                         return true;
-                    case 1:                                                    
                     default:
                         break;
                 }

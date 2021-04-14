@@ -90,7 +90,7 @@ namespace TaskbarMonitor
                 theme.StackedColors.Add(item);
             }
         }
-        public static GraphTheme DefaultTheme()
+        public static GraphTheme DefaultDarkTheme()
         {
             return new GraphTheme
             {
@@ -110,9 +110,29 @@ namespace TaskbarMonitor
                 }
             };
         }
+        public static GraphTheme DefaultLightTheme()
+        {
+            return new GraphTheme
+            {
+                BarColor = Color.FromArgb(255, 0, 0, 0),
+                TextColor = Color.FromArgb(200, 255, 0, 128),
+                TextShadowColor = Color.FromArgb(255, 234, 234, 234),
+                TitleColor = Color.FromArgb(255, 0, 0, 0),
+                TitleShadowColor = Color.FromArgb(255, 214, 214, 214),
+                TitleFont = "Arial",
+                TitleSize = 7f,
+                CurrentValueFont = "Arial",
+                CurrentValueSize = 7f,
+                StackedColors = new List<Color>
+                {
+                    Color.FromArgb(255, 102, 102, 102) ,
+                    Color.FromArgb(255, 145, 145, 145)
+                }
+            };
+        }
         public static GraphTheme ReadFromDisk()
         {
-            GraphTheme theme = DefaultTheme();
+            GraphTheme theme = DefaultDarkTheme();
 
             var folder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "taskbar-monitor");
             var origin = System.IO.Path.Combine(folder, "theme.json");
@@ -150,6 +170,39 @@ namespace TaskbarMonitor
                         break;
                 }
             }
+            return false;
+        }
+
+        public static bool IsCustom(GraphTheme theme)
+        {
+            var light = DefaultLightTheme();
+            var dark = DefaultDarkTheme();
+            if (theme.BarColor.ToArgb() != light.BarColor.ToArgb() && theme.BarColor.ToArgb() != dark.BarColor.ToArgb())
+                return true;
+            if (theme.TextColor.ToArgb() != light.TextColor.ToArgb() && theme.TextColor.ToArgb() != dark.TextColor.ToArgb())
+                return true;
+            if (theme.TextShadowColor.ToArgb() != light.TextShadowColor.ToArgb() && theme.TextShadowColor.ToArgb() != dark.TextShadowColor.ToArgb())
+                return true;
+            if (theme.TitleColor.ToArgb() != light.TitleColor.ToArgb() && theme.TitleColor.ToArgb() != dark.TitleColor.ToArgb())
+                return true;
+            if (theme.TitleShadowColor.ToArgb() != light.TitleShadowColor.ToArgb() && theme.TitleShadowColor.ToArgb() != dark.TitleShadowColor.ToArgb())
+                return true;
+            if (!theme.TitleFont.Equals(light) && !theme.TitleFont.Equals(dark))
+                return true;
+            if (!theme.TitleSize.Equals(light) && !theme.TitleSize.Equals(dark))
+                return true;
+
+            int i = 0;
+            
+            foreach (var item in theme.StackedColors)
+            {
+                if (light.StackedColors.Count <= i ) return true;
+                if (dark.StackedColors.Count <= i ) return true;
+                if (item.ToArgb() != light.StackedColors[i].ToArgb() && item.ToArgb() != dark.StackedColors[i].ToArgb())
+                    return true;
+                i++;
+            }
+
             return false;
         }
 
