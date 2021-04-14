@@ -30,10 +30,12 @@ namespace TaskbarMonitor.Counters
             ramCounter = new PerformanceCounter("Memory", "Available MBytes");
             
             GetPhysicallyInstalledSystemMemory(out totalMemory);
-
-            InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = totalMemory / 1024 };
-            Infos = new List<CounterInfo>();
-            Infos.Add(new CounterInfo() { Name = "U", History = new List<float>(), MaximumValue = totalMemory / 1024 });
+            lock (ThreadLock)
+            {
+                InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = totalMemory / 1024 };
+                Infos = new List<CounterInfo>();
+                Infos.Add(new CounterInfo() { Name = "U", History = new List<float>(), MaximumValue = totalMemory / 1024 });
+            }
             /*
             info.Add(CounterType.SINGLE, new List<CounterInfo> {
                 new CounterInfo() { Name = "default", History = new List<float>(), MaximumValue = totalMemory / 1024 }
@@ -43,19 +45,23 @@ namespace TaskbarMonitor.Counters
         {
             float currentValue = (totalMemory / 1024) - ramCounter.NextValue();
 
-            InfoSummary.CurrentValue = currentValue;
-            InfoSummary.History.Add(currentValue);
-            if (InfoSummary.History.Count > Options.HistorySize) InfoSummary.History.RemoveAt(0);
-            
-            InfoSummary.CurrentStringValue = (InfoSummary.CurrentValue / 1024).ToString("0.0") + "GB";
-
+            lock (ThreadLock)
             {
-                var info = Infos.Where(x => x.Name == "U").Single();
-                info.CurrentValue = currentValue;
-                info.History.Add(currentValue);
-                if (info.History.Count > Options.HistorySize) info.History.RemoveAt(0);
+                InfoSummary.CurrentValue = currentValue;
+                InfoSummary.History.Add(currentValue);
+                if (InfoSummary.History.Count > Options.HistorySize) InfoSummary.History.RemoveAt(0);
 
-                info.CurrentStringValue = (info.CurrentValue / 1024).ToString("0.0") + "GB";
+                InfoSummary.CurrentStringValue = (InfoSummary.CurrentValue / 1024).ToString("0.0") + "GB";
+
+                {
+                    var info = Infos.Where(x => x.Name == "U").Single();
+                    info.CurrentValue = currentValue;
+                    info.History.Add(currentValue);
+                    if (info.History.Count > Options.HistorySize) info.History.RemoveAt(0);
+
+                    info.CurrentStringValue = (info.CurrentValue / 1024).ToString("0.0") + "GB";
+                }
+
             }
             
 

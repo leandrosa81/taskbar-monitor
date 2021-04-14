@@ -35,16 +35,19 @@ namespace TaskbarMonitor.Counters
             });
             
              */
-            InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = 100.0f };
-            Infos = new List<CounterInfo>();
-            cpuCounterCores = new List<PerformanceCounter>();
-            foreach (var item in instances.OrderBy(x => x))
+            lock (ThreadLock)
             {
-                if (item.ToLower().Contains("_total")) continue;
+                InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = 100.0f };
+                Infos = new List<CounterInfo>();
+                cpuCounterCores = new List<PerformanceCounter>();
+                foreach (var item in instances.OrderBy(x => x))
+                {
+                    if (item.ToLower().Contains("_total")) continue;
 
-                // info[CounterType.STACKED].Add(new CounterInfo() { Name = item, History = new List<float>(), MaximumValue = 100.0f });
-                Infos.Add(new CounterInfo() { Name = item, History = new List<float>(), MaximumValue = 100.0f });
-                cpuCounterCores.Add(new PerformanceCounter("Processor", "% Processor Time", item));
+                    // info[CounterType.STACKED].Add(new CounterInfo() { Name = item, History = new List<float>(), MaximumValue = 100.0f });
+                    Infos.Add(new CounterInfo() { Name = item, History = new List<float>(), MaximumValue = 100.0f });
+                    cpuCounterCores.Add(new PerformanceCounter("Processor", "% Processor Time", item));
+                }
             }
             
         }
@@ -52,21 +55,24 @@ namespace TaskbarMonitor.Counters
         {
             currentValue = cpuCounter.NextValue();
 
-            InfoSummary.CurrentValue = currentValue;
-            InfoSummary.History.Add(currentValue);
-            if (InfoSummary.History.Count > Options.HistorySize) InfoSummary.History.RemoveAt(0);
-            InfoSummary.CurrentStringValue = InfoSummary.CurrentValue.ToString("0") + "%";
-
-            foreach (var item in cpuCounterCores)
+            lock (ThreadLock)
             {
-                var ct = Infos.Where(x => x.Name == item.InstanceName).Single();
+                InfoSummary.CurrentValue = currentValue;
+                InfoSummary.History.Add(currentValue);
+                if (InfoSummary.History.Count > Options.HistorySize) InfoSummary.History.RemoveAt(0);
+                InfoSummary.CurrentStringValue = InfoSummary.CurrentValue.ToString("0") + "%";
 
-                //var ct = info[CounterType.STACKED].Find(x => x.Name == item.InstanceName);
-                ct.CurrentValue = item.NextValue();                
-                ct.History.Add(ct.CurrentValue);
-                if (ct.History.Count > Options.HistorySize) ct.History.RemoveAt(0);
+                foreach (var item in cpuCounterCores)
+                {
+                    var ct = Infos.Where(x => x.Name == item.InstanceName).Single();
 
-                ct.CurrentStringValue = InfoSummary.CurrentStringValue;// same string value from summary
+                    //var ct = info[CounterType.STACKED].Find(x => x.Name == item.InstanceName);
+                    ct.CurrentValue = item.NextValue();
+                    ct.History.Add(ct.CurrentValue);
+                    if (ct.History.Count > Options.HistorySize) ct.History.RemoveAt(0);
+
+                    ct.CurrentStringValue = InfoSummary.CurrentStringValue;// same string value from summary
+                }
             }
 
         }

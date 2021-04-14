@@ -17,15 +17,21 @@ namespace TaskbarMonitor
     {
         private static Control _control;
 
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool SetProcessDPIAware();
+
         public Deskband()
         {
+            if (Environment.OSVersion.Version.Major >= 6)
+                SetProcessDPIAware();
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
             Options opt = TaskbarMonitor.Options.ReadFromDisk();
-            GraphTheme theme = GraphTheme.ReadFromDisk();
+            
 
-            var ctl = new SystemWatcherControl(opt, theme);
+            var ctl = new SystemWatcherControl(opt);
             Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, 30);
             ctl.OnChangeSize += Ctl_OnChangeSize;
             _control = ctl;

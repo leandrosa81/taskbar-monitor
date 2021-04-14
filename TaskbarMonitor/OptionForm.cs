@@ -94,6 +94,7 @@ namespace TaskbarMonitor
             initializing = true;
             this.editHistorySize.Value = this.Options.HistorySize;
             this.editPollTime.Value = this.Options.PollTime;
+            this.listThemeType.Text = this.Options.ThemeType.ToString();
             this.listCounters.DataSource = this.Options.CounterOptions.Keys.AsEnumerable().ToList();
             this.listShowTitle.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayType));
             this.listShowCurrentValue.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayType));
@@ -139,10 +140,25 @@ namespace TaskbarMonitor
                     i--;
                 }
             }*/
-            var previewTheme = new GraphTheme();
-            this.Theme.CopyTo(previewTheme);
+            GraphTheme previewTheme = GraphTheme.DefaultDarkTheme();
 
-            swcPreview.ApplyOptions(previewOptions, previewTheme);            
+            if (previewOptions.ThemeType == Options.ThemeList.LIGHT)
+                previewTheme = GraphTheme.DefaultLightTheme();
+            else if (previewOptions.ThemeType == Options.ThemeList.CUSTOM)
+            {
+                previewTheme = new GraphTheme();
+                this.Theme.CopyTo(previewTheme);
+            }
+            else if (previewOptions.ThemeType == Options.ThemeList.AUTOMATIC)
+            {
+                Color taskBarColour = BLL.Win32Api.GetColourAt(BLL.Win32Api.GetTaskbarPosition().Location);
+                if (taskBarColour.R + taskBarColour.G + taskBarColour.B > 382)
+                    previewTheme = GraphTheme.DefaultLightTheme();
+                else
+                    previewTheme = GraphTheme.DefaultDarkTheme();
+            }
+
+            swcPreview.ApplyOptions(previewOptions, previewTheme);
         }
 
         private void EditHistorySize_ValueChanged(object sender, EventArgs e)
@@ -527,7 +543,7 @@ namespace TaskbarMonitor
         private void buttonResetDefaults_Click(object sender, EventArgs e)
         {
             Options.DefaultOptions().CopyTo(this.Options);
-            GraphTheme.DefaultTheme().CopyTo(this.Theme);
+            GraphTheme.DefaultDarkTheme().CopyTo(this.Theme);
             Initialize();
         }
 
@@ -547,7 +563,7 @@ namespace TaskbarMonitor
             this.Theme.SaveToDisk();
             this.Close();
 
-            originalControl.ApplyOptions(this.OriginalOptions, this.OriginalTheme);
+            originalControl.ApplyOptions(this.OriginalOptions);
         }
 
         private void linkTitleFont_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -570,6 +586,26 @@ namespace TaskbarMonitor
             }
 
             UpdatePreview();
+        }
+
+        private void listThemeType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Options.ThemeType = (Options.ThemeList)Enum.Parse(typeof(Options.ThemeList), listThemeType.Text);
+            UpdatePreview();
+            UpdateThemeOptions();
+        }
+
+        private void UpdateThemeOptions()
+        {
+            btnColorBar.Enabled = Options.ThemeType == Options.ThemeList.CUSTOM;
+            btnColor1.Enabled = Options.ThemeType == Options.ThemeList.CUSTOM;
+            btnColor2.Enabled = Options.ThemeType == Options.ThemeList.CUSTOM;
+            btnColorTitle.Enabled = Options.ThemeType == Options.ThemeList.CUSTOM;
+            btnColorTitleShadow.Enabled = Options.ThemeType == Options.ThemeList.CUSTOM;
+            btnColorCurrentValue.Enabled = Options.ThemeType == Options.ThemeList.CUSTOM;
+            btnColorCurrentValueShadow.Enabled = Options.ThemeType == Options.ThemeList.CUSTOM;
+            linkTitleFont.Enabled = Options.ThemeType == Options.ThemeList.CUSTOM;
+            linkCurrentValueFont.Enabled = Options.ThemeType == Options.ThemeList.CUSTOM;
         }
     }
 }

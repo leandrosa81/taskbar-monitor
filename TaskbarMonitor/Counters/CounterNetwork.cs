@@ -25,11 +25,13 @@ namespace TaskbarMonitor.Counters
         {
 
             ReadCounters();
-
-            InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = 1 };
-            Infos = new List<CounterInfo>();
-            Infos.Add(new CounterInfo() { Name = "D", History = new List<float>(), MaximumValue = 1 });
-            Infos.Add(new CounterInfo() { Name = "U", History = new List<float>(), MaximumValue = 1 });
+            lock (ThreadLock)
+            {
+                InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = 1 };
+                Infos = new List<CounterInfo>();
+                Infos.Add(new CounterInfo() { Name = "D", History = new List<float>(), MaximumValue = 1 });
+                Infos.Add(new CounterInfo() { Name = "U", History = new List<float>(), MaximumValue = 1 });
+            }
         }
 
         private void ReadCounters()
@@ -79,20 +81,23 @@ namespace TaskbarMonitor.Counters
                         currentReceived += netCounter.NextValue();
                     }
 
-                    addValue(InfoSummary, currentSent + currentReceived);
-                    addValue(Infos.Where(x => x.Name == "D").Single(), currentReceived);
-                    addValue(Infos.Where(x => x.Name == "U").Single(), currentSent);
-
-                    // if locks down same scale for both counters is on
-                    if (!Options.CounterOptions["NET"].SeparateScales)
+                    lock (ThreadLock)
                     {
-                        var info1 = Infos.Where(x => x.Name == "D").Single();
-                        var info2 = Infos.Where(x => x.Name == "U").Single();
+                        addValue(InfoSummary, currentSent + currentReceived);
+                        addValue(Infos.Where(x => x.Name == "D").Single(), currentReceived);
+                        addValue(Infos.Where(x => x.Name == "U").Single(), currentSent);
 
-                        float max = info1.MaximumValue > info2.MaximumValue ? info1.MaximumValue : info2.MaximumValue;
-                        info1.MaximumValue = info2.MaximumValue = max;
-                    }
-                    success = true;
+                        // if locks down same scale for both counters is on
+                        if (!Options.CounterOptions["NET"].SeparateScales)
+                        {
+                            var info1 = Infos.Where(x => x.Name == "D").Single();
+                            var info2 = Infos.Where(x => x.Name == "U").Single();
+
+                            float max = info1.MaximumValue > info2.MaximumValue ? info1.MaximumValue : info2.MaximumValue;
+                            info1.MaximumValue = info2.MaximumValue = max;
+                        }
+                        success = true;
+                    }                    
                 }
                 catch (InvalidOperationException e)
                 {
