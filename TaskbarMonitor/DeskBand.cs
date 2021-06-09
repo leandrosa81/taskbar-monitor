@@ -1,11 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Drawing;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TaskbarMonitor
@@ -17,24 +12,31 @@ namespace TaskbarMonitor
     {
         private static Control _control;
 
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        [DllImport("user32.dll")]
         private static extern bool SetProcessDPIAware();
 
         public Deskband()
         {
-            if (Environment.OSVersion.Version.Major >= 6)
-                SetProcessDPIAware();
+            try
+            {
+                if (Environment.OSVersion.Version.Major >= 6)
+                    SetProcessDPIAware();
 
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
 
-            Options opt = TaskbarMonitor.Options.ReadFromDisk();
-            
+                Options opt = TaskbarMonitor.Options.ReadFromDisk();
 
-            var ctl = new SystemWatcherControl(opt);
-            Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, 30);
-            ctl.OnChangeSize += Ctl_OnChangeSize;
-            _control = ctl;
+
+                var ctl = new SystemWatcherControl(opt);
+                Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, 30);
+                ctl.OnChangeSize += Ctl_OnChangeSize;
+                _control = ctl;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error intializing Deskband: {ex.Message}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void Ctl_OnChangeSize(Size size)
