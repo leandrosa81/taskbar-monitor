@@ -68,9 +68,8 @@ namespace TaskbarMonitor
                 lightTheme = GraphTheme.DefaultLightTheme();
                 customTheme = GraphTheme.ReadFromDisk();
                 opt.Upgrade(customTheme);
-                opt.Upgrade(theme);
 
-                Initialize(opt, theme);
+                Initialize(opt);
             }
             catch (Exception ex)
             {
@@ -79,7 +78,7 @@ namespace TaskbarMonitor
         }
 
         public SystemWatcherControl()
-            :this(false)
+            :this(true)
         {            
         }
         public SystemWatcherControl(bool addSecondControl = false)
