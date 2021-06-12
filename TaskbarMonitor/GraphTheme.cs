@@ -116,7 +116,7 @@ namespace TaskbarMonitor
             {
                 BarColor = Color.FromArgb(255, 0, 0, 0),
                 TextColor = Color.FromArgb(200, 255, 0, 128),
-                TextShadowColor = Color.FromArgb(255, 234, 234, 234),
+                TextShadowColor = Color.FromArgb(255, 207, 207, 207),
                 TitleColor = Color.FromArgb(255, 0, 0, 0),
                 TitleShadowColor = Color.FromArgb(255, 214, 214, 214),
                 TitleFont = "Arial",

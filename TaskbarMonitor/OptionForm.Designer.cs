@@ -42,7 +42,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.listCounters = new System.Windows.Forms.ListBox();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.buttonReplicateSettings = new TaskbarMonitor.Controls.MenuButton();
             this.contextMenuStripReplicateSettings = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -76,6 +75,8 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.listThemeType = new System.Windows.Forms.ComboBox();
+            this.label35 = new System.Windows.Forms.Label();
             this.linkCurrentValueFont = new System.Windows.Forms.LinkLabel();
             this.linkTitleFont = new System.Windows.Forms.LinkLabel();
             this.label34 = new System.Windows.Forms.Label();
@@ -116,12 +117,12 @@
             this.label9 = new System.Windows.Forms.Label();
             this.panelFooter = new System.Windows.Forms.Panel();
             this.label17 = new System.Windows.Forms.Label();
-            this.swcPreview = new TaskbarMonitor.SystemWatcherControl();
             this.button3 = new System.Windows.Forms.Button();
             this.buttonResetDefaults = new System.Windows.Forms.Button();
             this.buttonApply = new System.Windows.Forms.Button();
-            this.label35 = new System.Windows.Forms.Label();
-            this.listThemeType = new System.Windows.Forms.ComboBox();
+            this.panelCustomTheme = new System.Windows.Forms.Panel();
+            this.swcPreview = new TaskbarMonitor.SystemWatcherControl();
+            this.buttonReplicateSettings = new TaskbarMonitor.Controls.MenuButton();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editHistorySize)).BeginInit();
             this.panelMenu.SuspendLayout();
@@ -139,6 +140,7 @@
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.panelFooter.SuspendLayout();
+            this.panelCustomTheme.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -291,17 +293,6 @@
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(415, 426);
             this.panel3.TabIndex = 2;
-            // 
-            // buttonReplicateSettings
-            // 
-            this.buttonReplicateSettings.Location = new System.Drawing.Point(249, 355);
-            this.buttonReplicateSettings.Menu = this.contextMenuStripReplicateSettings;
-            this.buttonReplicateSettings.Name = "buttonReplicateSettings";
-            this.buttonReplicateSettings.ShowMenuUnderCursor = true;
-            this.buttonReplicateSettings.Size = new System.Drawing.Size(154, 23);
-            this.buttonReplicateSettings.TabIndex = 2;
-            this.buttonReplicateSettings.Text = "Replicate Settings";
-            this.buttonReplicateSettings.UseVisualStyleBackColor = true;
             // 
             // contextMenuStripReplicateSettings
             // 
@@ -653,26 +644,9 @@
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.panelCustomTheme);
             this.groupBox5.Controls.Add(this.listThemeType);
             this.groupBox5.Controls.Add(this.label35);
-            this.groupBox5.Controls.Add(this.linkCurrentValueFont);
-            this.groupBox5.Controls.Add(this.linkTitleFont);
-            this.groupBox5.Controls.Add(this.label34);
-            this.groupBox5.Controls.Add(this.label33);
-            this.groupBox5.Controls.Add(this.btnColor2);
-            this.groupBox5.Controls.Add(this.label30);
-            this.groupBox5.Controls.Add(this.btnColor1);
-            this.groupBox5.Controls.Add(this.label29);
-            this.groupBox5.Controls.Add(this.btnColorCurrentValueShadow);
-            this.groupBox5.Controls.Add(this.label27);
-            this.groupBox5.Controls.Add(this.btnColorCurrentValue);
-            this.groupBox5.Controls.Add(this.label28);
-            this.groupBox5.Controls.Add(this.btnColorTitleShadow);
-            this.groupBox5.Controls.Add(this.label26);
-            this.groupBox5.Controls.Add(this.btnColorTitle);
-            this.groupBox5.Controls.Add(this.label25);
-            this.groupBox5.Controls.Add(this.btnColorBar);
-            this.groupBox5.Controls.Add(this.label24);
             this.groupBox5.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox5.Location = new System.Drawing.Point(0, 195);
             this.groupBox5.Name = "groupBox5";
@@ -681,12 +655,37 @@
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Visual";
             // 
+            // listThemeType
+            // 
+            this.listThemeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.listThemeType.FormattingEnabled = true;
+            this.listThemeType.Items.AddRange(new object[] {
+            "AUTOMATIC",
+            "DARK",
+            "LIGHT",
+            "CUSTOM"});
+            this.listThemeType.Location = new System.Drawing.Point(112, 33);
+            this.listThemeType.Margin = new System.Windows.Forms.Padding(2);
+            this.listThemeType.Name = "listThemeType";
+            this.listThemeType.Size = new System.Drawing.Size(130, 22);
+            this.listThemeType.TabIndex = 19;
+            this.listThemeType.SelectedIndexChanged += new System.EventHandler(this.listThemeType_SelectedIndexChanged);
+            // 
+            // label35
+            // 
+            this.label35.AutoSize = true;
+            this.label35.Location = new System.Drawing.Point(14, 36);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(73, 14);
+            this.label35.TabIndex = 18;
+            this.label35.Text = "Theme type:";
+            // 
             // linkCurrentValueFont
             // 
             this.linkCurrentValueFont.AutoSize = true;
             this.linkCurrentValueFont.Font = new System.Drawing.Font("Calibri", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.linkCurrentValueFont.LinkColor = System.Drawing.Color.Black;
-            this.linkCurrentValueFont.Location = new System.Drawing.Point(110, 137);
+            this.linkCurrentValueFont.Location = new System.Drawing.Point(108, 76);
             this.linkCurrentValueFont.Name = "linkCurrentValueFont";
             this.linkCurrentValueFont.Size = new System.Drawing.Size(26, 13);
             this.linkCurrentValueFont.TabIndex = 17;
@@ -700,7 +699,7 @@
             this.linkTitleFont.AutoSize = true;
             this.linkTitleFont.Font = new System.Drawing.Font("Calibri", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.linkTitleFont.LinkColor = System.Drawing.Color.Black;
-            this.linkTitleFont.Location = new System.Drawing.Point(110, 101);
+            this.linkTitleFont.Location = new System.Drawing.Point(108, 40);
             this.linkTitleFont.Name = "linkTitleFont";
             this.linkTitleFont.Size = new System.Drawing.Size(66, 13);
             this.linkTitleFont.TabIndex = 16;
@@ -712,7 +711,7 @@
             // label34
             // 
             this.label34.AutoSize = true;
-            this.label34.Location = new System.Drawing.Point(14, 137);
+            this.label34.Location = new System.Drawing.Point(12, 76);
             this.label34.Name = "label34";
             this.label34.Size = new System.Drawing.Size(79, 28);
             this.label34.TabIndex = 15;
@@ -721,7 +720,7 @@
             // label33
             // 
             this.label33.AutoSize = true;
-            this.label33.Location = new System.Drawing.Point(14, 101);
+            this.label33.Location = new System.Drawing.Point(12, 40);
             this.label33.Name = "label33";
             this.label33.Size = new System.Drawing.Size(63, 14);
             this.label33.TabIndex = 14;
@@ -730,7 +729,7 @@
             // btnColor2
             // 
             this.btnColor2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColor2.Location = new System.Drawing.Point(508, 67);
+            this.btnColor2.Location = new System.Drawing.Point(506, 6);
             this.btnColor2.Name = "btnColor2";
             this.btnColor2.Size = new System.Drawing.Size(75, 23);
             this.btnColor2.TabIndex = 13;
@@ -740,7 +739,7 @@
             // label30
             // 
             this.label30.AutoSize = true;
-            this.label30.Location = new System.Drawing.Point(402, 71);
+            this.label30.Location = new System.Drawing.Point(400, 10);
             this.label30.Name = "label30";
             this.label30.Size = new System.Drawing.Size(88, 14);
             this.label30.TabIndex = 12;
@@ -749,7 +748,7 @@
             // btnColor1
             // 
             this.btnColor1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColor1.Location = new System.Drawing.Point(316, 67);
+            this.btnColor1.Location = new System.Drawing.Point(314, 6);
             this.btnColor1.Name = "btnColor1";
             this.btnColor1.Size = new System.Drawing.Size(75, 23);
             this.btnColor1.TabIndex = 11;
@@ -759,7 +758,7 @@
             // label29
             // 
             this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(210, 71);
+            this.label29.Location = new System.Drawing.Point(208, 10);
             this.label29.Name = "label29";
             this.label29.Size = new System.Drawing.Size(88, 14);
             this.label29.TabIndex = 10;
@@ -768,7 +767,7 @@
             // btnColorCurrentValueShadow
             // 
             this.btnColorCurrentValueShadow.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColorCurrentValueShadow.Location = new System.Drawing.Point(507, 133);
+            this.btnColorCurrentValueShadow.Location = new System.Drawing.Point(505, 72);
             this.btnColorCurrentValueShadow.Name = "btnColorCurrentValueShadow";
             this.btnColorCurrentValueShadow.Size = new System.Drawing.Size(75, 23);
             this.btnColorCurrentValueShadow.TabIndex = 9;
@@ -778,7 +777,7 @@
             // label27
             // 
             this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(402, 137);
+            this.label27.Location = new System.Drawing.Point(400, 76);
             this.label27.Name = "label27";
             this.label27.Size = new System.Drawing.Size(83, 28);
             this.label27.TabIndex = 8;
@@ -787,7 +786,7 @@
             // btnColorCurrentValue
             // 
             this.btnColorCurrentValue.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColorCurrentValue.Location = new System.Drawing.Point(316, 133);
+            this.btnColorCurrentValue.Location = new System.Drawing.Point(314, 72);
             this.btnColorCurrentValue.Name = "btnColorCurrentValue";
             this.btnColorCurrentValue.Size = new System.Drawing.Size(75, 23);
             this.btnColorCurrentValue.TabIndex = 7;
@@ -797,7 +796,7 @@
             // label28
             // 
             this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(210, 137);
+            this.label28.Location = new System.Drawing.Point(208, 76);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(79, 28);
             this.label28.TabIndex = 6;
@@ -806,7 +805,7 @@
             // btnColorTitleShadow
             // 
             this.btnColorTitleShadow.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColorTitleShadow.Location = new System.Drawing.Point(507, 96);
+            this.btnColorTitleShadow.Location = new System.Drawing.Point(505, 35);
             this.btnColorTitleShadow.Name = "btnColorTitleShadow";
             this.btnColorTitleShadow.Size = new System.Drawing.Size(75, 23);
             this.btnColorTitleShadow.TabIndex = 5;
@@ -816,7 +815,7 @@
             // label26
             // 
             this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(402, 101);
+            this.label26.Location = new System.Drawing.Point(400, 40);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(78, 28);
             this.label26.TabIndex = 4;
@@ -825,7 +824,7 @@
             // btnColorTitle
             // 
             this.btnColorTitle.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColorTitle.Location = new System.Drawing.Point(316, 97);
+            this.btnColorTitle.Location = new System.Drawing.Point(314, 36);
             this.btnColorTitle.Name = "btnColorTitle";
             this.btnColorTitle.Size = new System.Drawing.Size(75, 23);
             this.btnColorTitle.TabIndex = 3;
@@ -835,7 +834,7 @@
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(210, 101);
+            this.label25.Location = new System.Drawing.Point(208, 40);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(65, 14);
             this.label25.TabIndex = 2;
@@ -844,7 +843,7 @@
             // btnColorBar
             // 
             this.btnColorBar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnColorBar.Location = new System.Drawing.Point(112, 67);
+            this.btnColorBar.Location = new System.Drawing.Point(110, 6);
             this.btnColorBar.Name = "btnColorBar";
             this.btnColorBar.Size = new System.Drawing.Size(75, 23);
             this.btnColorBar.TabIndex = 1;
@@ -854,7 +853,7 @@
             // label24
             // 
             this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(14, 67);
+            this.label24.Location = new System.Drawing.Point(12, 6);
             this.label24.Name = "label24";
             this.label24.Size = new System.Drawing.Size(58, 14);
             this.label24.TabIndex = 0;
@@ -1122,17 +1121,6 @@
             this.label17.TabIndex = 5;
             this.label17.Text = "Preview:";
             // 
-            // swcPreview
-            // 
-            this.swcPreview.BackColor = System.Drawing.Color.Transparent;
-            this.swcPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.swcPreview.Location = new System.Drawing.Point(15, 39);
-            this.swcPreview.Name = "swcPreview";
-            this.swcPreview.PreviewMode = true;
-            this.swcPreview.Size = new System.Drawing.Size(240, 30);
-            this.swcPreview.TabIndex = 4;
-            this.swcPreview.Version = ((System.Version)(resources.GetObject("swcPreview.Version")));
-            // 
             // button3
             // 
             this.button3.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -1147,9 +1135,9 @@
             // buttonResetDefaults
             // 
             this.buttonResetDefaults.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonResetDefaults.Location = new System.Drawing.Point(471, 10);
+            this.buttonResetDefaults.Location = new System.Drawing.Point(406, 10);
             this.buttonResetDefaults.Name = "buttonResetDefaults";
-            this.buttonResetDefaults.Size = new System.Drawing.Size(120, 23);
+            this.buttonResetDefaults.Size = new System.Drawing.Size(185, 29);
             this.buttonResetDefaults.TabIndex = 1;
             this.buttonResetDefaults.Text = "Reset to defaults";
             this.buttonResetDefaults.UseVisualStyleBackColor = true;
@@ -1167,30 +1155,52 @@
             this.buttonApply.UseVisualStyleBackColor = false;
             this.buttonApply.Click += new System.EventHandler(this.buttonApply_Click);
             // 
-            // label35
+            // panelCustomTheme
             // 
-            this.label35.AutoSize = true;
-            this.label35.Location = new System.Drawing.Point(14, 36);
-            this.label35.Name = "label35";
-            this.label35.Size = new System.Drawing.Size(73, 14);
-            this.label35.TabIndex = 18;
-            this.label35.Text = "Theme type:";
+            this.panelCustomTheme.Controls.Add(this.label24);
+            this.panelCustomTheme.Controls.Add(this.btnColorBar);
+            this.panelCustomTheme.Controls.Add(this.linkCurrentValueFont);
+            this.panelCustomTheme.Controls.Add(this.label25);
+            this.panelCustomTheme.Controls.Add(this.linkTitleFont);
+            this.panelCustomTheme.Controls.Add(this.btnColorTitle);
+            this.panelCustomTheme.Controls.Add(this.label34);
+            this.panelCustomTheme.Controls.Add(this.label26);
+            this.panelCustomTheme.Controls.Add(this.label33);
+            this.panelCustomTheme.Controls.Add(this.btnColorTitleShadow);
+            this.panelCustomTheme.Controls.Add(this.btnColor2);
+            this.panelCustomTheme.Controls.Add(this.label28);
+            this.panelCustomTheme.Controls.Add(this.label30);
+            this.panelCustomTheme.Controls.Add(this.btnColorCurrentValue);
+            this.panelCustomTheme.Controls.Add(this.btnColor1);
+            this.panelCustomTheme.Controls.Add(this.label27);
+            this.panelCustomTheme.Controls.Add(this.label29);
+            this.panelCustomTheme.Controls.Add(this.btnColorCurrentValueShadow);
+            this.panelCustomTheme.Location = new System.Drawing.Point(7, 62);
+            this.panelCustomTheme.Name = "panelCustomTheme";
+            this.panelCustomTheme.Size = new System.Drawing.Size(583, 125);
+            this.panelCustomTheme.TabIndex = 13;
             // 
-            // listThemeType
+            // swcPreview
             // 
-            this.listThemeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.listThemeType.FormattingEnabled = true;
-            this.listThemeType.Items.AddRange(new object[] {
-            "AUTOMATIC",
-            "DARK",
-            "LIGHT",
-            "CUSTOM"});
-            this.listThemeType.Location = new System.Drawing.Point(112, 33);
-            this.listThemeType.Margin = new System.Windows.Forms.Padding(2);
-            this.listThemeType.Name = "listThemeType";
-            this.listThemeType.Size = new System.Drawing.Size(92, 22);
-            this.listThemeType.TabIndex = 19;
-            this.listThemeType.SelectedIndexChanged += new System.EventHandler(this.listThemeType_SelectedIndexChanged);
+            this.swcPreview.BackColor = System.Drawing.Color.Transparent;
+            this.swcPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.swcPreview.Location = new System.Drawing.Point(15, 39);
+            this.swcPreview.Name = "swcPreview";
+            this.swcPreview.PreviewMode = true;
+            this.swcPreview.Size = new System.Drawing.Size(240, 30);
+            this.swcPreview.TabIndex = 4;
+            this.swcPreview.Version = ((System.Version)(resources.GetObject("swcPreview.Version")));
+            // 
+            // buttonReplicateSettings
+            // 
+            this.buttonReplicateSettings.Location = new System.Drawing.Point(249, 355);
+            this.buttonReplicateSettings.Menu = this.contextMenuStripReplicateSettings;
+            this.buttonReplicateSettings.Name = "buttonReplicateSettings";
+            this.buttonReplicateSettings.ShowMenuUnderCursor = true;
+            this.buttonReplicateSettings.Size = new System.Drawing.Size(154, 23);
+            this.buttonReplicateSettings.TabIndex = 2;
+            this.buttonReplicateSettings.Text = "Replicate Settings";
+            this.buttonReplicateSettings.UseVisualStyleBackColor = true;
             // 
             // OptionForm
             // 
@@ -1239,6 +1249,8 @@
             this.tabPage3.PerformLayout();
             this.panelFooter.ResumeLayout(false);
             this.panelFooter.PerformLayout();
+            this.panelCustomTheme.ResumeLayout(false);
+            this.panelCustomTheme.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1337,5 +1349,6 @@
         private System.Windows.Forms.LinkLabel linkCurrentValueFont;
         private System.Windows.Forms.ComboBox listThemeType;
         private System.Windows.Forms.Label label35;
+        private System.Windows.Forms.Panel panelCustomTheme;
     }
 }

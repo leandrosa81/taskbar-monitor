@@ -35,6 +35,9 @@ namespace TaskbarMonitor
             Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, 30);
             ctl.OnChangeSize += Ctl_OnChangeSize;
             _control = ctl;
+
+            
+
         }
 
         private void Ctl_OnChangeSize(Size size)

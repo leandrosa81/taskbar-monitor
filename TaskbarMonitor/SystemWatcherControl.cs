@@ -57,40 +57,63 @@ namespace TaskbarMonitor
         Font fontTitle;
         int lastSize = 30;
         bool mouseOver = false;
+        GraphTheme customTheme;
+        GraphTheme darkTheme;
+        GraphTheme lightTheme;
+
         GraphTheme defaultTheme;
 
         public SystemWatcherControl(Options opt)//CSDeskBand.CSDeskBandWin w, 
         {
-            var theme = GetTheme(opt);
-            opt.Upgrade(theme);
-
-            Initialize(opt, theme);
+            darkTheme = GraphTheme.DefaultDarkTheme();            
+            lightTheme = GraphTheme.DefaultLightTheme();
+            customTheme = GraphTheme.ReadFromDisk();
+            opt.Upgrade(customTheme);
+             
+            Initialize(opt);
+            
+            {
+                SecondaryTaskBar sTask = new SecondaryTaskBar();
+                sTask.AddControl();
+            }
         }
-         
         public SystemWatcherControl()
+            :this(false)
+        {            
+        }
+        public SystemWatcherControl(bool addSecondControl = false)
         {
             Options opt = TaskbarMonitor.Options.ReadFromDisk();
-            var theme = GetTheme(opt);
-            opt.Upgrade(theme);
 
-            Initialize(opt, theme);
+            darkTheme = GraphTheme.DefaultDarkTheme();
+            lightTheme = GraphTheme.DefaultLightTheme();
+            customTheme = GraphTheme.ReadFromDisk();
+            opt.Upgrade(customTheme);
+             
+            Initialize(opt);
+
+            if (addSecondControl)
+            {
+                SecondaryTaskBar sTask = new SecondaryTaskBar();
+                sTask.AddControl();
+            }
         }
 
         private GraphTheme GetTheme(Options opt)
         {
-            GraphTheme theme = GraphTheme.DefaultDarkTheme();
+            GraphTheme theme = darkTheme;
 
             if (opt.ThemeType == Options.ThemeList.LIGHT)
-                theme = GraphTheme.DefaultLightTheme();
+                theme = lightTheme;
             else if (opt.ThemeType == Options.ThemeList.CUSTOM)
-                theme = GraphTheme.ReadFromDisk();
+                theme = customTheme;
             else if (opt.ThemeType == Options.ThemeList.AUTOMATIC)
             {
                 Color taskBarColour = BLL.Win32Api.GetColourAt(BLL.Win32Api.GetTaskbarPosition().Location);
                 if (taskBarColour.R + taskBarColour.G + taskBarColour.B > 382)
-                    theme = GraphTheme.DefaultLightTheme();
+                    theme = lightTheme;
                 else
-                    theme = GraphTheme.DefaultDarkTheme();
+                    theme = darkTheme;
             }
             return theme;
         }
@@ -138,27 +161,17 @@ namespace TaskbarMonitor
                 Color taskBarColour = BLL.Win32Api.GetColourAt(BLL.Win32Api.GetTaskbarPosition().Location);
                 this.BackColor = taskBarColour;
 
-            }
+            }            
              
-            /*
-                float dpiX, dpiY;
-                using (Graphics graphics = this.CreateGraphics())
-                {
-                    dpiX = graphics.DpiX;
-                    dpiY = graphics.DpiY;
-                }
-                float fontSize = 7f;
-                if (dpiX > 96)
-                    fontSize = 6f;
-                */
-
             AdjustControlSize();
             UpdateGraphs();
             this.Invalidate();
 
         }
-        private void Initialize(Options opt, GraphTheme theme)
+        private void Initialize(Options opt)
         {
+
+            var theme = GetTheme(opt);
 
             Counters = new List<Counters.ICounter>();
             if (opt.CounterOptions.ContainsKey("CPU"))
@@ -189,6 +202,7 @@ namespace TaskbarMonitor
             ApplyOptions(opt, theme);
             //Initialize();
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+            SetStyle(ControlStyles.ResizeRedraw, true);
             SetStyle(ControlStyles.DoubleBuffer, true);
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             SetStyle(ControlStyles.UserPaint, true);            
@@ -562,7 +576,7 @@ namespace TaskbarMonitor
             OptionForm optForm = null;
             if (qtd.Count() == 0)
             {
-                optForm = new OptionForm(this.Options, this.defaultTheme, this.Version, this);
+                optForm = new OptionForm(this.Options, this.customTheme, this.Version, this);
                 optForm.Show();
             }
             else

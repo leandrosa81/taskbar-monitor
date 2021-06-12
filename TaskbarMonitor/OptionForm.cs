@@ -597,6 +597,7 @@ namespace TaskbarMonitor
 
         private void UpdateThemeOptions()
         {
+            panelCustomTheme.Visible = Options.ThemeType == Options.ThemeList.CUSTOM;
             btnColorBar.Enabled = Options.ThemeType == Options.ThemeList.CUSTOM;
             btnColor1.Enabled = Options.ThemeType == Options.ThemeList.CUSTOM;
             btnColor2.Enabled = Options.ThemeType == Options.ThemeList.CUSTOM;

@@ -21,7 +21,7 @@ namespace TaskbarMonitor
         public Dictionary<string, CounterOptions> CounterOptions { get; set; }
         public int HistorySize { get; set; } = 50;
         public int PollTime { get; set; } = 3;
-        public ThemeList ThemeType { get; set; } = ThemeList.DARK;
+        public ThemeList ThemeType { get; set; } = ThemeList.AUTOMATIC;
 
         public void CopyTo(Options opt)
         {
@@ -144,6 +144,6 @@ namespace TaskbarMonitor
         public DisplayPosition SummaryPosition { get; set; } = DisplayPosition.TOP;
         public bool InvertOrder { get; set; } = false;
         public bool SeparateScales { get; set; } = true;
-        public TaskbarMonitor.Counters.ICounter.CounterType GraphType { get; set; }        
+        public TaskbarMonitor.Counters.ICounter.CounterType GraphType { get; set; }      
     }
 }

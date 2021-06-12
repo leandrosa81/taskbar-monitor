@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BLL\Win32.cs" />
     <Compile Include="BLL\Win32Api.cs" />
     <Compile Include="Controls\MenuButton.cs">
       <SubType>Component</SubType>
@@ -82,6 +83,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SecondaryTaskBar.cs" />
     <Compile Include="SystemWatcherControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
