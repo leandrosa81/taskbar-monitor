@@ -1,12 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TaskbarMonitor
@@ -32,25 +28,27 @@ namespace TaskbarMonitor
 
         public OptionForm(Options opt, GraphTheme theme, Version version, SystemWatcherControl originalControl)
         {
-            this.Version = version;
-            
-            this.Theme = new GraphTheme();
-            this.OriginalTheme = theme;
-            theme.CopyTo(this.Theme);
+            try
+            {
+                this.Version = version;
 
-            this.Options = new Options();
-            this.OriginalOptions = opt;
-            opt.CopyTo(this.Options);
+                this.Theme = new GraphTheme();
+                this.OriginalTheme = theme;
+                theme.CopyTo(this.Theme);
 
-            this.originalControl = originalControl;
+                this.Options = new Options();
+                this.OriginalOptions = opt;
+                opt.CopyTo(this.Options);
 
-            AvailableGraphTypes = new Dictionary<string, IList<Counters.ICounter.CounterType>>
+                this.originalControl = originalControl;
+
+                AvailableGraphTypes = new Dictionary<string, IList<Counters.ICounter.CounterType>>
             {
                 {"CPU",  new List<TaskbarMonitor.Counters.ICounter.CounterType>
                 {
                     TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
                     TaskbarMonitor.Counters.ICounter.CounterType.STACKED
-                } 
+                }
                 },
                 {"MEM",  new List<TaskbarMonitor.Counters.ICounter.CounterType>
                 {
@@ -72,22 +70,27 @@ namespace TaskbarMonitor
                 }
                 }
             };
-            InitializeComponent();
-            /*
-            float dpiX, dpiY;
-            using (Graphics graphics = this.CreateGraphics())
-            {
-                dpiX = graphics.DpiX;
-                dpiY = graphics.DpiY;
-            }            
+                InitializeComponent();
+                /*
+                float dpiX, dpiY;
+                using (Graphics graphics = this.CreateGraphics())
+                {
+                    dpiX = graphics.DpiX;
+                    dpiY = graphics.DpiY;
+                }            
 
-            if (dpiX >= 96)
-            {
-                var fontSize = 7.25f;
-                this.Font = new Font("Calibri", fontSize, FontStyle.Regular);
+                if (dpiX >= 96)
+                {
+                    var fontSize = 7.25f;
+                    this.Font = new Font("Calibri", fontSize, FontStyle.Regular);
+                }
+                */
+                Initialize();
             }
-            */
-            Initialize();
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading Options: {ex.Message}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         private void Initialize()
         {

@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Data;
+using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using CSDeskBand;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
 
 // control architecture
 
@@ -19,8 +14,8 @@ using System.Diagnostics;
 //      Settings dialog window (receives copy of options)
 //          SystemWatcherControl(CopyOfOptions) (another instance for preview)        
 namespace TaskbarMonitor
-{    
-    public partial class SystemWatcherControl: UserControl
+{
+    public partial class SystemWatcherControl : UserControl
     {
         public delegate void SizeChangeHandler(Size size);
         public event SizeChangeHandler OnChangeSize;
@@ -33,14 +28,16 @@ namespace TaskbarMonitor
         private ContextMenu _contextMenu = null;
         private bool VerticalTaskbarMode = false;
         private System.Timers.Timer pollingTimer;
-        public bool PreviewMode { get
+        public bool PreviewMode
+        {
+            get
             {
                 return _previewMode;
             }
             set
             {
                 _previewMode = value;
-                this.ContextMenu = _previewMode ? null : _contextMenu;                
+                this.ContextMenu = _previewMode ? null : _contextMenu;
             }
         }
         public int CountersCount
@@ -53,7 +50,7 @@ namespace TaskbarMonitor
             }
         }
         List<Counters.ICounter> Counters;
-        System.Drawing.Font fontCounter;        
+        System.Drawing.Font fontCounter;
         Font fontTitle;
         int lastSize = 30;
         bool mouseOver = false;
@@ -65,37 +62,46 @@ namespace TaskbarMonitor
 
         public SystemWatcherControl(Options opt)//CSDeskBand.CSDeskBandWin w, 
         {
-            darkTheme = GraphTheme.DefaultDarkTheme();            
-            lightTheme = GraphTheme.DefaultLightTheme();
-            customTheme = GraphTheme.ReadFromDisk();
-            opt.Upgrade(customTheme);
-             
-            Initialize(opt);
-            
+            try
             {
-                SecondaryTaskBar sTask = new SecondaryTaskBar();
-                sTask.AddControl();
+                darkTheme = GraphTheme.DefaultDarkTheme();            
+                lightTheme = GraphTheme.DefaultLightTheme();
+                customTheme = GraphTheme.ReadFromDisk();
+                opt.Upgrade(customTheme);
+                opt.Upgrade(theme);
+
+                Initialize(opt, theme);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading SystemWatcherControl: {ex.Message}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         public SystemWatcherControl()
             :this(false)
         {            
         }
         public SystemWatcherControl(bool addSecondControl = false)
         {
-            Options opt = TaskbarMonitor.Options.ReadFromDisk();
-
-            darkTheme = GraphTheme.DefaultDarkTheme();
-            lightTheme = GraphTheme.DefaultLightTheme();
-            customTheme = GraphTheme.ReadFromDisk();
-            opt.Upgrade(customTheme);
-             
-            Initialize(opt);
-
-            if (addSecondControl)
+            try
             {
-                SecondaryTaskBar sTask = new SecondaryTaskBar();
-                sTask.AddControl();
+                Options opt = TaskbarMonitor.Options.ReadFromDisk();
+                darkTheme = GraphTheme.DefaultDarkTheme();
+                lightTheme = GraphTheme.DefaultLightTheme();
+                customTheme = GraphTheme.ReadFromDisk();
+                opt.Upgrade(customTheme);
+
+                Initialize(opt);
+                if (addSecondControl)
+                {
+                    SecondaryTaskBar sTask = new SecondaryTaskBar();
+                    sTask.AddControl();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading SystemWatcherControl: {ex.Message}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -122,11 +128,11 @@ namespace TaskbarMonitor
         {
             UpdateGraphs();
 
-            if(this.Options.ThemeType == Options.ThemeList.AUTOMATIC)
+            if (this.Options.ThemeType == Options.ThemeList.AUTOMATIC)
             {
                 this.defaultTheme = GetTheme(this.Options);
             }
-            
+
             this.Invalidate();
         }
 
@@ -149,7 +155,8 @@ namespace TaskbarMonitor
 
             _contextMenu = new ContextMenu();
             _contextMenu.MenuItems.Add(new MenuItem("Settings...", MenuItem_Settings_onClick));
-            _contextMenu.MenuItems.Add(new MenuItem("Open Resource Monitor...", (e, a) => {
+            _contextMenu.MenuItems.Add(new MenuItem("Open Resource Monitor...", (e, a) =>
+            {
                 System.Diagnostics.Process.Start("resmon.exe");
             }));
             _contextMenu.MenuItems.Add(new MenuItem(String.Format("About taskbar-monitor (v{0})...", Version.ToString(3)), MenuItem_About_onClick));
@@ -205,7 +212,7 @@ namespace TaskbarMonitor
             SetStyle(ControlStyles.ResizeRedraw, true);
             SetStyle(ControlStyles.DoubleBuffer, true);
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-            SetStyle(ControlStyles.UserPaint, true);            
+            SetStyle(ControlStyles.UserPaint, true);
 
             InitializeComponent();
             AdjustControlSize();
@@ -245,7 +252,7 @@ namespace TaskbarMonitor
                     OnChangeSize(new Size(controlWidth, controlHeight));
             }
         }
-         
+
         private void UpdateGraphs()
         {
             foreach (var ct in Counters)
@@ -262,7 +269,7 @@ namespace TaskbarMonitor
             if (maximumHeight <= 0)
                 maximumHeight = 30;
 
-            if(lastSize  != maximumHeight)
+            if (lastSize != maximumHeight)
             {
                 this.Height = maximumHeight;
                 lastSize = maximumHeight;
@@ -271,7 +278,7 @@ namespace TaskbarMonitor
             int graphPosition = 0;
             int graphPositionY = 0;
 
-            
+
             System.Drawing.Graphics formGraphics = e.Graphics;// this.CreateGraphics();
             formGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
 
@@ -284,7 +291,7 @@ namespace TaskbarMonitor
                 var infos = ct.Infos;
                 //var opt = Options.CounterOptions[ct.GetName()];
                 //if (!opt.Enabled) continue;
-                var showCurrentValue = !opt.CurrentValueAsSummary && 
+                var showCurrentValue = !opt.CurrentValueAsSummary &&
                     (opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW || (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver));
 
                 lock (ct.ThreadLock)
@@ -333,12 +340,12 @@ namespace TaskbarMonitor
 
                     if (opt.ShowTitle == CounterOptions.DisplayType.HOVER && !mouseOver)
                     {
-                        titleColor = Color.FromArgb(40, titleColor.R, titleColor.G, titleColor.B);                        
+                        titleColor = Color.FromArgb(40, titleColor.R, titleColor.G, titleColor.B);
                     }
 
 
                     System.Drawing.SolidBrush brushShadow = new System.Drawing.SolidBrush(titleShadow);
-                    System.Drawing.SolidBrush brushTitle = new System.Drawing.SolidBrush(titleColor);                    
+                    System.Drawing.SolidBrush brushTitle = new System.Drawing.SolidBrush(titleColor);
 
 
                     if (
@@ -350,7 +357,7 @@ namespace TaskbarMonitor
                         if ((opt.ShowTitle == CounterOptions.DisplayType.HOVER && mouseOver) || opt.ShowTitle == CounterOptions.DisplayType.SHOW)
                         {
                             formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) + 1, positions[opt.TitlePosition] + 1, sizeTitle.Width, maximumHeight), new StringFormat());
-                        }                        
+                        }
                         formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), positions[opt.TitlePosition], sizeTitle.Width, maximumHeight), new StringFormat());
                     }
 
@@ -360,7 +367,7 @@ namespace TaskbarMonitor
                 }
 
                 if (opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW
-                 || opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER)                   
+                 || opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER)
                 {
                     Dictionary<CounterOptions.DisplayPosition, string> texts = new Dictionary<CounterOptions.DisplayPosition, string>();
 
@@ -377,7 +384,7 @@ namespace TaskbarMonitor
                         var showName = infos.Count > 1;
                         for (int i = 0; i < infos.Count && i < 2; i++)
                         {
-                            texts.Add(positionsAvailable[i], (showName ? infos[i].Name + " "  : "" ) + infos[i].CurrentStringValue);
+                            texts.Add(positionsAvailable[i], (showName ? infos[i].Name + " " : "") + infos[i].CurrentStringValue);
                         }
                     }
                     foreach (var item in texts)
@@ -407,7 +414,7 @@ namespace TaskbarMonitor
                         {
                             if ((opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver) || opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW)
                             {
-                               formGraphics.DrawString(text, fontCounter, BrushTextShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, ypos + 1, sizeString.Width, maximumHeight), new StringFormat());
+                                formGraphics.DrawString(text, fontCounter, BrushTextShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, ypos + 1, sizeString.Width, maximumHeight), new StringFormat());
                             }
                             formGraphics.DrawString(text, fontCounter, BrushText, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2), ypos, sizeString.Width, maximumHeight), new StringFormat());
                         }
@@ -415,21 +422,21 @@ namespace TaskbarMonitor
                         BrushTextShadow.Dispose();
                     }
                 }
-                
+
 
                 graphPosition += Options.HistorySize + 10;
-                if(graphPosition >= this.Size.Width)
+                if (graphPosition >= this.Size.Width)
                 {
                     graphPosition = 0;
-                    graphPositionY += (maximumHeight + 10 );
+                    graphPositionY += (maximumHeight + 10);
                 }
             }
             AdjustControlSize();
-            
+
         }
 
-        
-        private void drawGraph (System.Drawing.Graphics formGraphics, int x, int y, int maxH, bool invertido, TaskbarMonitor.Counters.CounterInfo info, GraphTheme theme, CounterOptions opt)
+
+        private void drawGraph(System.Drawing.Graphics formGraphics, int x, int y, int maxH, bool invertido, TaskbarMonitor.Counters.CounterInfo info, GraphTheme theme, CounterOptions opt)
         {
             var pos = maxH - ((info.CurrentValue * maxH) / info.MaximumValue);
             if (pos > Int32.MaxValue) pos = Int32.MaxValue;
@@ -481,7 +488,7 @@ namespace TaskbarMonitor
 
         }
 
-        private void drawStackedGraph (System.Drawing.Graphics formGraphics, int x, int y, int maxH, bool invertido, List<TaskbarMonitor.Counters.CounterInfo> infos, GraphTheme theme, CounterOptions opt)
+        private void drawStackedGraph(System.Drawing.Graphics formGraphics, int x, int y, int maxH, bool invertido, List<TaskbarMonitor.Counters.CounterInfo> infos, GraphTheme theme, CounterOptions opt)
         {
             float absMax = 0;
             List<float> lastValue = new List<float>();
@@ -599,7 +606,7 @@ namespace TaskbarMonitor
 
     }
 
-    
+
 
 
 }
