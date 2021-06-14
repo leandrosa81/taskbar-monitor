@@ -60,7 +60,7 @@ namespace TaskbarMonitor
 
         GraphTheme defaultTheme;
 
-        public SystemWatcherControl(Options opt)//CSDeskBand.CSDeskBandWin w, 
+        public SystemWatcherControl(Options opt, bool addSecondControl = false)//CSDeskBand.CSDeskBandWin w, 
         {
             try
             {
@@ -70,6 +70,11 @@ namespace TaskbarMonitor
                 opt.Upgrade(customTheme);
 
                 Initialize(opt);
+                if (addSecondControl)
+                {
+                    SecondaryTaskBar sTask = new SecondaryTaskBar();
+                    sTask.AddControl();
+                }
             }
             catch (Exception ex)
             {

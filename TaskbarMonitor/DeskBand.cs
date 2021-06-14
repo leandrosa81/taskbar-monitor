@@ -23,12 +23,10 @@ namespace TaskbarMonitor
                     SetProcessDPIAware();
 
                 Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-
                 Options opt = TaskbarMonitor.Options.ReadFromDisk();
 
 
-                var ctl = new SystemWatcherControl(opt);
+                var ctl = new SystemWatcherControl(opt, true);
                 Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, 30);
                 ctl.OnChangeSize += Ctl_OnChangeSize;
                 _control = ctl;
