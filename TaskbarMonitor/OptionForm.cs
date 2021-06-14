@@ -574,6 +574,7 @@ namespace TaskbarMonitor
             if (ChooseFont(sender as LinkLabel, ref ChosenTitleFont))
             {                
                 this.Theme.TitleFont = ChosenTitleFont.Name;
+                this.Theme.TitleFontStyle = ChosenTitleFont.Style;
                 this.Theme.TitleSize = ChosenTitleFont.Size;
             }
 
@@ -585,6 +586,7 @@ namespace TaskbarMonitor
             if (ChooseFont(sender as LinkLabel, ref ChosenCurrentValueFont))
             {
                 this.Theme.CurrentValueFont = ChosenCurrentValueFont.Name;
+                this.Theme.CurrentValueFontStyle = ChosenCurrentValueFont.Style;
                 this.Theme.CurrentValueSize = ChosenCurrentValueFont.Size;
             }
 
