@@ -23,7 +23,7 @@ namespace TaskbarMonitor
                     SetProcessDPIAware();
 
                 Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
+                // Application.SetCompatibleTextRenderingDefault(false);
 
                 Options opt = TaskbarMonitor.Options.ReadFromDisk();
 
