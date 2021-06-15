@@ -154,8 +154,8 @@ namespace TaskbarMonitor
             this.Options = Options;
             this.defaultTheme = theme;
 
-            fontTitle = new Font(defaultTheme.TitleFont, defaultTheme.TitleSize, FontStyle.Bold);
-            fontCounter = new Font(defaultTheme.CurrentValueFont, defaultTheme.CurrentValueSize, FontStyle.Bold);
+            fontTitle = new Font(defaultTheme.TitleFont, defaultTheme.TitleSize, defaultTheme.TitleFontStyle);
+            fontCounter = new Font(defaultTheme.CurrentValueFont, defaultTheme.CurrentValueSize, defaultTheme.CurrentValueFontStyle);
 
             _contextMenu = new ContextMenu();
             _contextMenu.MenuItems.Add(new MenuItem("Settings...", MenuItem_Settings_onClick));

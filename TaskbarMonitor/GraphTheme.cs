@@ -20,9 +20,11 @@ namespace TaskbarMonitor
         public Color TitleColor { get; set; }
         public Color TitleShadowColor { get; set; }
         public string TitleFont { get; set; } = "Arial";
+        public System.Drawing.FontStyle TitleFontStyle { get; set; } =  FontStyle.Bold;
         public float TitleSize { get; set; } = 7f;
 
         public string CurrentValueFont { get; set; } = "Arial";
+        public System.Drawing.FontStyle CurrentValueFontStyle { get; set; } = FontStyle.Bold;
         public float CurrentValueSize { get; set; } = 7f;
 
         public List<Color> StackedColors { get; set; }
@@ -79,8 +81,10 @@ namespace TaskbarMonitor
             theme.TitleColor = this.TitleColor;
             theme.TitleShadowColor = this.TitleShadowColor;
             theme.TitleFont = this.TitleFont;
+            theme.TitleFontStyle = this.TitleFontStyle;
             theme.TitleSize = this.TitleSize;
             theme.CurrentValueFont = this.CurrentValueFont;
+            theme.CurrentValueFontStyle = this.CurrentValueFontStyle;
             theme.CurrentValueSize = this.CurrentValueSize;
             
             theme.StackedColors = new List<Color>();
@@ -100,8 +104,10 @@ namespace TaskbarMonitor
                 TitleColor = Color.FromArgb(255, 255, 255, 255),
                 TitleShadowColor = Color.FromArgb(255, 0, 0, 0),
                 TitleFont = "Arial",
+                TitleFontStyle = FontStyle.Bold,
                 TitleSize = 7f,
                 CurrentValueFont = "Arial",
+                CurrentValueFontStyle = FontStyle.Bold,
                 CurrentValueSize = 7f,
                 StackedColors = new List<Color>
                 {
@@ -120,8 +126,10 @@ namespace TaskbarMonitor
                 TitleColor = Color.FromArgb(255, 0, 0, 0),
                 TitleShadowColor = Color.FromArgb(255, 214, 214, 214),
                 TitleFont = "Arial",
+                TitleFontStyle = FontStyle.Bold,
                 TitleSize = 7f,
                 CurrentValueFont = "Arial",
+                CurrentValueFontStyle = FontStyle.Bold,
                 CurrentValueSize = 7f,
                 StackedColors = new List<Color>
                 {
