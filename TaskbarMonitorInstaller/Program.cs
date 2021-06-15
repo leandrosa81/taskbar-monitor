@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using TaskbarMonitorInstaller.BLL;
 
 namespace TaskbarMonitorInstaller
@@ -13,7 +14,7 @@ namespace TaskbarMonitorInstaller
         static Guid UninstallGuid = new Guid(@"c7f3d760-a8d1-4fdc-9c74-41bf9112e835");
         class InstallInfo
         {
-            public Dictionary<string, byte[]> FilesToCopy { get; set; }
+            public List<string> FilesToCopy { get; set; }
             public List<string> FilesToRegister { get; set; }
             public string TargetPath { get; set; }
         }
@@ -24,23 +25,37 @@ namespace TaskbarMonitorInstaller
 
             InstallInfo info = new InstallInfo
             {
-                FilesToCopy = new Dictionary<string, byte[]> { 
-                    { "TaskbarMonitor.dll", Properties.Resources.TaskbarMonitor }, 
-                    { "Newtonsoft.Json.dll", Properties.Resources.Newtonsoft_Json } 
-                },
+                FilesToCopy = new List<string> { "TaskbarMonitor.dll" },
                 FilesToRegister = new List<string> { "TaskbarMonitor.dll" },
                 //TargetPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "TaskbarMonitor")
                 TargetPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "TaskbarMonitor")
             };
 
             if (args.Length > 0 && args[0].ToLower() == "/uninstall")
+            {
                 RollBack(info);
+            }
             else
+            {
                 Install(info);
+            }
 
             // pause
-            Console.WriteLine("Press any key to close this window...");
+            Console.WriteLine("Press any key to close this window..");
             Console.ReadKey();
+        }
+
+        public static void WriteEmbeddedResourceToFile(string resourceName, string fileName)
+        {
+            string fullResourceName = $"{Assembly.GetExecutingAssembly().GetName().Name}.Resources.{resourceName}";
+
+            using (Stream manifestResourceSTream = Assembly.GetExecutingAssembly().GetManifestResourceStream(fullResourceName))
+            {
+                using (FileStream fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+                {
+                    manifestResourceSTream.CopyTo(fileStream);
+                }
+            }
         }
 
         static void Install(InstallInfo info)
@@ -56,18 +71,17 @@ namespace TaskbarMonitorInstaller
                 Console.WriteLine("OK.");
 
                 // First copy files to program files folder          
-                foreach (var file in info.FilesToCopy)
+                foreach (var item in info.FilesToCopy)
                 {
-                    var item = file.Key;
-
                     var targetFilePath = Path.Combine(info.TargetPath, item);
                     Console.Write(string.Format("Copying {0}... ", item));
-                    File.WriteAllBytes(targetFilePath, file.Value);
+                    WriteEmbeddedResourceToFile(item, targetFilePath);
                     //File.Copy(item, targetFilePath, true);
                     Console.WriteLine("OK.");
                 }
-                // copy the uninstaller too
-                File.Copy("TaskbarMonitorInstaller.exe", Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"));
+
+                // Copy the uninstaller too
+                File.Copy(Assembly.GetExecutingAssembly().Location, Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"), true);
             }
             else
             {
@@ -75,18 +89,17 @@ namespace TaskbarMonitorInstaller
                 restartExplorer.Execute(() =>
                 {
                     // First copy files to program files folder          
-                    foreach (var file in info.FilesToCopy)
+                    foreach (var item in info.FilesToCopy)
                     {
-                        var item = file.Key;
-
                         var targetFilePath = Path.Combine(info.TargetPath, item);
                         Console.Write($"Copying {item}... ");
-                        File.WriteAllBytes(targetFilePath, file.Value);
+                        WriteEmbeddedResourceToFile(item, targetFilePath);
                         //File.Copy(item, targetFilePath, true);
                         Console.WriteLine("OK.");
                     }
-                    // copy the uninstaller too
-                    File.Copy("TaskbarMonitorInstaller.exe", Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"), true);
+
+                    // Copy the uninstaller too
+                    File.Copy(Assembly.GetExecutingAssembly().Location, Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"), true);
                 });
             }
 
@@ -101,7 +114,8 @@ namespace TaskbarMonitorInstaller
             }
 
             Console.Write("Registering uninstaller... ");
-            CreateUninstaller(Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"));
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.dll"));
+            CreateUninstaller(Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"), Version.Parse(fileVersionInfo.FileVersion));
             Console.WriteLine("OK.");
 
             // remove pending delete operations
@@ -141,10 +155,10 @@ namespace TaskbarMonitorInstaller
             restartExplorer.Execute(() =>
             {
                 // First copy files to program files folder          
-                foreach (var file in info.FilesToCopy)
+                foreach (var item in info.FilesToCopy)
                 {
-                    var item = file.Key;
                     var targetFilePath = Path.Combine(info.TargetPath, item);
+
                     if (File.Exists(targetFilePath))
                     {
                         Console.Write($"Deleting {item}... ");
@@ -177,7 +191,7 @@ namespace TaskbarMonitorInstaller
                 }
                 
             }
-            
+
             if (Directory.Exists(info.TargetPath))
             {
                 Console.Write("Deleting target directory... ");
@@ -192,6 +206,7 @@ namespace TaskbarMonitorInstaller
                     Console.WriteLine("Scheduled for deletion after next reboot.");
                 }
             }
+
             Console.Write("Removing uninstall info from registry... "); 
             DeleteUninstaller();
             Console.WriteLine("OK.");
@@ -231,7 +246,7 @@ namespace TaskbarMonitorInstaller
             }
         
         }
-        static private void CreateUninstaller(string pathToUninstaller)
+        static private void CreateUninstaller(string pathToUninstaller, Version version)
         {
             var UninstallRegKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
             using (Microsoft.Win32.RegistryKey parent = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
@@ -256,15 +271,13 @@ namespace TaskbarMonitorInstaller
                             throw new Exception(String.Format("Unable to create uninstaller '{0}\\{1}'", UninstallRegKeyPath, guidText));
                         }
 
-                        Version v = new Version(Properties.Resources.Version);
-                         
                         string exe = pathToUninstaller;
 
                         key.SetValue("DisplayName", "taskbar-monitor");
-                        key.SetValue("ApplicationVersion", v.ToString());
+                        key.SetValue("ApplicationVersion", version.ToString());
                         key.SetValue("Publisher", "Leandro Lugarinho");
                         key.SetValue("DisplayIcon", exe);
-                        key.SetValue("DisplayVersion", v.ToString(3));
+                        key.SetValue("DisplayVersion", version.ToString(3));
                         key.SetValue("URLInfoAbout", "https://lugarinho.tech/tools/taskbar-monitor");
                         key.SetValue("Contact", "leandrosa81@gmail.com");
                         key.SetValue("InstallDate", DateTime.Now.ToString("yyyyMMdd"));
