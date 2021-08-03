@@ -236,6 +236,11 @@ namespace TaskbarMonitor
                 controlWidth = counterSize * countersPerLine;
                 controlHeight = Convert.ToInt32(Math.Ceiling((float)CountersCount / (float)countersPerLine)) * (30 + 10);
             }
+            if (!VerticalTaskbarMode)
+            {
+                this.Top = 1;
+                controlHeight = controlHeight - 2;
+            }
             if (this.Size.Width != controlWidth || this.Size.Height != controlHeight)
             {
                 this.Size = new Size(controlWidth, controlHeight);
