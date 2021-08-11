@@ -74,7 +74,8 @@ namespace TaskbarMonitor
                 {
                     SecondaryTaskBar sTask = new SecondaryTaskBar();
                     sTask.AddControl();
-                }
+                }                
+                this.BackColor = Color.Transparent;
             }
             catch (Exception ex)
             {
@@ -101,7 +102,8 @@ namespace TaskbarMonitor
                 {
                     SecondaryTaskBar sTask = new SecondaryTaskBar();
                     sTask.AddControl();
-                }
+                }                
+                this.BackColor = Color.Transparent;
             }
             catch (Exception ex)
             {
@@ -157,23 +159,43 @@ namespace TaskbarMonitor
             fontTitle = new Font(defaultTheme.TitleFont, defaultTheme.TitleSize, defaultTheme.TitleFontStyle);
             fontCounter = new Font(defaultTheme.CurrentValueFont, defaultTheme.CurrentValueSize, defaultTheme.CurrentValueFontStyle);
 
-            _contextMenu = new ContextMenu();
-            _contextMenu.MenuItems.Add(new MenuItem("Settings...", MenuItem_Settings_onClick));
-            _contextMenu.MenuItems.Add(new MenuItem("Open Resource Monitor...", (e, a) =>
+            if (!PreviewMode)
             {
-                System.Diagnostics.Process.Start("resmon.exe");
-            }));
-            _contextMenu.MenuItems.Add(new MenuItem(String.Format("About taskbar-monitor (v{0})...", Version.ToString(3)), MenuItem_About_onClick));
-            this.ContextMenu = _contextMenu;
+                _contextMenu = new ContextMenu();
+                _contextMenu.MenuItems.Add(new MenuItem("Settings...", MenuItem_Settings_onClick));
+                _contextMenu.MenuItems.Add(new MenuItem("Open Resource Monitor...", (e, a) =>
+                {
+                    System.Diagnostics.Process.Start("resmon.exe");
+                }));
+                _contextMenu.MenuItems.Add(new MenuItem(String.Format("About taskbar-monitor (v{0})...", Version.ToString(3)), MenuItem_About_onClick));
+                this.ContextMenu = _contextMenu;
+            }
 
 
             if (PreviewMode)
             {
-                Color taskBarColour = BLL.Win32Api.GetColourAt(BLL.Win32Api.GetTaskbarPosition().Location);
+                var pos = BLL.Win32Api.GetTaskbarPosition();
+                Color taskBarColour = BLL.Win32Api.GetColourAt(new Point(pos.Location.X + 1, pos.Location.Y + 1));
                 this.BackColor = taskBarColour;
 
-            }            
-             
+            }
+            else
+            {
+                this.BackColor = Color.Transparent;
+            }
+
+            /*
+                float dpiX, dpiY;
+                using (Graphics graphics = this.CreateGraphics())
+                {
+                    dpiX = graphics.DpiX;
+                    dpiY = graphics.DpiY;
+                }
+                float fontSize = 7f;
+                if (dpiX > 96)
+                    fontSize = 6f;
+                */
+
             AdjustControlSize();
             UpdateGraphs();
             this.Invalidate();
@@ -210,13 +232,15 @@ namespace TaskbarMonitor
                 Counters.Add(ct);
             }
 
-            ApplyOptions(opt, theme);
-            //Initialize();
+            
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.ResizeRedraw, true);
             SetStyle(ControlStyles.DoubleBuffer, true);
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             SetStyle(ControlStyles.UserPaint, true);
+            SetStyle(ControlStyles.Opaque, true);
+            ApplyOptions(opt, theme);
+            //Initialize();
 
             InitializeComponent();
             AdjustControlSize();
@@ -248,6 +272,11 @@ namespace TaskbarMonitor
                 int countersPerLine = Convert.ToInt32(Math.Floor((float)taskbarWidth / (float)counterSize));
                 controlWidth = counterSize * countersPerLine;
                 controlHeight = Convert.ToInt32(Math.Ceiling((float)CountersCount / (float)countersPerLine)) * (30 + 10);
+            }
+            if (!VerticalTaskbarMode && !PreviewMode)
+            {
+                this.Top = 1;
+                controlHeight = controlHeight - 2;
             }
             if (this.Size.Width != controlWidth || this.Size.Height != controlHeight)
             {
@@ -283,9 +312,9 @@ namespace TaskbarMonitor
             int graphPositionY = 0;
 
 
-            System.Drawing.Graphics formGraphics = e.Graphics;// this.CreateGraphics();
-            formGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
-
+            System.Drawing.Graphics formGraphics = e.Graphics;// this.CreateGraphics();            
+            formGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;//AntiAliasGridFit;
+            formGraphics.Clear(this.BackColor);
             //formGraphics.Clear(Color.Transparent);
             foreach (var pair in Options.CounterOptions.Where(x => x.Value.Enabled == true))
             {
@@ -350,8 +379,7 @@ namespace TaskbarMonitor
 
                     System.Drawing.SolidBrush brushShadow = new System.Drawing.SolidBrush(titleShadow);
                     System.Drawing.SolidBrush brushTitle = new System.Drawing.SolidBrush(titleColor);
-
-
+                    
                     if (
                         (opt.ShowTitleShadowOnHover && opt.ShowTitle == CounterOptions.DisplayType.HOVER && !mouseOver)
                         || (opt.ShowTitle == CounterOptions.DisplayType.HOVER && mouseOver)
@@ -418,15 +446,16 @@ namespace TaskbarMonitor
                         {
                             if ((opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver) || opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW)
                             {
-                                formGraphics.DrawString(text, fontCounter, BrushTextShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, ypos + 1, sizeString.Width, maximumHeight), new StringFormat());
+                                formGraphics.DrawString(text, fontCounter, BrushTextShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, ypos + 1, sizeString.Width, maximumHeight), new StringFormat());                                
                             }
                             formGraphics.DrawString(text, fontCounter, BrushText, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2), ypos, sizeString.Width, maximumHeight), new StringFormat());
                         }
+                        //formGraphics.DrawString(titleShadow.ToString(), fontCounter, BrushText, new RectangleF(0, 15, 400, 100), new StringFormat());
                         BrushText.Dispose();
                         BrushTextShadow.Dispose();
                     }
                 }
-
+                
 
                 graphPosition += Options.HistorySize + 10;
                 if (graphPosition >= this.Size.Width)
@@ -605,6 +634,12 @@ namespace TaskbarMonitor
         {
             OpenSettings(2);
 
+        }
+
+        protected override void OnParentBackColorChanged(EventArgs e)
+        {
+            this.Invalidate();
+            base.OnParentBackColorChanged(e);
         }
 
 
