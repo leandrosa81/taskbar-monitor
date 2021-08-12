@@ -1,12 +1,19 @@
-To use this software, you can use the batch file or install it manually in your system:
+To use this software, you can use the installer provided, use the batch file or install it manually in your system:
 
-1. batch file
+1. installer
 
-Just run the batch file with Administrative privileges and everything should work. After install, right click on the task bar and select "Taskbar Monitor" on the Toolbars submenu.
+Just run the downloaded TaskbarMonitorInstaller.exe file from GitHub and it will install everything. After install, right click on the task bar and select "taskbar-monitor" on the Toolbars submenu.
 
-2. manual install
+To uninstall it, you can remove this app using the "Add or Remove Programs" Windows dialog.
 
-Extract The TaskbarMonitor.dll file to any folder, open a command prompt (with administrative privileges) and type:
+2. batch file
+
+Compile the project, and run the batch file (in the \batch folder) with Administrative privileges and everything should work. After install, right click on the task bar and select "taskbar-monitor" on the Toolbars submenu.
+
+3. manual install
+
+Compile the project, then copy the file TaskbarMonitor.dll file to any folder (eg. c:\taskbar-monitor), open a command prompt (with administrative privileges) and type:
 
 C:\Windows\Microsoft.NET\Framework64\v4.0.30319\regasm /codebase TaskbarMonitor.dll
-After install, right click on the task bar and select "System Watch Band" on the Toolbars submenu.
+
+After install, right click on the task bar and select "taskbar-monitor" on the Toolbars submenu.
