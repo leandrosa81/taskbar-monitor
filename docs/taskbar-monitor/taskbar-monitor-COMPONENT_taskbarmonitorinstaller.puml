@@ -1,0 +1,20 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+SHOW_PERSON_OUTLINE()
+LAYOUT_LANDSCAPE()
+title Component Diagram for taskbar-monitor (taskbar-monitor installer)
+System_Boundary(taskbarmonitor,"taskbar-monitor", $link="taskbar-monitor-CONTAINER_taskbarmonitor.html") {
+Container_Boundary(taskbarmonitorinstaller,"taskbar-monitor installer", $link="taskbar-monitor-COMPONENT_taskbarmonitorinstaller.html") {
+Component(installer, "installer component", "", "")
+}
+}
+Enterprise_Boundary(rnd51599,"Microsoft") {
+System(windows10, "Windows 10", "", $link="taskbar-monitor-CONTAINER_windows10.html")
+System(windows11, "Windows 11", "", $link="taskbar-monitor-CONTAINER_windows11.html")
+}
+Rel(installer, windows10, "copy files, registers DLL and installer")
+Rel(installer, windows11, "copy files, registers installer")
+
+@enduml

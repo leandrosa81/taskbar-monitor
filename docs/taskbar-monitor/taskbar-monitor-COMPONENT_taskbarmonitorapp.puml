@@ -1,0 +1,28 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+SHOW_PERSON_OUTLINE()
+LAYOUT_LANDSCAPE()
+title Component Diagram for taskbar-monitor (taskbar-monitor app)
+System_Boundary(taskbarmonitor,"taskbar-monitor", $link="taskbar-monitor-CONTAINER_taskbarmonitor.html") {
+Container_Boundary(taskbarmonitorapp,"taskbar-monitor app", $link="taskbar-monitor-COMPONENT_taskbarmonitorapp.html") {
+Component(control, "SystemWatcherControl", "", "", $link="taskbar-monitor-CLASS_control.html")
+Component(optionsfrm, "OptionForm", "", "", $link="taskbar-monitor-CLASS_optionsfrm.html")
+Component(deskband, "DeskBand", "", "")
+Component(savefile, "Settings File", "", "")
+}
+}
+Enterprise_Boundary(rnd15678,"Microsoft") {
+System_Boundary(windows10,"Windows 10", $link="taskbar-monitor-CONTAINER_windows10.html") {
+Container_Ext(taskbar10, "Windows Taskbar", "", "")
+}
+}
+Rel(deskband, control, "creates instance and hosts it")
+Rel(control, optionsfrm, "opens form")
+Rel(optionsfrm, control, "displays preview")
+Rel(deskband, taskbar10, "hosts itself on taskbar")
+Rel(optionsfrm, savefile, "reads and saves settings")
+Rel(control, savefile, "reads settings")
+
+@enduml

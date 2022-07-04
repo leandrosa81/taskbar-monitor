@@ -1,0 +1,78 @@
+@startuml
+class APPBARDATA <<struct>> {
+    + cbSize : int
+    + hWnd : IntPtr
+    + uCallbackMessage : int
+    + uEdge : int
+    + rc : RECT
+    + lParam : IntPtr
+}
+class RECT <<struct>> {
+    + left : int
+    + top : int
+    + right : int
+    + bottom : int
+}
+class Win32Api {
+    <<internal>> <<const>> ABM_GETTASKBARPOS : int = 5
+    - {static} <<extern>> SHAppBarMessage(msg:int, data:APPBARDATA) : IntPtr
+    - {static} <<extern>> BitBlt(hDC:IntPtr, x:int, y:int, nWidth:int, nHeight:int, hSrcDC:IntPtr, xSrc:int, ySrc:int, dwRop:int) : int
+    <<internal>> {static} <<extern>> FindWindow(lpClassName:string, lpWindowName:string) : IntPtr
+    <<internal>> {static} <<extern>> DestroyWindow(hWnd:IntPtr) : bool
+    <<internal>> {static} <<extern>> FindWindowByCaption(ZeroOnly:IntPtr, lpWindowName:string) : IntPtr
+    <<internal>> {static} <<extern>> SetWindowLong32(hWnd:HandleRef, nIndex:int, dwNewLong:int) : int
+    <<internal>> {static} <<extern>> SetWindowLong32(windowHandle:IntPtr, nIndex:GWLParameter, dwNewLong:int) : int
+    <<internal>> {static} <<extern>> SetWindowLongPtr64(windowHandle:IntPtr, nIndex:GWLParameter, dwNewLong:IntPtr) : IntPtr
+    <<internal>> {static} <<extern>> SetWindowLongPtr64(hWnd:HandleRef, nIndex:int, dwNewLong:IntPtr) : IntPtr
+    <<internal>> {static} <<extern>> SetParent(windowHandle:IntPtr, parentHandle:IntPtr) : IntPtr
+    <<internal>> {static} <<extern>> BringWindowToTop(windowHandle:IntPtr) : bool
+    <<internal>> {static} <<extern>> SetWindowPos(hWnd:IntPtr, hWndInsertAfter:IntPtr, X:int, Y:int, cx:int, cy:int, uFlags:uint) : bool
+    <<internal>> {static} <<extern>> EnableWindow(hWnd:IntPtr, bEnable:bool) : bool
+    <<internal>> {static} <<extern>> UnhookWinEvent(eventHookHandle:IntPtr) : bool
+    <<internal>> {static} <<extern>> AttachThreadInput(idAttach:uint, idAttachTo:uint, fAttach:bool) : bool
+    + {static} <<extern>> PostMessageA(hWnd:IntPtr, Msg:uint, wparam:uint, lparam:uint) : bool
+    <<internal>> {static} <<extern>> GetWindowThreadProcessId(hWnd:IntPtr, lpdwProcessId:uint) : uint
+    <<internal>> {static} <<extern>> SetWinEventHook(eventMin:AccessibleEvents, eventMax:AccessibleEvents, eventHookAssemblyHandle:IntPtr, eventHookHandle:WinEventProc, processId:uint, threadId:uint, parameterFlags:SetWinEventHookParameter) : IntPtr
+    <<internal>> {static} <<extern>> SetFocus(hWnd:IntPtr) : IntPtr
+    {static} <<extern>> GetWindowRect(hWnd:IntPtr, lpRect:RECT) : bool
+    {static} <<extern>> GetDesktopWindow() : IntPtr
+    + {static} GetTaskbarPosition() : Rectangle
+    + {static} GetWindowSize(handle:IntPtr) : Rectangle
+    + {static} GetWorkingAreaSize() : Rectangle
+    + {static} GetColourAt(location:Point) : Color
+    + {static} Find(ModuleName:string, MainWindowTitle:string) : IntPtr
+    + {static} SetWindowLong(windowHandle:IntPtr, nIndex:GWLParameter, dwNewLong:int) : int
+    + {static} SetWindowLongPtr(hWnd:HandleRef, nIndex:int, dwNewLong:IntPtr) : IntPtr
+}
+enum GWLParameter {
+    GWL_EXSTYLE= -20,
+    GWL_HINSTANCE= -6,
+    GWL_HWNDPARENT= -8,
+    GWL_ID= -12,
+    GWL_STYLE= -16,
+    GWL_USERDATA= -21,
+    GWL_WNDPROC= -4,
+}
+enum SetWinEventHookParameter {
+    WINEVENT_INCONTEXT= 4,
+    WINEVENT_OUTOFCONTEXT= 0,
+    WINEVENT_SKIPOWNPROCESS= 2,
+    WINEVENT_SKIPOWNTHREAD= 1,
+}
+class TITLEBARINFO <<struct>> {
+    + <<const>> CCHILDREN_TITLEBAR : int = 5
+    + cbSize : uint
+    + rcTitleBar : RECT
+    + rgstate : AccessibleStates[]
+}
+class RECT <<struct>> {
+    <<internal>> left : int
+    <<internal>> top : int
+    <<internal>> right : int
+    <<internal>> bottom : int
+}
+Win32Api +-- GWLParameter
+Win32Api +-- SetWinEventHookParameter
+Win32Api +-- TITLEBARINFO
+Win32Api +-- RECT
+@enduml

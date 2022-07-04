@@ -1,0 +1,17 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+SHOW_PERSON_OUTLINE()
+LAYOUT_LANDSCAPE()
+title Landscape Diagram
+Person(user, "User", "")
+System(taskbarmonitor, "taskbar-monitor", "taskbar-monitor software", $link="taskbar-monitor-CONTEXT_taskbarmonitor.html")
+Enterprise_Boundary(rnd40227,"Microsoft") {
+System(windows10, "Windows 10", "", $link="taskbar-monitor-CONTEXT_windows10.html")
+System(windows11, "Windows 11", "", $link="taskbar-monitor-CONTEXT_windows11.html")
+}
+Rel(user, taskbarmonitor, "opera")
+Rel(taskbarmonitor, windows10, "hosts itself as a deskband on taskbar")
+Rel(taskbarmonitor, windows11, "inject the taskbar-control on the taskbar window.")
+
+@enduml

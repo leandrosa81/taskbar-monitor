@@ -1,0 +1,39 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+Container_Boundary(CSDeskBand,"CSDeskBand") {
+Container_Boundary(CSDeskBand.Interop,"CSDeskBand.Interop") {
+}
+Container_Boundary(CSDeskBand.ContextMenu,"CSDeskBand.ContextMenu") {
+}
+Component(CSDeskBand.CSDeskBandImpl,"CSDeskBand.CSDeskBandImpl")
+Component(CSDeskBand.CSDeskBandOptions,"CSDeskBand.CSDeskBandOptions")
+Component(CSDeskBand.CSDeskBandRegistrationAttribute,"CSDeskBand.CSDeskBandRegistrationAttribute")
+Component(CSDeskBand.DeskBandSize,"CSDeskBand.DeskBandSize")
+Component(CSDeskBand.ICSDeskBand,"CSDeskBand.ICSDeskBand")
+Component(CSDeskBand.IDeskBandProvider,"CSDeskBand.IDeskBandProvider")
+Component(CSDeskBand.RegistrationHelper,"CSDeskBand.RegistrationHelper")
+Component(CSDeskBand.TaskbarInfo,"CSDeskBand.TaskbarInfo")
+Component(CSDeskBand.TaskbarOrientationChangedEventArgs,"CSDeskBand.TaskbarOrientationChangedEventArgs")
+Component(CSDeskBand.TaskbarSizeChangedEventArgs,"CSDeskBand.TaskbarSizeChangedEventArgs")
+Component(CSDeskBand.TaskbarEdgeChangedEventArgs,"CSDeskBand.TaskbarEdgeChangedEventArgs")
+}
+Container_Boundary(TaskbarMonitor,"TaskbarMonitor") {
+Container_Boundary(TaskbarMonitor.BLL,"TaskbarMonitor.BLL") {
+}
+Container_Boundary(TaskbarMonitor.Controls,"TaskbarMonitor.Controls") {
+}
+Container_Boundary(TaskbarMonitor.Counters,"TaskbarMonitor.Counters") {
+}
+Container_Boundary(TaskbarMonitor.Properties,"TaskbarMonitor.Properties") {
+}
+Component(TaskbarMonitor.Deskband,"TaskbarMonitor.Deskband")
+Component(TaskbarMonitor.GithubUpdater,"TaskbarMonitor.GithubUpdater")
+Component(TaskbarMonitor.GraphTheme,"TaskbarMonitor.GraphTheme")
+Component(TaskbarMonitor.OptionForm,"TaskbarMonitor.OptionForm")
+Component(TaskbarMonitor.Options,"TaskbarMonitor.Options")
+Component(TaskbarMonitor.CounterOptions,"TaskbarMonitor.CounterOptions")
+Component(TaskbarMonitor.SystemWatcherControl,"TaskbarMonitor.SystemWatcherControl")
+Component(TaskbarMonitor.TaskbarManager,"TaskbarMonitor.TaskbarManager")
+}
+@enduml

@@ -1,0 +1,15 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+SHOW_PERSON_OUTLINE()
+LAYOUT_LANDSCAPE()
+title System Context Diagram for taskbar-monitor (external)
+System(a, "external", "this one is not important", $link="taskbar-monitor-CONTAINER_a.html")
+Enterprise_Boundary(rnd16397,"Microsoft") {
+System(windows10, "Windows 10", "", $link="taskbar-monitor-CONTAINER_windows10.html")
+}
+Rel(a, windows10, "installs virus on")
+
+@enduml

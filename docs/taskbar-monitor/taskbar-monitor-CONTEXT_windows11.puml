@@ -1,0 +1,22 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+SHOW_PERSON_OUTLINE()
+LAYOUT_LANDSCAPE()
+title System Context Diagram for taskbar-monitor (Windows 11)
+System_Boundary(taskbarmonitor,"taskbar-monitor", $link="taskbar-monitor-CONTAINER_taskbarmonitor.html") {
+Container_Ext(taskbarmonitorappforwin11, "taskbar-monitor app for win11", ".net", "New taskbar with Windows 11 support")
+Container_Boundary(taskbarmonitorinstaller,"taskbar-monitor installer", $link="taskbar-monitor-COMPONENT_taskbarmonitorinstaller.html") {
+Component(installer, "installer component", "", "")
+}
+}
+Enterprise_Boundary(rnd50221,"Microsoft") {
+System(windows11, "Windows 11", "", $link="taskbar-monitor-CONTAINER_windows11.html")
+}
+Rel(taskbarmonitor, windows11, "inject the taskbar-control on the taskbar window.")
+Rel(windows11, taskbarmonitorappforwin11, "starts on windows initialization.")
+Rel(installer, windows11, "copy files, registers installer")
+
+@enduml

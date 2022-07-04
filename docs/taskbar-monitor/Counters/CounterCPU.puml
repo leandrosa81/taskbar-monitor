@@ -1,0 +1,13 @@
+@startuml
+class CounterCPU {
+    cpuCounter : PerformanceCounter
+    cpuCounterCores : List<PerformanceCounter>
+    currentValue : float = 0
+    + CounterCPU(options:Options)
+    + <<override>> Initialize() : void
+    + <<override>> Update() : void
+    + <<override>> GetName() : string
+    + <<override>> GetCounterType() : CounterType
+}
+ICounter <|-- CounterCPU
+@enduml

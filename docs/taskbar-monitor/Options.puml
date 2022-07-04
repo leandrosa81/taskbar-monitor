@@ -1,0 +1,48 @@
+@startuml
+class Options {
+    + {static} <<readonly>> LATESTOPTIONSVERSION : int = 2
+    + OptionsVersion : int
+    + CounterOptions : Dictionary<string, CounterOptions> <<get>> <<set>>
+    + HistorySize : int <<get>> <<set>> = 50
+    + PollTime : int <<get>> <<set>> = 3
+    + ThemeType : ThemeList <<get>> <<set>>
+    + CopyTo(opt:Options) : void
+    + {static} DefaultOptions() : Options
+    + {static} ReadFromDisk() : Options
+    + Upgrade(graphTheme:GraphTheme) : bool
+    + SaveToDisk() : bool
+    - _Upgrade(graphTheme:GraphTheme) : bool
+}
+class CounterOptions {
+    + Enabled : bool <<get>> <<set>> = true
+    + ShowTitle : DisplayType <<get>> <<set>>
+    + TitlePosition : DisplayPosition <<get>> <<set>>
+    + ShowTitleShadowOnHover : bool <<get>> <<set>> = true
+    + ShowCurrentValue : DisplayType <<get>> <<set>>
+    + ShowCurrentValueShadowOnHover : bool <<get>> <<set>> = true
+    + CurrentValueAsSummary : bool <<get>> <<set>> = true
+    + SummaryPosition : DisplayPosition <<get>> <<set>>
+    + InvertOrder : bool <<get>> <<set>> = false
+    + SeparateScales : bool <<get>> <<set>> = true
+    + GraphType : TaskbarMonitor.Counters.ICounter.CounterType <<get>> <<set>>
+}
+enum ThemeList {
+    AUTOMATIC,
+    DARK,
+    LIGHT,
+    CUSTOM,
+}
+enum DisplayType {
+    HIDDEN,
+    SHOW,
+    HOVER,
+}
+enum DisplayPosition {
+    TOP,
+    BOTTOM,
+    MIDDLE,
+}
+Options +-- ThemeList
+CounterOptions +-- DisplayType
+CounterOptions +-- DisplayPosition
+@enduml

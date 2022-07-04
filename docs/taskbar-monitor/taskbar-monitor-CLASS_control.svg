@@ -1,0 +1,1241 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="423px" preserveAspectRatio="none" style="width:3624px;height:423px;background:#FFFFFF;" version="1.1" viewBox="0 0 3624 423" width="3624px" zoomAndPan="magnify"><defs/><g><!--MD5=[2480cb3f513c40e656c0fca1f081c483]
+cluster CSDeskBand--><rect fill="#FFFFFF" height="410" style="stroke:#444444;stroke-width:1.0;stroke-dasharray:7.0,7.0;" width="1798" x="7" y="7"/><text fill="#444444" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="103" x="854.5" y="35.6094">CSDeskBand</text><text fill="#444444" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="60" x="876" y="51.582">[Container]</text><!--MD5=[1487ae089c0e8271da5ad4f2db1e6051]
+cluster TaskbarMonitor--><rect fill="#FFFFFF" height="410" style="stroke:#444444;stroke-width:1.0;stroke-dasharray:7.0,7.0;" width="1789" x="1829" y="7"/><text fill="#444444" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="120" x="2663.5" y="35.6094">TaskbarMonitor</text><text fill="#444444" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="60" x="2693.5" y="51.582">[Container]</text><!--MD5=[7c105d193eeadab3340db547150a1560]
+entity CSDeskBand.CSDeskBandImpl--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="262" x="504" y="71"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="597" y="93.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="242" x="514" y="112.7031">CSDeskBand.CSDeskBandImpl</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="632" y="128.6758">[]</text><!--MD5=[c9f2d667507b407cc7aa12e37ea4061d]
+entity CSDeskBand.CSDeskBandOptions--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="290" x="801" y="71"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="908" y="93.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="270" x="811" y="112.7031">CSDeskBand.CSDeskBandOptions</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="943" y="128.6758">[]</text><!--MD5=[4ef5938dfefd7c85c66934c8c183fc18]
+entity CSDeskBand.CSDeskBandRegistrationAttribute--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="388" x="1126" y="71"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="1282" y="93.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="368" x="1136" y="112.7031">CSDeskBand.CSDeskBandRegistrationAttribute</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="1317" y="128.6758">[]</text><!--MD5=[4460cb38cc0a3497313deed1f7985cb2]
+entity CSDeskBand.DeskBandSize--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="240" x="1549" y="71"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="1631" y="93.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="220" x="1559" y="112.7031">CSDeskBand.DeskBandSize</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="1666" y="128.6758">[]</text><!--MD5=[c95dc7c95fb56afc1c158fde5f8f6601]
+entity CSDeskBand.ICSDeskBand--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="234" x="518" y="201"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="597" y="223.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="214" x="528" y="242.7031">CSDeskBand.ICSDeskBand</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="632" y="258.6758">[]</text><!--MD5=[67025f4f3782aad63651a6e785e5037e]
+entity CSDeskBand.IDeskBandProvider--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="276" x="787" y="201"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="887" y="223.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="256" x="797" y="242.7031">CSDeskBand.IDeskBandProvider</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="922" y="258.6758">[]</text><!--MD5=[404bc7f56138fd133d6df668c0a303b5]
+entity CSDeskBand.RegistrationHelper--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="270" x="1098" y="201"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="1195" y="223.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="250" x="1108" y="242.7031">CSDeskBand.RegistrationHelper</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="1230" y="258.6758">[]</text><!--MD5=[4e61f16c8b7742c095d50515be52b936]
+entity CSDeskBand.TaskbarInfo--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="218" x="1403" y="201"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="1474" y="223.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="198" x="1413" y="242.7031">CSDeskBand.TaskbarInfo</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="1509" y="258.6758">[]</text><!--MD5=[ed34364b84feb0035230da3e073db62f]
+entity CSDeskBand.TaskbarOrientationChangedEventArgs--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="423" x="423.5" y="331"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="597" y="353.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="403" x="433.5" y="372.7031">CSDeskBand.TaskbarOrientationChangedEventArgs</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="632" y="388.6758">[]</text><!--MD5=[aa523abaec910f964c26b87145a6c373]
+entity CSDeskBand.TaskbarSizeChangedEventArgs--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="372" x="882" y="331"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="1030" y="353.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="352" x="892" y="372.7031">CSDeskBand.TaskbarSizeChangedEventArgs</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="1065" y="388.6758">[]</text><!--MD5=[ac09d54bbaa683f209d8406d2dab27e2]
+entity CSDeskBand.TaskbarEdgeChangedEventArgs--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="379" x="1289.5" y="331"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="1441" y="353.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="359" x="1299.5" y="372.7031">CSDeskBand.TaskbarEdgeChangedEventArgs</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="1476" y="388.6758">[]</text><!--MD5=[b3a9ba3ce582f13215783c1d8e76c427]
+entity CSDeskBand.Interop--><rect height="65.2188" style="stroke:#444444;stroke-width:1.0;fill:none;stroke-dasharray:7.0,7.0;" width="181" x="287.5" y="73.5"/><text fill="#444444" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="161" x="297.5" y="110.1094">CSDeskBand.Interop</text><text fill="#444444" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="60" x="348" y="126.082">[Container]</text><!--MD5=[038fdd1fd1ff04b7336f76eba8fdcf2d]
+entity CSDeskBand.ContextMenu--><rect height="65.2188" style="stroke:#444444;stroke-width:1.0;fill:none;stroke-dasharray:7.0,7.0;" width="229" x="23.5" y="73.5"/><text fill="#444444" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="209" x="33.5" y="110.1094">CSDeskBand.ContextMenu</text><text fill="#444444" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="60" x="108" y="126.082">[Container]</text><!--MD5=[e5c5fe9a62b28f0ed9257c2f95f9fc7e]
+entity TaskbarMonitor.Deskband--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="222" x="2810" y="71"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="2883" y="93.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="202" x="2820" y="112.7031">TaskbarMonitor.Deskband</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="2918" y="128.6758">[]</text><!--MD5=[bd56d5cf0a40a1cda34a6aff2dfa61b6]
+entity TaskbarMonitor.GithubUpdater--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="256" x="3067" y="71"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="3157" y="93.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="236" x="3077" y="112.7031">TaskbarMonitor.GithubUpdater</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="3192" y="128.6758">[]</text><!--MD5=[cd9f40758fb9219809ba6d2a170ba52a]
+entity TaskbarMonitor.GraphTheme--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="243" x="3358.5" y="71"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="3442" y="93.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="223" x="3368.5" y="112.7031">TaskbarMonitor.GraphTheme</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="3477" y="128.6758">[]</text><!--MD5=[6ebd956494e1e29a400244a78c51fe47]
+entity TaskbarMonitor.OptionForm--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="235" x="2803.5" y="201"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="2883" y="223.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="215" x="2813.5" y="242.7031">TaskbarMonitor.OptionForm</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="2918" y="258.6758">[]</text><!--MD5=[83dfc8df65e3a30590cd9c7d5cda23e8]
+entity TaskbarMonitor.Options--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="204" x="3074" y="201"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="3138" y="223.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="184" x="3084" y="242.7031">TaskbarMonitor.Options</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="3173" y="258.6758">[]</text><!--MD5=[10601a27327128009fc3df5899abfe4e]
+entity TaskbarMonitor.CounterOptions--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="266" x="3313" y="201"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="3408" y="223.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="246" x="3323" y="242.7031">TaskbarMonitor.CounterOptions</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="3443" y="258.6758">[]</text><!--MD5=[070a3d09f0b41f65fefbafcd56084564]
+entity TaskbarMonitor.SystemWatcherControl--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="321" x="2760.5" y="331"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="2883" y="353.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="301" x="2770.5" y="372.7031">TaskbarMonitor.SystemWatcherControl</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="2918" y="388.6758">[]</text><!--MD5=[79a1bc4911ecff82d5f945a05cc6bb95]
+entity TaskbarMonitor.TaskbarManager--><rect fill="#85BBF0" height="70.3125" style="stroke:#78A8D8;stroke-width:1.5;" width="272" x="3117" y="331"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="76" x="3215" y="353.457">«component»</text><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="252" x="3127" y="372.7031">TaskbarMonitor.TaskbarManager</text><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="6" x="3250" y="388.6758">[]</text><!--MD5=[c3fbbbd374de246cd9940ebc93207d48]
+entity TaskbarMonitor.BLL--><rect height="65.2188" style="stroke:#444444;stroke-width:1.0;fill:none;stroke-dasharray:7.0,7.0;" width="176" x="2599" y="73.5"/><text fill="#444444" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="156" x="2609" y="110.1094">TaskbarMonitor.BLL</text><text fill="#444444" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="60" x="2657" y="126.082">[Container]</text><!--MD5=[15ddc0ab1c8182cb53be8da2e9b25f88]
+entity TaskbarMonitor.Controls--><rect height="65.2188" style="stroke:#444444;stroke-width:1.0;fill:none;stroke-dasharray:7.0,7.0;" width="210" x="2354" y="73.5"/><text fill="#444444" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="190" x="2364" y="110.1094">TaskbarMonitor.Controls</text><text fill="#444444" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="60" x="2429" y="126.082">[Container]</text><!--MD5=[cc1081689a21b0e8a87130d64be178fc]
+entity TaskbarMonitor.Counters--><rect height="65.2188" style="stroke:#444444;stroke-width:1.0;fill:none;stroke-dasharray:7.0,7.0;" width="215" x="2103.5" y="73.5"/><text fill="#444444" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="195" x="2113.5" y="110.1094">TaskbarMonitor.Counters</text><text fill="#444444" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="60" x="2181" y="126.082">[Container]</text><!--MD5=[f2b79733e7769ca7b9b184a6296b3a0a]
+entity TaskbarMonitor.Properties--><rect height="65.2188" style="stroke:#444444;stroke-width:1.0;fill:none;stroke-dasharray:7.0,7.0;" width="223" x="1845.5" y="73.5"/><text fill="#444444" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="203" x="1855.5" y="110.1094">TaskbarMonitor.Properties</text><text fill="#444444" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="60" x="1927" y="126.082">[Container]</text><!--MD5=[77f19790dabc66afd4294576259d447b]
+link CSDeskBand.CSDeskBandImpl to CSDeskBand.CSDeskBandOptions--><!--MD5=[35a8589b8bb66845c7789fb896dec0b1]
+link CSDeskBand.CSDeskBandOptions to CSDeskBand.CSDeskBandRegistrationAttribute--><!--MD5=[2a1ffe8cefe607fe4291d71d38497c33]
+link CSDeskBand.CSDeskBandRegistrationAttribute to CSDeskBand.DeskBandSize--><!--MD5=[aca23dfaf4af7b4df81c0757483a7c5e]
+link CSDeskBand.CSDeskBandImpl to CSDeskBand.ICSDeskBand--><!--MD5=[f57a0cbeb084e23ef16fe9cb2c4c9893]
+link CSDeskBand.ICSDeskBand to CSDeskBand.IDeskBandProvider--><!--MD5=[2ce8cfb165bfe83bd712311d3afb4585]
+link CSDeskBand.IDeskBandProvider to CSDeskBand.RegistrationHelper--><!--MD5=[72faecdf33461e96a7a1951bb175d673]
+link CSDeskBand.RegistrationHelper to CSDeskBand.TaskbarInfo--><!--MD5=[0596fd6dc21e16da5fd87004d427d228]
+link CSDeskBand.ICSDeskBand to CSDeskBand.TaskbarOrientationChangedEventArgs--><!--MD5=[87b0f591ac134d251f8c9de63030efc0]
+link CSDeskBand.TaskbarOrientationChangedEventArgs to CSDeskBand.TaskbarSizeChangedEventArgs--><!--MD5=[96466bb459897fa3d23b53ef292cf7ed]
+link CSDeskBand.TaskbarSizeChangedEventArgs to CSDeskBand.TaskbarEdgeChangedEventArgs--><!--MD5=[75f467ebeda1f840219832eade1bd074]
+link TaskbarMonitor.Deskband to TaskbarMonitor.GithubUpdater--><!--MD5=[0ad546d22348d62fbcc2aa7ffd9e0529]
+link TaskbarMonitor.GithubUpdater to TaskbarMonitor.GraphTheme--><!--MD5=[03b246ef48202062012e48c6c9c0b502]
+link TaskbarMonitor.Deskband to TaskbarMonitor.OptionForm--><!--MD5=[807a86446c2274efac8885d465fae2b2]
+link TaskbarMonitor.OptionForm to TaskbarMonitor.Options--><!--MD5=[beca5cbb1959bc970f07ffdedb604b3c]
+link TaskbarMonitor.Options to TaskbarMonitor.CounterOptions--><!--MD5=[007840a77a3a8ab6db571a827ae8407a]
+link TaskbarMonitor.OptionForm to TaskbarMonitor.SystemWatcherControl--><!--MD5=[d981d836ec469dd4b3a93b86f006c6f0]
+link TaskbarMonitor.SystemWatcherControl to TaskbarMonitor.TaskbarManager--><!--MD5=[4b489ab81e46663a4948bd71e6576c51]
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+Container_Boundary(CSDeskBand,"CSDeskBand") {
+Container_Boundary(CSDeskBand.Interop,"CSDeskBand.Interop") {
+}
+Container_Boundary(CSDeskBand.ContextMenu,"CSDeskBand.ContextMenu") {
+}
+Component(CSDeskBand.CSDeskBandImpl,"CSDeskBand.CSDeskBandImpl")
+Component(CSDeskBand.CSDeskBandOptions,"CSDeskBand.CSDeskBandOptions")
+Component(CSDeskBand.CSDeskBandRegistrationAttribute,"CSDeskBand.CSDeskBandRegistrationAttribute")
+Component(CSDeskBand.DeskBandSize,"CSDeskBand.DeskBandSize")
+Component(CSDeskBand.ICSDeskBand,"CSDeskBand.ICSDeskBand")
+Component(CSDeskBand.IDeskBandProvider,"CSDeskBand.IDeskBandProvider")
+Component(CSDeskBand.RegistrationHelper,"CSDeskBand.RegistrationHelper")
+Component(CSDeskBand.TaskbarInfo,"CSDeskBand.TaskbarInfo")
+Component(CSDeskBand.TaskbarOrientationChangedEventArgs,"CSDeskBand.TaskbarOrientationChangedEventArgs")
+Component(CSDeskBand.TaskbarSizeChangedEventArgs,"CSDeskBand.TaskbarSizeChangedEventArgs")
+Component(CSDeskBand.TaskbarEdgeChangedEventArgs,"CSDeskBand.TaskbarEdgeChangedEventArgs")
+}
+Container_Boundary(TaskbarMonitor,"TaskbarMonitor") {
+Container_Boundary(TaskbarMonitor.BLL,"TaskbarMonitor.BLL") {
+}
+Container_Boundary(TaskbarMonitor.Controls,"TaskbarMonitor.Controls") {
+}
+Container_Boundary(TaskbarMonitor.Counters,"TaskbarMonitor.Counters") {
+}
+Container_Boundary(TaskbarMonitor.Properties,"TaskbarMonitor.Properties") {
+}
+Component(TaskbarMonitor.Deskband,"TaskbarMonitor.Deskband")
+Component(TaskbarMonitor.GithubUpdater,"TaskbarMonitor.GithubUpdater")
+Component(TaskbarMonitor.GraphTheme,"TaskbarMonitor.GraphTheme")
+Component(TaskbarMonitor.OptionForm,"TaskbarMonitor.OptionForm")
+Component(TaskbarMonitor.Options,"TaskbarMonitor.Options")
+Component(TaskbarMonitor.CounterOptions,"TaskbarMonitor.CounterOptions")
+Component(TaskbarMonitor.SystemWatcherControl,"TaskbarMonitor.SystemWatcherControl")
+Component(TaskbarMonitor.TaskbarManager,"TaskbarMonitor.TaskbarManager")
+}
+@enduml
+
+@startuml
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+skinparam defaultTextAlignment center
+
+skinparam wrapWidth 200
+skinparam maxMessageSize 150
+
+skinparam LegendBorderColor transparent
+skinparam LegendBackgroundColor transparent
+skinparam LegendFontColor #FFFFFF
+
+skinparam shadowing<<legendArea>> false
+skinparam rectangle<<legendArea>> {
+    backgroundcolor #00000000
+    bordercolor #00000000
+}
+
+skinparam rectangle {
+    StereotypeFontSize 12
+    shadowing false
+}
+
+skinparam database {
+    StereotypeFontSize 12
+    shadowing false
+}
+
+skinparam queue {
+    StereotypeFontSize 12
+    shadowing false
+}
+
+skinparam arrow {
+    Color #666666
+    FontColor #666666
+    FontSize 12
+}
+
+skinparam actor {
+    StereotypeFontSize 12
+    shadowing false
+    style awesome
+}
+
+skinparam person {
+    StereotypeFontSize 12
+    shadowing false
+}
+
+skinparam package {
+    StereotypeFontSize 6
+    StereotypeFontColor transparent
+    FontStyle plain
+    BackgroundColor transparent
+}
+
+skinparam rectangle<<boundary>> {
+    Shadowing false
+    StereotypeFontSize 6
+    StereotypeFontColor transparent
+    FontColor #444444
+    BorderColor #444444
+    BackgroundColor transparent
+    BorderStyle dashed
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+skinparam rectangle<<person>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #08427B
+    BorderColor #073B6F
+}
+skinparam database<<person>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #08427B
+    BorderColor #073B6F
+}
+skinparam queue<<person>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #08427B
+    BorderColor #073B6F
+}
+skinparam actor<<person>> {
+    StereotypeFontColor #08427B
+    FontColor #08427B
+    BackgroundColor #08427B
+    BorderColor #073B6F
+}
+skinparam person<<person>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #08427B
+    BorderColor #073B6F
+}
+
+
+skinparam rectangle<<external_person>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #686868
+    BorderColor #8A8A8A
+}
+skinparam database<<external_person>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #686868
+    BorderColor #8A8A8A
+}
+skinparam queue<<external_person>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #686868
+    BorderColor #8A8A8A
+}
+skinparam actor<<external_person>> {
+    StereotypeFontColor #686868
+    FontColor #686868
+    BackgroundColor #686868
+    BorderColor #8A8A8A
+}
+skinparam person<<external_person>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #686868
+    BorderColor #8A8A8A
+}
+
+
+skinparam rectangle<<system>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #1168BD
+    BorderColor #3C7FC0
+}
+skinparam database<<system>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #1168BD
+    BorderColor #3C7FC0
+}
+skinparam queue<<system>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #1168BD
+    BorderColor #3C7FC0
+}
+skinparam actor<<system>> {
+    StereotypeFontColor #1168BD
+    FontColor #1168BD
+    BackgroundColor #1168BD
+    BorderColor #3C7FC0
+}
+skinparam person<<system>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #1168BD
+    BorderColor #3C7FC0
+}
+
+
+skinparam rectangle<<external_system>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #999999
+    BorderColor #8A8A8A
+}
+skinparam database<<external_system>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #999999
+    BorderColor #8A8A8A
+}
+skinparam queue<<external_system>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #999999
+    BorderColor #8A8A8A
+}
+skinparam actor<<external_system>> {
+    StereotypeFontColor #999999
+    FontColor #999999
+    BackgroundColor #999999
+    BorderColor #8A8A8A
+}
+skinparam person<<external_system>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #999999
+    BorderColor #8A8A8A
+}
+
+
+
+
+
+sprite $person [48x48/16] {
+000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000
+0000000000000000000049BCCA7200000000000000000000
+0000000000000000006EFFFFFFFFB3000000000000000000
+00000000000000001CFFFFFFFFFFFF700000000000000000
+0000000000000001EFFFFFFFFFFFFFF80000000000000000
+000000000000000CFFFFFFFFFFFFFFFF6000000000000000
+000000000000007FFFFFFFFFFFFFFFFFF100000000000000
+00000000000001FFFFFFFFFFFFFFFFFFF900000000000000
+00000000000006FFFFFFFFFFFFFFFFFFFF00000000000000
+0000000000000BFFFFFFFFFFFFFFFFFFFF40000000000000
+0000000000000EFFFFFFFFFFFFFFFFFFFF70000000000000
+0000000000000FFFFFFFFFFFFFFFFFFFFF80000000000000
+0000000000000FFFFFFFFFFFFFFFFFFFFF80000000000000
+0000000000000DFFFFFFFFFFFFFFFFFFFF60000000000000
+0000000000000AFFFFFFFFFFFFFFFFFFFF40000000000000
+00000000000006FFFFFFFFFFFFFFFFFFFE00000000000000
+00000000000000EFFFFFFFFFFFFFFFFFF800000000000000
+000000000000007FFFFFFFFFFFFFFFFFF100000000000000
+000000000000000BFFFFFFFFFFFFFFFF5000000000000000
+0000000000000001DFFFFFFFFFFFFFF70000000000000000
+00000000000000000BFFFFFFFFFFFF500000000000000000
+0000000000000000005DFFFFFFFFA1000000000000000000
+0000000000000000000037ABB96100000000000000000000
+000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000
+000000000000025788300000000005886410000000000000
+000000000007DFFFFFFD9643347BFFFFFFFB400000000000
+0000000004EFFFFFFFFFFFFFFFFFFFFFFFFFFB1000000000
+000000007FFFFFFFFFFFFFFFFFFFFFFFFFFFFFD200000000
+00000006FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE10000000
+0000003FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB0000000
+000000BFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5000000
+000003FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD000000
+000009FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF200000
+00000DFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF600000
+00000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF800000
+00001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA00000
+00001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB00000
+00001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB00000
+00001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB00000
+00001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA00000
+00000EFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF700000
+000006FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE100000
+0000008FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD3000000
+000000014555555555555555555555555555555300000000
+000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000
+}
+
+sprite $person2 [48x48/16] {
+0000000000000000000049BCCA7200000000000000000000
+0000000000000000006EFFFFFFFFB3000000000000000000
+00000000000000001CFFFFFFFFFFFF700000000000000000
+0000000000000001EFFFFFFFFFFFFFF80000000000000000
+000000000000000CFFFFFFFFFFFFFFFF6000000000000000
+000000000000007FFFFFFFFFFFFFFFFFF100000000000000
+00000000000001FFFFFFFFFFFFFFFFFFF900000000000000
+00000000000006FFFFFFFFFFFFFFFFFFFF00000000000000
+0000000000000BFFFFFFFFFFFFFFFFFFFF40000000000000
+0000000000000EFFFFFFFFFFFFFFFFFFFF70000000000000
+0000000000000FFFFFFFFFFFFFFFFFFFFF80000000000000
+0000000000000FFFFFFFFFFFFFFFFFFFFF80000000000000
+0000000000000DFFFFFFFFFFFFFFFFFFFF60000000000000
+0000000000000AFFFFFFFFFFFFFFFFFFFF40000000000000
+00000000000006FFFFFFFFFFFFFFFFFFFE00000000000000
+00000000000000EFFFFFFFFFFFFFFFFFF800000000000000
+000000000000007FFFFFFFFFFFFFFFFFF100000000000000
+000000000000000BFFFFFFFFFFFFFFFF5000000000000000
+0000000000000001DFFFFFFFFFFFFFF70000000000000000
+00000000000000000BFFFFFFFFFFFF500000000000000000
+0000000000000000005DFFFFFFFFA1000000000000000000
+0000000000000000000037ABB96100000000000000000000
+000000000002578888300000000005888864100000000000
+0000000007DFFFFFFFFD9643347BFFFFFFFFFB4000000000
+00000004EFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB10000000
+0000007FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD2000000
+000006FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE100000
+00003FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB00000
+0000BFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF50000
+0003FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD0000
+0009FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2000
+000DFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6000
+000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF8000
+001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB000
+001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB000
+001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB000
+001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA000
+000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF8000
+000DFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6000
+0009FFFFFFFF8FFFFFFFFFFFFFFFFFFFFFF8FFFFFFFF2000
+0003FFFFFFFF8FFFFFFFFFFFFFFFFFFFFFF8FFFFFFFD0000
+0000BFFFFFFF8FFFFFFFFFFFFFFFFFFFFFF8FFFFFFF50000
+00003FFFFFFF8FFFFFFFFFFFFFFFFFFFFFF8FFFFFFB00000
+000006FFFFFF8FFFFFFFFFFFFFFFFFFFFFF8FFFFFE100000
+0000007FFFFF8FFFFFFFFFFFFFFFFFFFFFF8FFFFD2000000
+00000004EFFF8FFFFFFFFFFFFFFFFFFFFFF8FFFB10000000
+0000000007DF8FFFFFFFFFFFFFFFFFFFFFF8FB4000000000
+000000000002578888888888888888888864100000000000
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+skinparam rectangle<<container>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #438DD5
+    BorderColor #3C7FC0
+}
+skinparam database<<container>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #438DD5
+    BorderColor #3C7FC0
+}
+skinparam queue<<container>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #438DD5
+    BorderColor #3C7FC0
+}
+skinparam actor<<container>> {
+    StereotypeFontColor #438DD5
+    FontColor #438DD5
+    BackgroundColor #438DD5
+    BorderColor #3C7FC0
+}
+skinparam person<<container>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #438DD5
+    BorderColor #3C7FC0
+}
+
+
+skinparam rectangle<<external_container>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #B3B3B3
+    BorderColor #A6A6A6
+}
+skinparam database<<external_container>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #B3B3B3
+    BorderColor #A6A6A6
+}
+skinparam queue<<external_container>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #B3B3B3
+    BorderColor #A6A6A6
+}
+skinparam actor<<external_container>> {
+    StereotypeFontColor #B3B3B3
+    FontColor #B3B3B3
+    BackgroundColor #B3B3B3
+    BorderColor #A6A6A6
+}
+skinparam person<<external_container>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #B3B3B3
+    BorderColor #A6A6A6
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+skinparam rectangle<<component>> {
+    StereotypeFontColor #000000
+    FontColor #000000
+    BackgroundColor #85BBF0
+    BorderColor #78A8D8
+}
+skinparam database<<component>> {
+    StereotypeFontColor #000000
+    FontColor #000000
+    BackgroundColor #85BBF0
+    BorderColor #78A8D8
+}
+skinparam queue<<component>> {
+    StereotypeFontColor #000000
+    FontColor #000000
+    BackgroundColor #85BBF0
+    BorderColor #78A8D8
+}
+skinparam actor<<component>> {
+    StereotypeFontColor #85BBF0
+    FontColor #85BBF0
+    BackgroundColor #85BBF0
+    BorderColor #78A8D8
+}
+skinparam person<<component>> {
+    StereotypeFontColor #000000
+    FontColor #000000
+    BackgroundColor #85BBF0
+    BorderColor #78A8D8
+}
+
+
+skinparam rectangle<<external_component>> {
+    StereotypeFontColor #000000
+    FontColor #000000
+    BackgroundColor #CCCCCC
+    BorderColor #BFBFBF
+}
+skinparam database<<external_component>> {
+    StereotypeFontColor #000000
+    FontColor #000000
+    BackgroundColor #CCCCCC
+    BorderColor #BFBFBF
+}
+skinparam queue<<external_component>> {
+    StereotypeFontColor #000000
+    FontColor #000000
+    BackgroundColor #CCCCCC
+    BorderColor #BFBFBF
+}
+skinparam actor<<external_component>> {
+    StereotypeFontColor #CCCCCC
+    FontColor #CCCCCC
+    BackgroundColor #CCCCCC
+    BorderColor #BFBFBF
+}
+skinparam person<<external_component>> {
+    StereotypeFontColor #000000
+    FontColor #000000
+    BackgroundColor #CCCCCC
+    BorderColor #BFBFBF
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+skinparam defaultTextAlignment center
+
+skinparam wrapWidth 200
+skinparam maxMessageSize 150
+
+skinparam LegendBorderColor transparent
+skinparam LegendBackgroundColor transparent
+skinparam LegendFontColor #FFFFFF
+
+skinparam shadowing<<legendArea>> false
+skinparam rectangle<<legendArea>> {
+    backgroundcolor #00000000
+    bordercolor #00000000
+}
+
+skinparam rectangle {
+    StereotypeFontSize 12
+    shadowing false
+}
+
+skinparam database {
+    StereotypeFontSize 12
+    shadowing false
+}
+
+skinparam queue {
+    StereotypeFontSize 12
+    shadowing false
+}
+
+skinparam arrow {
+    Color #666666
+    FontColor #666666
+    FontSize 12
+}
+
+skinparam actor {
+    StereotypeFontSize 12
+    shadowing false
+    style awesome
+}
+
+skinparam person {
+    StereotypeFontSize 12
+    shadowing false
+}
+
+skinparam package {
+    StereotypeFontSize 6
+    StereotypeFontColor transparent
+    FontStyle plain
+    BackgroundColor transparent
+}
+
+skinparam rectangle<<boundary>> {
+    Shadowing false
+    StereotypeFontSize 6
+    StereotypeFontColor transparent
+    FontColor #444444
+    BorderColor #444444
+    BackgroundColor transparent
+    BorderStyle dashed
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+skinparam rectangle<<person>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #08427B
+    BorderColor #073B6F
+}
+skinparam database<<person>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #08427B
+    BorderColor #073B6F
+}
+skinparam queue<<person>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #08427B
+    BorderColor #073B6F
+}
+skinparam actor<<person>> {
+    StereotypeFontColor #08427B
+    FontColor #08427B
+    BackgroundColor #08427B
+    BorderColor #073B6F
+}
+skinparam person<<person>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #08427B
+    BorderColor #073B6F
+}
+
+
+skinparam rectangle<<external_person>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #686868
+    BorderColor #8A8A8A
+}
+skinparam database<<external_person>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #686868
+    BorderColor #8A8A8A
+}
+skinparam queue<<external_person>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #686868
+    BorderColor #8A8A8A
+}
+skinparam actor<<external_person>> {
+    StereotypeFontColor #686868
+    FontColor #686868
+    BackgroundColor #686868
+    BorderColor #8A8A8A
+}
+skinparam person<<external_person>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #686868
+    BorderColor #8A8A8A
+}
+
+
+skinparam rectangle<<system>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #1168BD
+    BorderColor #3C7FC0
+}
+skinparam database<<system>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #1168BD
+    BorderColor #3C7FC0
+}
+skinparam queue<<system>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #1168BD
+    BorderColor #3C7FC0
+}
+skinparam actor<<system>> {
+    StereotypeFontColor #1168BD
+    FontColor #1168BD
+    BackgroundColor #1168BD
+    BorderColor #3C7FC0
+}
+skinparam person<<system>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #1168BD
+    BorderColor #3C7FC0
+}
+
+
+skinparam rectangle<<external_system>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #999999
+    BorderColor #8A8A8A
+}
+skinparam database<<external_system>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #999999
+    BorderColor #8A8A8A
+}
+skinparam queue<<external_system>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #999999
+    BorderColor #8A8A8A
+}
+skinparam actor<<external_system>> {
+    StereotypeFontColor #999999
+    FontColor #999999
+    BackgroundColor #999999
+    BorderColor #8A8A8A
+}
+skinparam person<<external_system>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #999999
+    BorderColor #8A8A8A
+}
+
+
+
+
+
+sprite $person [48x48/16] {
+000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000
+0000000000000000000049BCCA7200000000000000000000
+0000000000000000006EFFFFFFFFB3000000000000000000
+00000000000000001CFFFFFFFFFFFF700000000000000000
+0000000000000001EFFFFFFFFFFFFFF80000000000000000
+000000000000000CFFFFFFFFFFFFFFFF6000000000000000
+000000000000007FFFFFFFFFFFFFFFFFF100000000000000
+00000000000001FFFFFFFFFFFFFFFFFFF900000000000000
+00000000000006FFFFFFFFFFFFFFFFFFFF00000000000000
+0000000000000BFFFFFFFFFFFFFFFFFFFF40000000000000
+0000000000000EFFFFFFFFFFFFFFFFFFFF70000000000000
+0000000000000FFFFFFFFFFFFFFFFFFFFF80000000000000
+0000000000000FFFFFFFFFFFFFFFFFFFFF80000000000000
+0000000000000DFFFFFFFFFFFFFFFFFFFF60000000000000
+0000000000000AFFFFFFFFFFFFFFFFFFFF40000000000000
+00000000000006FFFFFFFFFFFFFFFFFFFE00000000000000
+00000000000000EFFFFFFFFFFFFFFFFFF800000000000000
+000000000000007FFFFFFFFFFFFFFFFFF100000000000000
+000000000000000BFFFFFFFFFFFFFFFF5000000000000000
+0000000000000001DFFFFFFFFFFFFFF70000000000000000
+00000000000000000BFFFFFFFFFFFF500000000000000000
+0000000000000000005DFFFFFFFFA1000000000000000000
+0000000000000000000037ABB96100000000000000000000
+000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000
+000000000000025788300000000005886410000000000000
+000000000007DFFFFFFD9643347BFFFFFFFB400000000000
+0000000004EFFFFFFFFFFFFFFFFFFFFFFFFFFB1000000000
+000000007FFFFFFFFFFFFFFFFFFFFFFFFFFFFFD200000000
+00000006FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE10000000
+0000003FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB0000000
+000000BFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5000000
+000003FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD000000
+000009FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF200000
+00000DFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF600000
+00000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF800000
+00001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA00000
+00001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB00000
+00001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB00000
+00001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB00000
+00001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA00000
+00000EFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF700000
+000006FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE100000
+0000008FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD3000000
+000000014555555555555555555555555555555300000000
+000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000
+}
+
+sprite $person2 [48x48/16] {
+0000000000000000000049BCCA7200000000000000000000
+0000000000000000006EFFFFFFFFB3000000000000000000
+00000000000000001CFFFFFFFFFFFF700000000000000000
+0000000000000001EFFFFFFFFFFFFFF80000000000000000
+000000000000000CFFFFFFFFFFFFFFFF6000000000000000
+000000000000007FFFFFFFFFFFFFFFFFF100000000000000
+00000000000001FFFFFFFFFFFFFFFFFFF900000000000000
+00000000000006FFFFFFFFFFFFFFFFFFFF00000000000000
+0000000000000BFFFFFFFFFFFFFFFFFFFF40000000000000
+0000000000000EFFFFFFFFFFFFFFFFFFFF70000000000000
+0000000000000FFFFFFFFFFFFFFFFFFFFF80000000000000
+0000000000000FFFFFFFFFFFFFFFFFFFFF80000000000000
+0000000000000DFFFFFFFFFFFFFFFFFFFF60000000000000
+0000000000000AFFFFFFFFFFFFFFFFFFFF40000000000000
+00000000000006FFFFFFFFFFFFFFFFFFFE00000000000000
+00000000000000EFFFFFFFFFFFFFFFFFF800000000000000
+000000000000007FFFFFFFFFFFFFFFFFF100000000000000
+000000000000000BFFFFFFFFFFFFFFFF5000000000000000
+0000000000000001DFFFFFFFFFFFFFF70000000000000000
+00000000000000000BFFFFFFFFFFFF500000000000000000
+0000000000000000005DFFFFFFFFA1000000000000000000
+0000000000000000000037ABB96100000000000000000000
+000000000002578888300000000005888864100000000000
+0000000007DFFFFFFFFD9643347BFFFFFFFFFB4000000000
+00000004EFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB10000000
+0000007FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD2000000
+000006FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE100000
+00003FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB00000
+0000BFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF50000
+0003FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD0000
+0009FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2000
+000DFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6000
+000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF8000
+001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB000
+001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB000
+001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB000
+001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA000
+000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF8000
+000DFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6000
+0009FFFFFFFF8FFFFFFFFFFFFFFFFFFFFFF8FFFFFFFF2000
+0003FFFFFFFF8FFFFFFFFFFFFFFFFFFFFFF8FFFFFFFD0000
+0000BFFFFFFF8FFFFFFFFFFFFFFFFFFFFFF8FFFFFFF50000
+00003FFFFFFF8FFFFFFFFFFFFFFFFFFFFFF8FFFFFFB00000
+000006FFFFFF8FFFFFFFFFFFFFFFFFFFFFF8FFFFFE100000
+0000007FFFFF8FFFFFFFFFFFFFFFFFFFFFF8FFFFD2000000
+00000004EFFF8FFFFFFFFFFFFFFFFFFFFFF8FFFB10000000
+0000000007DF8FFFFFFFFFFFFFFFFFFFFFF8FB4000000000
+000000000002578888888888888888888864100000000000
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+skinparam rectangle<<container>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #438DD5
+    BorderColor #3C7FC0
+}
+skinparam database<<container>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #438DD5
+    BorderColor #3C7FC0
+}
+skinparam queue<<container>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #438DD5
+    BorderColor #3C7FC0
+}
+skinparam actor<<container>> {
+    StereotypeFontColor #438DD5
+    FontColor #438DD5
+    BackgroundColor #438DD5
+    BorderColor #3C7FC0
+}
+skinparam person<<container>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #438DD5
+    BorderColor #3C7FC0
+}
+
+
+skinparam rectangle<<external_container>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #B3B3B3
+    BorderColor #A6A6A6
+}
+skinparam database<<external_container>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #B3B3B3
+    BorderColor #A6A6A6
+}
+skinparam queue<<external_container>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #B3B3B3
+    BorderColor #A6A6A6
+}
+skinparam actor<<external_container>> {
+    StereotypeFontColor #B3B3B3
+    FontColor #B3B3B3
+    BackgroundColor #B3B3B3
+    BorderColor #A6A6A6
+}
+skinparam person<<external_container>> {
+    StereotypeFontColor #FFFFFF
+    FontColor #FFFFFF
+    BackgroundColor #B3B3B3
+    BorderColor #A6A6A6
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+rectangle "==CSDeskBand\n<size:12>[Container]</size>" <<boundary>> as CSDeskBand  {
+rectangle "==CSDeskBand.Interop\n<size:12>[Container]</size>" <<boundary>> as CSDeskBand.Interop  {
+}
+rectangle "==CSDeskBand.ContextMenu\n<size:12>[Container]</size>" <<boundary>> as CSDeskBand.ContextMenu  {
+}
+rectangle "==CSDeskBand.CSDeskBandImpl\n//<size:12>[]</size>//" <<component>> as CSDeskBand.CSDeskBandImpl 
+rectangle "==CSDeskBand.CSDeskBandOptions\n//<size:12>[]</size>//" <<component>> as CSDeskBand.CSDeskBandOptions 
+rectangle "==CSDeskBand.CSDeskBandRegistrationAttribute\n//<size:12>[]</size>//" <<component>> as CSDeskBand.CSDeskBandRegistrationAttribute 
+rectangle "==CSDeskBand.DeskBandSize\n//<size:12>[]</size>//" <<component>> as CSDeskBand.DeskBandSize 
+rectangle "==CSDeskBand.ICSDeskBand\n//<size:12>[]</size>//" <<component>> as CSDeskBand.ICSDeskBand 
+rectangle "==CSDeskBand.IDeskBandProvider\n//<size:12>[]</size>//" <<component>> as CSDeskBand.IDeskBandProvider 
+rectangle "==CSDeskBand.RegistrationHelper\n//<size:12>[]</size>//" <<component>> as CSDeskBand.RegistrationHelper 
+rectangle "==CSDeskBand.TaskbarInfo\n//<size:12>[]</size>//" <<component>> as CSDeskBand.TaskbarInfo 
+rectangle "==CSDeskBand.TaskbarOrientationChangedEventArgs\n//<size:12>[]</size>//" <<component>> as CSDeskBand.TaskbarOrientationChangedEventArgs 
+rectangle "==CSDeskBand.TaskbarSizeChangedEventArgs\n//<size:12>[]</size>//" <<component>> as CSDeskBand.TaskbarSizeChangedEventArgs 
+rectangle "==CSDeskBand.TaskbarEdgeChangedEventArgs\n//<size:12>[]</size>//" <<component>> as CSDeskBand.TaskbarEdgeChangedEventArgs 
+}
+rectangle "==TaskbarMonitor\n<size:12>[Container]</size>" <<boundary>> as TaskbarMonitor  {
+rectangle "==TaskbarMonitor.BLL\n<size:12>[Container]</size>" <<boundary>> as TaskbarMonitor.BLL  {
+}
+rectangle "==TaskbarMonitor.Controls\n<size:12>[Container]</size>" <<boundary>> as TaskbarMonitor.Controls  {
+}
+rectangle "==TaskbarMonitor.Counters\n<size:12>[Container]</size>" <<boundary>> as TaskbarMonitor.Counters  {
+}
+rectangle "==TaskbarMonitor.Properties\n<size:12>[Container]</size>" <<boundary>> as TaskbarMonitor.Properties  {
+}
+rectangle "==TaskbarMonitor.Deskband\n//<size:12>[]</size>//" <<component>> as TaskbarMonitor.Deskband 
+rectangle "==TaskbarMonitor.GithubUpdater\n//<size:12>[]</size>//" <<component>> as TaskbarMonitor.GithubUpdater 
+rectangle "==TaskbarMonitor.GraphTheme\n//<size:12>[]</size>//" <<component>> as TaskbarMonitor.GraphTheme 
+rectangle "==TaskbarMonitor.OptionForm\n//<size:12>[]</size>//" <<component>> as TaskbarMonitor.OptionForm 
+rectangle "==TaskbarMonitor.Options\n//<size:12>[]</size>//" <<component>> as TaskbarMonitor.Options 
+rectangle "==TaskbarMonitor.CounterOptions\n//<size:12>[]</size>//" <<component>> as TaskbarMonitor.CounterOptions 
+rectangle "==TaskbarMonitor.SystemWatcherControl\n//<size:12>[]</size>//" <<component>> as TaskbarMonitor.SystemWatcherControl 
+rectangle "==TaskbarMonitor.TaskbarManager\n//<size:12>[]</size>//" <<component>> as TaskbarMonitor.TaskbarManager 
+}
+@enduml
+
+PlantUML version 1.2021.10(Mon Aug 30 10:43:48 BRT 2021)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) Client VM
+Default Encoding: Cp1252
+Language: pt
+Country: BR
+--></g></svg>

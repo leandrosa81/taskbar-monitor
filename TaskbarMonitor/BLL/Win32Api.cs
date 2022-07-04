@@ -25,10 +25,8 @@ namespace TaskbarMonitor.BLL
     {
         public int left, top, right, bottom;
     }
-
-    
-
-    class Win32Api
+     
+    public class Win32Api
     {
         internal const int ABM_GETTASKBARPOS = 5;
 
@@ -46,6 +44,7 @@ namespace TaskbarMonitor.BLL
                                 //This data is intended for use by the application 
                                 //that created the window. Its value is initially zero.
             GWL_WNDPROC = -4 //Sets a new address for the window procedure.
+
         }
 
         [DllImport("shell32.dll")]
@@ -57,6 +56,9 @@ namespace TaskbarMonitor.BLL
         // Get a handle to an application window.
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        [DllImport("user32.dll")]
+        internal static extern bool DestroyWindow(IntPtr hWnd);
 
         // Find window by Caption only. Note you must pass IntPtr.Zero as the first parameter.
         [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)]
@@ -79,9 +81,30 @@ namespace TaskbarMonitor.BLL
         internal static extern IntPtr SetWindowLongPtr64
             (HandleRef hWnd, int nIndex, IntPtr dwNewLong);
 
+        [DllImport("user32.dll", EntryPoint = "SetParent")]
+        internal static extern IntPtr SetParent(IntPtr windowHandle, IntPtr parentHandle);
+        [DllImport("user32.dll", EntryPoint = "BringWindowToTop")]
+        internal static extern bool BringWindowToTop(IntPtr windowHandle);
+
+        [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
+        internal static extern bool SetWindowPos(IntPtr hWnd,IntPtr hWndInsertAfter,int X,int Y,int cx,int cy,uint uFlags);
+
+        [DllImport("user32.dll", EntryPoint = "EnableWindow")]
+        internal static extern bool EnableWindow(IntPtr hWnd, bool bEnable);
+
         [return: MarshalAs(UnmanagedType.Bool)]
         [DllImport("user32.dll")]
         internal static extern bool UnhookWinEvent(IntPtr eventHookHandle);
+        
+        [return: MarshalAs(UnmanagedType.Bool)]
+        [DllImport("user32.dll")]
+        internal static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+        [DllImport("user32.dll")]
+        public static extern bool PostMessageA(IntPtr hWnd, uint Msg, uint wparam, uint lparam);
+
+        [DllImport("user32.dll")]
+        internal static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
         [DllImport("user32.dll")]
         internal static extern IntPtr SetWinEventHook(
@@ -126,6 +149,9 @@ namespace TaskbarMonitor.BLL
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+        [DllImport("user32.dll", SetLastError = false)]
+        static extern IntPtr GetDesktopWindow();
 
         [Flags]
         internal enum SetWinEventHookParameter
@@ -182,7 +208,7 @@ namespace TaskbarMonitor.BLL
             return new Rectangle(data.rc.left, data.rc.top, data.rc.right - data.rc.left, data.rc.bottom - data.rc.top);            
         }
 
-        public static Rectangle GetTaskBarSize(IntPtr handle)
+        public static Rectangle GetWindowSize(IntPtr handle)
         {
             RECT rct;
 
@@ -197,6 +223,24 @@ namespace TaskbarMonitor.BLL
             myRect.Height = rct.bottom - rct.top;
             return myRect;
         }
+
+        public static Rectangle GetWorkingAreaSize()
+        {
+            RECT rct;
+
+            if (!GetWindowRect(GetDesktopWindow(), out rct))
+            {
+                return Rectangle.Empty;
+            }
+            var myRect = new Rectangle();
+            myRect.X = rct.left;
+            myRect.Y = rct.top;
+            myRect.Width = rct.right - rct.left;
+            myRect.Height = rct.bottom - rct.top;
+            return myRect;
+        }
+
+
 
         public static Color GetColourAt(Point location)
         {
@@ -251,6 +295,9 @@ namespace TaskbarMonitor.BLL
             }
             return new IntPtr(SetWindowLong32(hWnd, nIndex, dwNewLong.ToInt32()));
         }
-         
+
+        
+
+
     }
 }

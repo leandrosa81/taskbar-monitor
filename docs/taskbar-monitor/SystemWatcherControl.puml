@@ -1,0 +1,53 @@
+@startuml
+class SystemWatcherControl <<partial>> {
+    + SHOW_DEBUG : bool = false
+    taskbarHeight : int = 0
+    +  <<event>> OnChangeSize : SizeChangeHandler 
+    + Version : Version <<get>> <<set>>
+    + Options : Options <<get>> <<set>>
+    - _previewMode : bool = false
+    - _contextMenu : ContextMenu = null
+    + VerticalTaskbarMode : bool <<get>>
+    - pollingTimer : System.Timers.Timer
+    + PreviewMode : bool <<get>> <<set>>
+    + CountersCount : int <<get>>
+    Counters : List<Counters.ICounter>
+    fontCounter : System.Drawing.Font
+    fontTitle : Font
+    lastSize : int = 30
+    mouseOver : bool = false
+    + customTheme : GraphTheme
+    darkTheme : GraphTheme
+    lightTheme : GraphTheme
+    defaultTheme : GraphTheme
+    AssociatedDeskband : Deskband = null
+    sTask : TaskbarManager
+    + SystemWatcherControl(opt:Options, addSecondControl:bool, verticalMode:bool, associatedDeskband:Deskband)
+    + SystemWatcherControl()
+    + SystemWatcherControl(addSecondControl:bool)
+    # <<override>> OnHandleDestroyed(e:EventArgs) : void
+    - GetTheme(opt:Options) : GraphTheme
+    - PollingTimer_Elapsed(sender:object, e:System.Timers.ElapsedEventArgs) : void
+    + IsCustomTheme() : bool
+    + ApplyOptions(Options:Options) : void
+    + ApplyOptions(Options:Options, theme:GraphTheme) : void
+    - Initialize(opt:Options) : void
+    - AdjustControlSize() : void
+    - UpdateGraphs() : void
+    - SystemWatcherControl_Paint(sender:object, e:PaintEventArgs) : void
+    - drawGraph(formGraphics:System.Drawing.Graphics, x:int, y:int, maxH:int, invertido:bool, info:TaskbarMonitor.Counters.CounterInfo, theme:GraphTheme, opt:CounterOptions) : void
+    - drawStackedGraph(formGraphics:System.Drawing.Graphics, x:int, y:int, maxH:int, invertido:bool, infos:List<TaskbarMonitor.Counters.CounterInfo>, theme:GraphTheme, opt:CounterOptions) : void
+    + {static} GetTaskbarWidth() : int
+    + {static} GetTaskbarHeight() : int
+    - SystemWatcherControl_MouseEnter(sender:object, e:EventArgs) : void
+    - SystemWatcherControl_MouseLeave(sender:object, e:EventArgs) : void
+    # <<override>> WndProc(m:Message) : void
+    - OpenSettings(activeIndex:int) : void
+    - MenuItem_Settings_onClick(sender:object, e:EventArgs) : void
+    - MenuItem_About_onClick(sender:object, e:EventArgs) : void
+    # <<override>> OnParentBackColorChanged(e:EventArgs) : void
+    - SystemWatcherControl_DoubleClick(sender:object, e:EventArgs) : void
+    # <<override>> OnNotifyMessage(m:Message) : void
+}
+UserControl <|-- SystemWatcherControl
+@enduml

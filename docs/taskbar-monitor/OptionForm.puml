@@ -1,0 +1,61 @@
+@startuml
+class OptionForm <<partial>> {
+    - OriginalOptions : Options
+    - OriginalTheme : GraphTheme
+    - Options : Options
+    - Theme : GraphTheme
+    - Version : Version
+    - ActiveCounter : CounterOptions = null
+    - initializing : bool = true
+    AvailableGraphTypes : Dictionary<string, IList<TaskbarMonitor.Counters.ICounter.CounterType>>
+    originalControl : SystemWatcherControl = null
+    - ChosenTitleFont : Font
+    - ChosenCurrentValueFont : Font
+    + OptionForm(opt:Options, theme:GraphTheme, version:Version, originalControl:SystemWatcherControl)
+    - Initialize() : void
+    - UpdatePreview() : void
+    - EditHistorySize_ValueChanged(sender:object, e:EventArgs) : void
+    - editPollTime_ValueChanged(sender:object, e:EventArgs) : void
+    - ListCounters_SelectedIndexChanged(sender:object, e:EventArgs) : void
+    - UpdateReplicateSettingsMenu() : void
+    - contextMenuStripReplicateSettings_OnClick(sender:object, e:EventArgs) : void
+    - UpdateForm() : void
+    - UpdateFormScales() : void
+    - UpdateFormOrder() : void
+    - UpdateFormShow() : void
+    - ListShowTitle_SelectedIndexChanged(sender:object, e:EventArgs) : void
+    - listShowCurrentValue_SelectedIndexChanged(sender:object, e:EventArgs) : void
+    - listGraphType_SelectedIndexChanged(sender:object, e:EventArgs) : void
+    - btnMenu_Click(sender:object, e:EventArgs) : void
+    - UpdateMenuColors(active:Button) : void
+    + OpenTab(i:int) : void
+    - linkLabel_LinkClicked(sender:object, e:LinkLabelLinkClickedEventArgs) : void
+    - checkShowSummary_CheckedChanged(sender:object, e:EventArgs) : void
+    - checkInvertOrder_CheckedChanged(sender:object, e:EventArgs) : void
+    - btnCheckUpdate_Click(sender:object, e:EventArgs) : void
+    - ChooseColor(sender:Button) : bool
+    - ChooseFont(sender:LinkLabel, font:Font) : bool
+    - btnColorBar_Click(sender:object, e:EventArgs) : void
+    - btnColorCurrentValue_Click(sender:object, e:EventArgs) : void
+    - btnColorCurrentValueShadow_Click(sender:object, e:EventArgs) : void
+    - btnColorTitle_Click(sender:object, e:EventArgs) : void
+    - btnColorTitleShadow_Click(sender:object, e:EventArgs) : void
+    - btnColor1_Click(sender:object, e:EventArgs) : void
+    - btnColor2_Click(sender:object, e:EventArgs) : void
+    - checkSeparateScales_CheckedChanged(sender:object, e:EventArgs) : void
+    - checkTitleShadowHover_CheckedChanged(sender:object, e:EventArgs) : void
+    - listTitlePosition_SelectedIndexChanged(sender:object, e:EventArgs) : void
+    - checkValueShadowHover_CheckedChanged(sender:object, e:EventArgs) : void
+    - listSummaryPosition_SelectedIndexChanged(sender:object, e:EventArgs) : void
+    - linkLatestVersion_LinkClicked(sender:object, e:LinkLabelLinkClickedEventArgs) : void
+    - button3_Click(sender:object, e:EventArgs) : void
+    - buttonResetDefaults_Click(sender:object, e:EventArgs) : void
+    - checkEnabled_CheckedChanged(sender:object, e:EventArgs) : void
+    - buttonApply_Click(sender:object, e:EventArgs) : void
+    - linkTitleFont_LinkClicked(sender:object, e:LinkLabelLinkClickedEventArgs) : void
+    - linkCurrentValueFont_LinkClicked(sender:object, e:LinkLabelLinkClickedEventArgs) : void
+    - listThemeType_SelectedIndexChanged(sender:object, e:EventArgs) : void
+    - UpdateThemeOptions() : void
+}
+Form <|-- OptionForm
+@enduml

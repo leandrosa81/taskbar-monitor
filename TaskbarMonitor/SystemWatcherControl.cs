@@ -17,6 +17,8 @@ namespace TaskbarMonitor
 {
     public partial class SystemWatcherControl : UserControl
     {
+        public bool SHOW_DEBUG = false;
+        int taskbarHeight = 0;
         public delegate void SizeChangeHandler(Size size);
         public event SizeChangeHandler OnChangeSize;
         public Version Version { get; set; } = new Version(Properties.Resources.Version);
@@ -26,7 +28,10 @@ namespace TaskbarMonitor
 
         private bool _previewMode = false;
         private ContextMenu _contextMenu = null;
-        private bool VerticalTaskbarMode = false;
+        public bool VerticalTaskbarMode
+        {
+            get; private set;
+        }
         private System.Timers.Timer pollingTimer;
         public bool PreviewMode
         {
@@ -37,7 +42,7 @@ namespace TaskbarMonitor
             set
             {
                 _previewMode = value;
-                this.ContextMenu = _previewMode ? null : _contextMenu;
+                //this.ContextMenu = _previewMode ? null : _contextMenu;
             }
         }
         public int CountersCount
@@ -54,14 +59,21 @@ namespace TaskbarMonitor
         Font fontTitle;
         int lastSize = 30;
         bool mouseOver = false;
-        GraphTheme customTheme;
+        public GraphTheme customTheme;
         GraphTheme darkTheme;
         GraphTheme lightTheme;
 
         GraphTheme defaultTheme;
 
-        public SystemWatcherControl(Options opt, bool addSecondControl = false)//CSDeskBand.CSDeskBandWin w, 
+
+        Deskband AssociatedDeskband = null;
+        TaskbarManager sTask;
+
+        public SystemWatcherControl(Options opt, bool addSecondControl = false, bool verticalMode = false, Deskband associatedDeskband = null)//CSDeskBand.CSDeskBandWin w, 
         {
+            this.VerticalTaskbarMode = verticalMode;
+            this.AssociatedDeskband = associatedDeskband;
+            this.SetStyle(ControlStyles.EnableNotifyMessage, true);
             try
             {
                 darkTheme = GraphTheme.DefaultDarkTheme();            
@@ -72,9 +84,9 @@ namespace TaskbarMonitor
                 Initialize(opt);
                 if (addSecondControl)
                 {
-                    SecondaryTaskBar sTask = new SecondaryTaskBar();
-                    sTask.AddControl();
-                }                
+                     sTask = new TaskbarManager();
+                     sTask.AddControlsExtraMonitors();
+                }
                 this.BackColor = Color.Transparent;
             }
             catch (Exception ex)
@@ -89,6 +101,7 @@ namespace TaskbarMonitor
         }
         public SystemWatcherControl(bool addSecondControl = false)
         {
+            this.SetStyle(ControlStyles.EnableNotifyMessage, true);
             try
             {
                 Options opt = TaskbarMonitor.Options.ReadFromDisk();
@@ -100,8 +113,8 @@ namespace TaskbarMonitor
                 Initialize(opt);
                 if (addSecondControl)
                 {
-                    SecondaryTaskBar sTask = new SecondaryTaskBar();
-                    sTask.AddControl();
+                    TaskbarManager sTask = new TaskbarManager();
+                    sTask.AddControlsExtraMonitors();
                 }                
                 this.BackColor = Color.Transparent;
             }
@@ -109,6 +122,12 @@ namespace TaskbarMonitor
             {
                 MessageBox.Show($"Error loading SystemWatcherControl: {ex.Message}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+        protected override void OnHandleDestroyed(EventArgs e)
+        {
+            if(sTask != null)
+                sTask.RemoveControls();
+            base.OnHandleDestroyed(e);
         }
 
         private GraphTheme GetTheme(Options opt)
@@ -170,6 +189,10 @@ namespace TaskbarMonitor
                 _contextMenu.MenuItems.Add(new MenuItem(String.Format("About taskbar-monitor (v{0})...", Version.ToString(3)), MenuItem_About_onClick));
                 this.ContextMenu = _contextMenu;
             }
+            else
+            {
+                this.ContextMenu = null;
+            }
 
 
             if (PreviewMode)
@@ -183,19 +206,7 @@ namespace TaskbarMonitor
             {
                 this.BackColor = Color.Transparent;
             }
-
-            /*
-                float dpiX, dpiY;
-                using (Graphics graphics = this.CreateGraphics())
-                {
-                    dpiX = graphics.DpiX;
-                    dpiY = graphics.DpiY;
-                }
-                float fontSize = 7f;
-                if (dpiX > 96)
-                    fontSize = 6f;
-                */
-
+            
             AdjustControlSize();
             UpdateGraphs();
             this.Invalidate();
@@ -238,12 +249,14 @@ namespace TaskbarMonitor
             SetStyle(ControlStyles.DoubleBuffer, true);
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             SetStyle(ControlStyles.UserPaint, true);
-            SetStyle(ControlStyles.Opaque, true);
+            SetStyle(ControlStyles.Opaque, true);            
             ApplyOptions(opt, theme);
             //Initialize();
 
             InitializeComponent();
             AdjustControlSize();
+
+            //BLL.Win32Api.SetWindowPos(this.Handle, new IntPtr(0), this.Left, this.Top, this.Width, this.Height, 0);
 
             pollingTimer = new System.Timers.Timer(opt.PollTime * 1000);
             pollingTimer.Enabled = true;
@@ -254,11 +267,19 @@ namespace TaskbarMonitor
 
         private void AdjustControlSize()
         {
+            if (PreviewMode)
+                return;
             int taskbarWidth = GetTaskbarWidth();
-            int taskbarHeight = GetTaskbarHeight();
-            int minimumHeight = taskbarHeight;
-            if (minimumHeight < 30)
-                minimumHeight = 30;
+            taskbarHeight = GetTaskbarHeight();
+
+            // taskbar not being shown
+            if(taskbarWidth == 0 && taskbarHeight == 0)
+            {
+                return;
+            }
+            int minimumHeight = taskbarHeight;            
+            if (minimumHeight < 20)
+                minimumHeight = 20;
 
             if (taskbarWidth > 0 && taskbarHeight == 0)
                 VerticalTaskbarMode = true;
@@ -298,15 +319,8 @@ namespace TaskbarMonitor
 
         private void SystemWatcherControl_Paint(object sender, PaintEventArgs e)
         {
-            int maximumHeight = GetTaskbarHeight();
-            if (maximumHeight <= 0)
-                maximumHeight = 30;
-
-            if (lastSize != maximumHeight)
-            {
-                this.Height = maximumHeight;
-                lastSize = maximumHeight;
-            }
+           
+            var maximumHeight = this.Height;
 
             int graphPosition = 0;
             int graphPositionY = 0;
@@ -316,152 +330,175 @@ namespace TaskbarMonitor
             formGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;//AntiAliasGridFit;
             formGraphics.Clear(this.BackColor);
             //formGraphics.Clear(Color.Transparent);
-            foreach (var pair in Options.CounterOptions.Where(x => x.Value.Enabled == true))
+            if (SHOW_DEBUG)
             {
-                var name = pair.Key;
-                var opt = pair.Value;
-                var ct = Counters.Where(x => x.GetName() == name).Single();
-                var infos = ct.Infos;
-                //var opt = Options.CounterOptions[ct.GetName()];
-                //if (!opt.Enabled) continue;
-                var showCurrentValue = !opt.CurrentValueAsSummary &&
-                    (opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW || (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver));
+                using (SolidBrush BrushText = new SolidBrush(defaultTheme.TextColor))
+                {                    
+                    formGraphics.DrawString($"w: {this.Width}, h: {this.Height}", fontCounter, BrushText, new RectangleF(2, 2, 400, 100), new StringFormat());
+                    formGraphics.DrawString($"tb h: {this.taskbarHeight}", fontCounter, BrushText, new RectangleF(2, 10, 400, 100), new StringFormat());
 
-                lock (ct.ThreadLock)
-                {
-                    if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.SINGLE)
+                    if (this.AssociatedDeskband != null)
                     {
-                        var info = infos[0];
-                        drawGraph(formGraphics, graphPosition, 0 + graphPositionY, maximumHeight, false, info, defaultTheme, opt);
+                        formGraphics.DrawString($"db w: {this.AssociatedDeskband.Size.Width}, h: {this.AssociatedDeskband.Size.Height}", fontCounter, BrushText, new RectangleF(70, 2, 400, 100), new StringFormat());
+                        formGraphics.DrawString($"tb h: {this.AssociatedDeskband.TaskbarInfo.Size.Height}", fontCounter, BrushText, new RectangleF(70, 10, 400, 100), new StringFormat());
 
+                        formGraphics.DrawString($"min w: {this.AssociatedDeskband.Options.MinHorizontalSize.Width}, h: {this.AssociatedDeskband.Options.MinHorizontalSize.Height}", fontCounter, BrushText, new RectangleF(150, 2, 400, 100), new StringFormat());
                     }
-                    else if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED)
+                    using (Pen pen = new Pen(BrushText))
                     {
-
-
-                        for (int z = 0; z < infos.Count; z++)
-                        {
-                            var info = opt.InvertOrder ? infos[infos.Count - 1 - z] : infos[z];
-                            drawGraph(formGraphics, graphPosition, z * (maximumHeight / 2) + graphPositionY, maximumHeight / 2, z == 1, info, defaultTheme, opt);
-                        }
-
-
-                    }
-                    else if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.STACKED)
-                    {
-                        drawStackedGraph(formGraphics, graphPosition, 0 + graphPositionY, maximumHeight, opt.InvertOrder, infos, defaultTheme, opt);
-
-
+                        formGraphics.DrawRectangle(pen, new Rectangle(0, 0, this.Width - 1, this.Height - 1));
                     }
                 }
-
-                var sizeTitle = formGraphics.MeasureString(ct.GetName(), fontTitle);
-                Dictionary<CounterOptions.DisplayPosition, float> positions = new Dictionary<CounterOptions.DisplayPosition, float>();
-
-                positions.Add(CounterOptions.DisplayPosition.MIDDLE, (maximumHeight / 2 - sizeTitle.Height / 2) + 1 + graphPositionY);
-                positions.Add(CounterOptions.DisplayPosition.TOP, graphPositionY);
-                positions.Add(CounterOptions.DisplayPosition.BOTTOM, (maximumHeight - sizeTitle.Height + 1) + graphPositionY);
-
-                CounterOptions.DisplayPosition? usedPosition = null;
-                if (opt.ShowTitle == CounterOptions.DisplayType.SHOW
-                 || opt.ShowTitle == CounterOptions.DisplayType.HOVER)
+            }
+            else
+            {
+                foreach (var pair in Options.CounterOptions.Where(x => x.Value.Enabled == true))
                 {
+                    var name = pair.Key;
+                    var opt = pair.Value;
+                    var ct = Counters.Where(x => x.GetName() == name).Single();
+                    var infos = ct.Infos;
+                    //var opt = Options.CounterOptions[ct.GetName()];
+                    //if (!opt.Enabled) continue;
+                    var showCurrentValue = !opt.CurrentValueAsSummary &&
+                        (opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW || (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver));
 
-                    usedPosition = opt.TitlePosition;
-                    var titleShadow = defaultTheme.TitleShadowColor;
-                    var titleColor = defaultTheme.TitleColor;
-
-                    if (opt.ShowTitle == CounterOptions.DisplayType.HOVER && !mouseOver)
+                    lock (ct.ThreadLock)
                     {
-                        titleColor = Color.FromArgb(40, titleColor.R, titleColor.G, titleColor.B);
-                    }
-
-
-                    System.Drawing.SolidBrush brushShadow = new System.Drawing.SolidBrush(titleShadow);
-                    System.Drawing.SolidBrush brushTitle = new System.Drawing.SolidBrush(titleColor);
-                    
-                    if (
-                        (opt.ShowTitleShadowOnHover && opt.ShowTitle == CounterOptions.DisplayType.HOVER && !mouseOver)
-                        || (opt.ShowTitle == CounterOptions.DisplayType.HOVER && mouseOver)
-                        || opt.ShowTitle == CounterOptions.DisplayType.SHOW
-                       )
-                    {
-                        if ((opt.ShowTitle == CounterOptions.DisplayType.HOVER && mouseOver) || opt.ShowTitle == CounterOptions.DisplayType.SHOW)
+                        if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.SINGLE)
                         {
-                            formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) + 1, positions[opt.TitlePosition] + 1, sizeTitle.Width, maximumHeight), new StringFormat());
+                            var info = infos[0];
+                            drawGraph(formGraphics, graphPosition, 0 + graphPositionY, maximumHeight, false, info, defaultTheme, opt);
+
                         }
-                        formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), positions[opt.TitlePosition], sizeTitle.Width, maximumHeight), new StringFormat());
-                    }
-
-
-                    brushShadow.Dispose();
-                    brushTitle.Dispose();
-                }
-
-                if (opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW
-                 || opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER)
-                {
-                    Dictionary<CounterOptions.DisplayPosition, string> texts = new Dictionary<CounterOptions.DisplayPosition, string>();
-
-                    if (opt.CurrentValueAsSummary || infos.Count > 2)
-                    {
-                        texts.Add(opt.SummaryPosition, ct.InfoSummary.CurrentStringValue);
-
-                    }
-                    else
-                    {
-                        List<CounterOptions.DisplayPosition> positionsAvailable = new List<CounterOptions.DisplayPosition> { CounterOptions.DisplayPosition.TOP, CounterOptions.DisplayPosition.MIDDLE, CounterOptions.DisplayPosition.BOTTOM };
-                        if (usedPosition.HasValue)
-                            positionsAvailable.Remove(usedPosition.Value);
-                        var showName = infos.Count > 1;
-                        for (int i = 0; i < infos.Count && i < 2; i++)
+                        else if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED)
                         {
-                            texts.Add(positionsAvailable[i], (showName ? infos[i].Name + " " : "") + infos[i].CurrentStringValue);
+
+
+                            for (int z = 0; z < infos.Count; z++)
+                            {
+                                var info = opt.InvertOrder ? infos[infos.Count - 1 - z] : infos[z];
+                                drawGraph(formGraphics, graphPosition, z * (maximumHeight / 2) + graphPositionY, maximumHeight / 2, z == 1, info, defaultTheme, opt);
+                            }
+
+
+                        }
+                        else if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.STACKED)
+                        {
+                            drawStackedGraph(formGraphics, graphPosition, 0 + graphPositionY, maximumHeight, opt.InvertOrder, infos, defaultTheme, opt);
+
+
                         }
                     }
-                    foreach (var item in texts)
+
+                    var sizeTitle = formGraphics.MeasureString(ct.GetName(), fontTitle);
+                    Dictionary<CounterOptions.DisplayPosition, float> positions = new Dictionary<CounterOptions.DisplayPosition, float>();
+
+                    positions.Add(CounterOptions.DisplayPosition.MIDDLE, (maximumHeight / 2 - sizeTitle.Height / 2) + 1 + graphPositionY);
+                    positions.Add(CounterOptions.DisplayPosition.TOP, graphPositionY);
+                    positions.Add(CounterOptions.DisplayPosition.BOTTOM, (maximumHeight - sizeTitle.Height + 1) + graphPositionY);
+
+                    CounterOptions.DisplayPosition? usedPosition = null;
+                    if (opt.ShowTitle == CounterOptions.DisplayType.SHOW
+                     || opt.ShowTitle == CounterOptions.DisplayType.HOVER)
                     {
-                        string text = item.Value;
 
-                        var sizeString = formGraphics.MeasureString(text, fontCounter);
-                        float ypos = positions[item.Key];
+                        usedPosition = opt.TitlePosition;
+                        var titleShadow = defaultTheme.TitleShadowColor;
+                        var titleColor = defaultTheme.TitleColor;
 
-                        var titleShadow = defaultTheme.TextShadowColor;
-                        var titleColor = defaultTheme.TextColor;
-
-                        if (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && !mouseOver)
+                        if (opt.ShowTitle == CounterOptions.DisplayType.HOVER && !mouseOver)
                         {
                             titleColor = Color.FromArgb(40, titleColor.R, titleColor.G, titleColor.B);
-                            //titleShadow = Color.FromArgb(40, titleShadow.R, titleShadow.G, titleShadow.B);
                         }
 
-                        SolidBrush BrushText = new SolidBrush(titleColor);
-                        SolidBrush BrushTextShadow = new SolidBrush(titleShadow);
+
+                        System.Drawing.SolidBrush brushShadow = new System.Drawing.SolidBrush(titleShadow);
+                        System.Drawing.SolidBrush brushTitle = new System.Drawing.SolidBrush(titleColor);
 
                         if (
-                        (opt.ShowCurrentValueShadowOnHover && opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && !mouseOver)
-                        || (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver)
-                        || opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW
-                       )
+                            (opt.ShowTitleShadowOnHover && opt.ShowTitle == CounterOptions.DisplayType.HOVER && !mouseOver)
+                            || (opt.ShowTitle == CounterOptions.DisplayType.HOVER && mouseOver)
+                            || opt.ShowTitle == CounterOptions.DisplayType.SHOW
+                           )
                         {
-                            if ((opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver) || opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW)
+                            if ((opt.ShowTitle == CounterOptions.DisplayType.HOVER && mouseOver) || opt.ShowTitle == CounterOptions.DisplayType.SHOW)
                             {
-                                formGraphics.DrawString(text, fontCounter, BrushTextShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, ypos + 1, sizeString.Width, maximumHeight), new StringFormat());                                
+                                formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) + 1, positions[opt.TitlePosition] + 1, sizeTitle.Width, maximumHeight), new StringFormat());
                             }
-                            formGraphics.DrawString(text, fontCounter, BrushText, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2), ypos, sizeString.Width, maximumHeight), new StringFormat());
+                            formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), positions[opt.TitlePosition], sizeTitle.Width, maximumHeight), new StringFormat());
                         }
-                        //formGraphics.DrawString(titleShadow.ToString(), fontCounter, BrushText, new RectangleF(0, 15, 400, 100), new StringFormat());
-                        BrushText.Dispose();
-                        BrushTextShadow.Dispose();
-                    }
-                }
-                
 
-                graphPosition += Options.HistorySize + 10;
-                if (graphPosition >= this.Size.Width)
-                {
-                    graphPosition = 0;
-                    graphPositionY += (maximumHeight + 10);
+
+                        brushShadow.Dispose();
+                        brushTitle.Dispose();
+                    }
+
+                    if (opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW
+                     || opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER)
+                    {
+                        Dictionary<CounterOptions.DisplayPosition, string> texts = new Dictionary<CounterOptions.DisplayPosition, string>();
+
+                        if (opt.CurrentValueAsSummary || infos.Count > 2)
+                        {
+                            texts.Add(opt.SummaryPosition, ct.InfoSummary.CurrentStringValue);
+
+                        }
+                        else
+                        {
+                            List<CounterOptions.DisplayPosition> positionsAvailable = new List<CounterOptions.DisplayPosition> { CounterOptions.DisplayPosition.TOP, CounterOptions.DisplayPosition.MIDDLE, CounterOptions.DisplayPosition.BOTTOM };
+                            if (usedPosition.HasValue)
+                                positionsAvailable.Remove(usedPosition.Value);
+                            var showName = infos.Count > 1;
+                            for (int i = 0; i < infos.Count && i < 2; i++)
+                            {
+                                texts.Add(positionsAvailable[i], (showName ? infos[i].Name + " " : "") + infos[i].CurrentStringValue);
+                            }
+                        }
+                        foreach (var item in texts)
+                        {
+                            string text = item.Value;
+
+                            var sizeString = formGraphics.MeasureString(text, fontCounter);
+                            float ypos = positions[item.Key];
+
+                            var titleShadow = defaultTheme.TextShadowColor;
+                            var titleColor = defaultTheme.TextColor;
+
+                            if (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && !mouseOver)
+                            {
+                                titleColor = Color.FromArgb(40, titleColor.R, titleColor.G, titleColor.B);
+                                //titleShadow = Color.FromArgb(40, titleShadow.R, titleShadow.G, titleShadow.B);
+                            }
+
+                            SolidBrush BrushText = new SolidBrush(titleColor);
+                            SolidBrush BrushTextShadow = new SolidBrush(titleShadow);
+
+                            if (
+                            (opt.ShowCurrentValueShadowOnHover && opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && !mouseOver)
+                            || (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver)
+                            || opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW
+                           )
+                            {
+                                if ((opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver) || opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW)
+                                {
+                                    formGraphics.DrawString(text, fontCounter, BrushTextShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, ypos + 1, sizeString.Width, maximumHeight), new StringFormat());
+                                }
+                                formGraphics.DrawString(text, fontCounter, BrushText, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2), ypos, sizeString.Width, maximumHeight), new StringFormat());
+                            }
+                            BrushText.Dispose();
+                            BrushTextShadow.Dispose();
+                        }
+                    }
+
+
+                    graphPosition += Options.HistorySize + 10;
+                    if (VerticalTaskbarMode && graphPosition >= this.Size.Width)
+                    {
+                        graphPosition = 0;
+                        graphPositionY += (maximumHeight + 10);
+                    }
+
                 }
             }
             AdjustControlSize();
@@ -473,11 +510,11 @@ namespace TaskbarMonitor
         {
             var pos = maxH - ((info.CurrentValue * maxH) / info.MaximumValue);
             if (pos > Int32.MaxValue) pos = Int32.MaxValue;
-            int posInt = Convert.ToInt32(pos) + y;
+            int posInt = Convert.ToInt32(Math.Round(pos)) + y;
 
             var height = (info.CurrentValue * maxH) / info.MaximumValue;
             if (height > Int32.MaxValue) height = Int32.MaxValue;
-            int heightInt = Convert.ToInt32(height);
+            int heightInt = Convert.ToInt32(Math.Round(height));
 
             using (SolidBrush BrushBar = new SolidBrush(theme.BarColor))
             {
@@ -495,7 +532,7 @@ namespace TaskbarMonitor
             {
                 var heightItem = (item * maxH) / info.MaximumValue;
                 if (heightItem > Int32.MaxValue) height = Int32.MaxValue;
-                var convertido = Convert.ToInt32(heightItem);
+                var convertido = Convert.ToInt32(Math.Round(heightItem));
 
 
                 if (invertido)
@@ -553,11 +590,11 @@ namespace TaskbarMonitor
                 float currentValue = info.Count > 0 ? info.Last() : 0;
                 var pos = maxH - ((currentValue * maxH) / absMax);
                 if (pos > Int32.MaxValue) pos = Int32.MaxValue;
-                int posInt = Convert.ToInt32(pos) + y;
+                int posInt = Convert.ToInt32(Math.Round(pos)) + y;
 
                 var height = (currentValue * maxH) / absMax;
                 if (height > Int32.MaxValue) height = Int32.MaxValue;
-                int heightInt = Convert.ToInt32(height);
+                int heightInt = Convert.ToInt32(Math.Round(height));
 
                 SolidBrush BrushBar = new SolidBrush(theme.BarColor);
                 formGraphics.FillRectangle(BrushBar, new Rectangle(x + Options.HistorySize, posInt, 4, heightInt));
@@ -570,7 +607,7 @@ namespace TaskbarMonitor
                 {
                     var heightItem = (item * maxH) / absMax;
                     if (heightItem > Int32.MaxValue) heightItem = Int32.MaxValue;
-                    var convertido = Convert.ToInt32(heightItem);
+                    var convertido = Convert.ToInt32(Math.Round(heightItem));
 
                     points[i] = new Point(initialGraphPosition + i, maxH - convertido + y);
                     i++;
@@ -609,6 +646,10 @@ namespace TaskbarMonitor
             mouseOver = false;
             this.Invalidate();
         }
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+        }
 
         private void OpenSettings(int activeIndex = 0)
         {
@@ -642,7 +683,15 @@ namespace TaskbarMonitor
             base.OnParentBackColorChanged(e);
         }
 
-
+        private void SystemWatcherControl_DoubleClick(object sender, EventArgs e)
+        {
+            SHOW_DEBUG = !SHOW_DEBUG;
+            this.Invalidate();
+        }
+        protected override void OnNotifyMessage(Message m)
+        {
+            base.OnNotifyMessage(m);
+        }
     }
 
 

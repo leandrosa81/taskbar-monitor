@@ -1,0 +1,19 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+SHOW_PERSON_OUTLINE()
+LAYOUT_LANDSCAPE()
+title System Context Diagram for taskbar-monitor (taskbar-monitor)
+Person(user, "User", "")
+System(taskbarmonitor, "taskbar-monitor", "taskbar-monitor software", $link="taskbar-monitor-CONTAINER_taskbarmonitor.html")
+Enterprise_Boundary(rnd1374,"Microsoft") {
+System(windows10, "Windows 10", "", $link="taskbar-monitor-CONTAINER_windows10.html")
+System(windows11, "Windows 11", "", $link="taskbar-monitor-CONTAINER_windows11.html")
+}
+Rel(user, taskbarmonitor, "opera")
+Rel(taskbarmonitor, windows10, "hosts itself as a deskband on taskbar")
+Rel(taskbarmonitor, windows11, "inject the taskbar-control on the taskbar window.")
+
+@enduml

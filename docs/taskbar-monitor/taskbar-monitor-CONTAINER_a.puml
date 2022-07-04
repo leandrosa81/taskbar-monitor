@@ -1,0 +1,12 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+SHOW_PERSON_OUTLINE()
+LAYOUT_LANDSCAPE()
+title Container Diagram for taskbar-monitor (external)
+System_Boundary(a,"external", $link="taskbar-monitor-CONTAINER_a.html") {
+Container(acontainer, "a external container", ".net", "Original taskbar-monitor for Windows 10", $link="taskbar-monitor-COMPONENT_acontainer.html")
+}
+
+@enduml

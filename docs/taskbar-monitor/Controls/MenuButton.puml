@@ -1,0 +1,9 @@
+@startuml
+class MenuButton {
+    + Menu : ContextMenuStrip <<get>> <<set>>
+    + ShowMenuUnderCursor : bool <<get>> <<set>>
+    # <<override>> OnMouseDown(mevent:MouseEventArgs) : void
+    # <<override>> OnPaint(pevent:PaintEventArgs) : void
+}
+Button <|-- MenuButton
+@enduml

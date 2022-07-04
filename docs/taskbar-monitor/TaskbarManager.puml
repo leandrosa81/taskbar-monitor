@@ -1,0 +1,20 @@
+@startuml
+class TaskbarManager {
+    - TargetWnd : List<IntPtr>
+    g_hook : IntPtr
+    + OnTopControls : List<SystemWatcherControl>
+    - _mainControl : SystemWatcherControl = null
+    + MainControl : SystemWatcherControl <<get>>
+    + UpdatePositions() : void
+    + AddControlsWin11() : bool
+    + AddControlsExtraMonitors() : bool
+    - HookEvents() : void
+    + RemoveControls() : void
+    - InitializeWinEventToHandlerMap() : Dictionary<AccessibleEvents, BLL.Win32Api.WinEventProc>
+    - DestroyCallback(winEventHookHandle:IntPtr, accEvent:AccessibleEvents, windowHandle:IntPtr, objectId:int, childId:int, eventThreadId:uint, eventTimeInMilliseconds:uint) : void
+    - ObjectInvokedCallback(winEventHookHandle:IntPtr, accEvent:AccessibleEvents, windowHandle:IntPtr, objectId:int, childId:int, eventThreadId:uint, eventTimeInMilliseconds:uint) : void
+    - SystemCaptureStartCallback(winEventHookHandle:IntPtr, accEvent:AccessibleEvents, windowHandle:IntPtr, objectId:int, childId:int, eventThreadId:uint, eventTimeInMilliseconds:uint) : void
+    - SystemCaptureEndCallback(winEventHookHandle:IntPtr, accEvent:AccessibleEvents, windowHandle:IntPtr, objectId:int, childId:int, eventThreadId:uint, eventTimeInMilliseconds:uint) : void
+    - DestroyHelper(state:object) : void
+}
+@enduml

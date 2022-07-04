@@ -43,8 +43,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.Black;
             this.Name = "SystemWatcherControl";
-            this.Size = new System.Drawing.Size(200, 30);
+            this.Size = new System.Drawing.Size(240, 30);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.SystemWatcherControl_Paint);
+            this.DoubleClick += new System.EventHandler(this.SystemWatcherControl_DoubleClick);
             this.MouseEnter += new System.EventHandler(this.SystemWatcherControl_MouseEnter);
             this.MouseLeave += new System.EventHandler(this.SystemWatcherControl_MouseLeave);
             this.ResumeLayout(false);

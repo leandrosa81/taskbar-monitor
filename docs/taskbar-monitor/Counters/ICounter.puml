@@ -1,0 +1,26 @@
+@startuml
+class CounterInfo {
+    + Name : string <<get>> <<set>>
+    + MaximumValue : float <<get>> <<set>>
+    + CurrentValue : float <<get>> <<set>>
+    + CurrentStringValue : string <<get>> <<set>>
+    + History : List<float> <<get>> <<set>>
+}
+abstract class ICounter {
+    + Options : Options <<get>>
+    + InfoSummary : CounterInfo <<get>> <<protected set>>
+    + Infos : List<CounterInfo> <<get>> <<protected set>>
+    + ThreadLock : object <<get>> <<protected set>>
+    + ICounter(options:Options)
+    + {abstract} GetName() : string
+    + {abstract} Initialize() : void
+    + {abstract} Update() : void
+    + {abstract} GetCounterType() : CounterType
+}
+enum CounterType {
+    SINGLE,
+    STACKED,
+    MIRRORED,
+}
+ICounter +-- CounterType
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+class Program {
+    {static} UninstallGuid : Guid
+    {static} Main(args:string[]) : void
+    {static} Install(info:InstallInfo) : void
+    {static} RegisterDLL(target:string, bit64:bool, unregister:bool) : bool
+    {static} RollBack(info:InstallInfo) : bool
+    {static} RunProgram(path:string, args:string) : string
+    {static} - DeleteUninstaller() : void
+    {static} - CreateUninstaller(pathToUninstaller:string) : void
+    {static} CleanUpPendingDeleteOperations(basepath:string, errorMessage:string) : bool
+}
+class InstallInfo {
+    + FilesToCopy : Dictionary<string, byte[]> <<get>> <<set>>
+    + FilesToRegister : List<string> <<get>> <<set>>
+    + TargetPath : string <<get>> <<set>>
+}
+Program +-- InstallInfo
+@enduml

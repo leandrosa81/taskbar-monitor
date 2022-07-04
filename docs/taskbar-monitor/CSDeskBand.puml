@@ -1,0 +1,612 @@
+@startuml
+class CSDeskBandImpl <<sealed>> {
+    - <<readonly>> _provider : IDeskBandProvider
+    - <<readonly>> _contextMenuActions : Dictionary<uint, DeskBandMenuAction>
+    - _parentWindowHandle : IntPtr
+    - _parentSite : object
+    - _id : uint
+    - _menutStartId : uint = 0
+    - _deskbandCommandGroupId : Guid
+    + CSDeskBandImpl(provider:IDeskBandProvider)
+    <<internal>>  <<event>> Closed : EventHandler 
+    <<internal>> Options : CSDeskBandOptions <<get>>
+    <<internal>> TaskbarInfo : TaskbarInfo <<get>>
+    + GetWindow(phwnd:IntPtr) : int
+    + ContextSensitiveHelp(fEnterMode:bool) : int
+    + ShowDW(fShow:bool) : int
+    + CloseDW(dwReserved:uint) : int
+    + ResizeBorderDW(prcBorder:RECT, punkToolbarSite:IntPtr, fReserved:bool) : int
+    + GetBandInfo(dwBandID:uint, dwViewMode:DESKBANDINFO.DBIF, pdbi:DESKBANDINFO) : int
+    + CanRenderComposited(pfCanRenderComposited:bool) : int
+    + SetCompositionState(fCompositionEnabled:bool) : int
+    + GetCompositionState(pfCompositionEnabled:bool) : int
+    + SetSite(pUnkSite:object) : int
+    + GetSite(riid:Guid, ppvSite:IntPtr) : int
+    + QueryContextMenu(hMenu:IntPtr, indexMenu:uint, idCmdFirst:uint, idCmdLast:uint, uFlags:QueryContextMenuFlags) : int
+    + InvokeCommand(pici:IntPtr) : int
+    + GetCommandString(idcmd:uint, uflags:uint, pwReserved:uint, pcszName:string, cchMax:uint) : int
+    + HandleMenuMsg(uMsg:uint, wParam:IntPtr, lParam:IntPtr) : int
+    + HandleMenuMsg2(uMsg:uint, wParam:IntPtr, lParam:IntPtr, plResult:IntPtr) : int
+    + GetClassID(pClassID:Guid) : int
+    + GetSizeMax(pcbSize:ulong) : int
+    + IsDirty() : int
+    + Load(pStm:object) : int
+    + Save(pStm:IntPtr, fClearDirty:bool) : int
+    + CloseDeskBand() : void
+    + UIActivateIO(fActivate:int, msg:MSG) : int
+    + HasFocusIO() : int
+    + TranslateAcceleratorIO(msg:MSG) : int
+    + UpdateFocus(focused:bool) : void
+    - Options_PropertyChanged(sender:object, e:System.ComponentModel.PropertyChangedEventArgs) : void
+}
+class CSDeskBandOptions <<sealed>> {
+    + {static} <<readonly>> TaskbarHorizontalHeightLarge : int = 40
+    + {static} <<readonly>> TaskbarHorizontalHeightSmall : int = 30
+    + {static} <<readonly>> TaskbarVerticalWidth : int = 62
+    + {static} <<readonly>> NoLimit : int
+    - _horizontalSize : DeskBandSize
+    - _maxHorizontalHeight : int
+    - _minHorizontalSize : DeskBandSize
+    - _verticalSize : DeskBandSize
+    - _maxVerticalWidth : int
+    - _minVerticalSize : DeskBandSize
+    - _title : string = ""
+    - _showTitle : bool = false
+    - _isFixed : bool = false
+    - _heightIncrement : int = 1
+    - _heightCanChange : bool = true
+    - _contextMenuItems : ICollection<DeskBandMenuItem>
+    + CSDeskBandOptions()
+    +  <<event>> PropertyChanged : PropertyChangedEventHandler 
+    + HeightCanChange : bool <<get>> <<set>>
+    + HeightIncrement : int <<get>> <<set>>
+    + IsFixed : bool <<get>> <<set>>
+    + ShowTitle : bool <<get>> <<set>>
+    + Title : string <<get>> <<set>>
+    + MinVerticalSize : DeskBandSize <<get>> <<set>>
+    + MaxVerticalWidth : int <<get>> <<set>>
+    + VerticalSize : DeskBandSize <<get>> <<set>>
+    + MinHorizontalSize : DeskBandSize <<get>> <<set>>
+    + MaxHorizontalHeight : int <<get>> <<set>>
+    + HorizontalSize : DeskBandSize <<get>> <<set>>
+    + ContextMenuItems : ICollection<DeskBandMenuItem> <<get>> <<set>>
+    - OnPropertyChanged(propertyName:string) : void
+}
+class CSDeskBandRegistrationAttribute <<sealed>> {
+    + Name : string <<get>> <<set>>
+    + ShowDeskBand : bool <<get>> <<set>>
+}
+class DeskBandSize <<sealed>> {
+    - _width : int
+    - _height : int
+    + DeskBandSize(width:int, height:int)
+    +  <<event>> PropertyChanged : PropertyChangedEventHandler 
+    + Width : int <<get>> <<set>>
+    + Height : int <<get>> <<set>>
+    - OnPropertyChanged(propertyName:string) : void
+}
+interface ICSDeskBand {
+}
+interface IDeskBandProvider {
+    Handle : IntPtr <<get>>
+    Options : CSDeskBandOptions <<get>>
+    Guid : Guid <<get>>
+    HasFocus : bool <<get>> <<set>>
+}
+class RegistrationHelper <<static>> {
+    + {static} Register(t:Type) : void
+    + {static} Unregister(t:Type) : void
+    <<internal>> {static} GetToolbarName(t:Type) : string
+    <<internal>> {static} GetToolbarRequestToShow(t:Type) : bool
+}
+enum TaskbarOrientation {
+    Vertical,
+    Horizontal,
+}
+enum Edge {
+    Left,
+    Top,
+    Right,
+    Bottom,
+}
+class TaskbarInfo <<sealed>> {
+    - _orientation : TaskbarOrientation
+    - _edge : Edge
+    - _size : DeskBandSize
+    <<internal>> TaskbarInfo()
+    +  <<event>> TaskbarOrientationChanged : EventHandler<TaskbarOrientationChangedEventArgs> 
+    +  <<event>> TaskbarEdgeChanged : EventHandler<TaskbarEdgeChangedEventArgs> 
+    +  <<event>> TaskbarSizeChanged : EventHandler<TaskbarSizeChangedEventArgs> 
+    + Orientation : TaskbarOrientation <<get>>
+    + Edge : Edge <<get>>
+    + Size : DeskBandSize <<get>>
+    <<internal>> UpdateInfo() : void
+}
+class TaskbarOrientationChangedEventArgs <<sealed>> {
+    + TaskbarOrientationChangedEventArgs(orientation:TaskbarOrientation)
+    + Orientation : TaskbarOrientation <<get>>
+}
+class TaskbarSizeChangedEventArgs <<sealed>> {
+    + TaskbarSizeChangedEventArgs(size:DeskBandSize)
+    + Size : DeskBandSize <<get>>
+}
+class TaskbarEdgeChangedEventArgs <<sealed>> {
+    + TaskbarEdgeChangedEventArgs(edge:Edge)
+    + Edge : Edge <<get>>
+}
+interface IBandSite {
+    AddBand(punk:object) : int
+    EnumBands(uBand:int, pdwBandID:uint) : int
+    QueryBand(dwBandID:uint, ppstb:IDeskBand, pdwState:BANDSITEINFO.BSSF, pszName:string, cchName:int) : int
+    SetBandState(dwBandID:uint, dwMask:BANDSITEINFO.BSIM, dwState:BANDSITEINFO.BSSF) : int
+    RemoveBand(dwBandID:uint) : int
+    GetBandObject(dwBandID:uint, riid:Guid, ppv:IntPtr) : int
+    SetBandSiteInfo(pbsinfo:BANDSITEINFO) : int
+    GetBandSiteInfo(pbsinfo:BANDSITEINFO) : int
+}
+interface IDockingWindow {
+    <<new>> GetWindow(phwnd:IntPtr) : int
+    <<new>> ContextSensitiveHelp(fEnterMode:bool) : int
+    ShowDW(fShow:bool) : int
+    CloseDW(dwReserved:uint) : int
+    ResizeBorderDW(prcBorder:RECT, punkToolbarSite:IntPtr, fReserved:bool) : int
+}
+interface IDeskBand {
+    <<new>> GetWindow(phwnd:IntPtr) : int
+    <<new>> ContextSensitiveHelp(fEnterMode:bool) : int
+    <<new>> ShowDW(fShow:bool) : int
+    <<new>> CloseDW(dwReserved:uint) : int
+    <<new>> ResizeBorderDW(prcBorder:RECT, punkToolbarSite:IntPtr, fReserved:bool) : int
+    GetBandInfo(dwBandID:uint, dwViewMode:DESKBANDINFO.DBIF, pdbi:DESKBANDINFO) : int
+}
+interface IDeskBand2 {
+    <<new>> GetWindow(phwnd:IntPtr) : int
+    <<new>> ContextSensitiveHelp(fEnterMode:bool) : int
+    <<new>> ShowDW(fShow:bool) : int
+    <<new>> CloseDW(dwReserved:uint) : int
+    <<new>> ResizeBorderDW(prcBorder:RECT, punkToolbarSite:IntPtr, fReserved:bool) : int
+    <<new>> GetBandInfo(dwBandID:uint, dwViewMode:DESKBANDINFO.DBIF, pdbi:DESKBANDINFO) : int
+    CanRenderComposited(pfCanRenderComposited:bool) : int
+    SetCompositionState(fCompositionEnabled:bool) : int
+    GetCompositionState(pfCompositionEnabled:bool) : int
+}
+interface IContextMenu {
+    QueryContextMenu(hMenu:IntPtr, indexMenu:uint, idCmdFirst:uint, idCmdLast:uint, uFlags:QueryContextMenuFlags) : int
+    InvokeCommand(pici:IntPtr) : int
+    GetCommandString(idcmd:uint, uflags:uint, pwReserved:uint, pcszName:string, cchMax:uint) : int
+}
+interface IContextMenu2 {
+    <<new>> QueryContextMenu(hMenu:IntPtr, indexMenu:uint, idCmdFirst:uint, idCmdLast:uint, uFlags:QueryContextMenuFlags) : int
+    <<new>> InvokeCommand(pici:IntPtr) : int
+    <<new>> GetCommandString(idcmd:uint, uflags:uint, pwReserved:uint, pcszName:string, cchMax:uint) : int
+    HandleMenuMsg(uMsg:uint, wParam:IntPtr, lParam:IntPtr) : int
+}
+interface IContextMenu3 {
+    <<new>> QueryContextMenu(hMenu:IntPtr, indexMenu:uint, idCmdFirst:uint, idCmdLast:uint, uFlags:QueryContextMenuFlags) : int
+    <<new>> InvokeCommand(pici:IntPtr) : int
+    <<new>> GetCommandString(idcmd:uint, uflags:uint, pwReserved:uint, pcszName:string, cchMax:uint) : int
+    <<new>> HandleMenuMsg(uMsg:uint, wParam:IntPtr, lParam:IntPtr) : int
+    HandleMenuMsg2(uMsg:uint, wParam:IntPtr, lParam:IntPtr, plResult:IntPtr) : int
+}
+interface IInputObject {
+    UIActivateIO(fActivate:int, msg:MSG) : int
+    HasFocusIO() : int
+    TranslateAcceleratorIO(msg:MSG) : int
+}
+interface IInputObjectSite {
+    OnFocusChangeIS(punkObj:object, fSetFocus:Int32) : int
+}
+interface IObjectWithSite {
+    SetSite(pUnkSite:object) : int
+    GetSite(riid:Guid, ppvSite:IntPtr) : int
+}
+interface IOleCommandTarget {
+    QueryStatus(pguidCmdGroup:Guid, cCmds:uint, prgCmds:OLECMD[], pCmdText:OLECMDTEXT) : void
+    Exec(pguidCmdGroup:Guid, nCmdID:uint, nCmdExecOpt:uint, pvaIn:IntPtr, pvaOut:IntPtr) : int
+}
+interface IOleWindow {
+    GetWindow(phwnd:IntPtr) : int
+    ContextSensitiveHelp(fEnterMode:bool) : int
+}
+interface IPersist {
+    GetClassID(pClassID:Guid) : int
+}
+interface IPersistStream {
+    <<new>> GetClassID(pClassID:Guid) : int
+    GetSizeMax(pcbSize:ulong) : int
+    IsDirty() : int
+    Load(pStm:object) : int
+    Save(pStm:IntPtr, fClearDirty:bool) : int
+}
+interface ITrayDeskband {
+    ShowDeskBand(clsid:Guid) : int
+    HideDeskBand(clsid:Guid) : int
+    IsDeskBandShown(clsid:Guid) : int
+    DeskBandRegistrationChanged() : int
+}
+class User32 {
+    + {static} <<extern>> SetParent(hWndChild:IntPtr, hWndNewParent:IntPtr) : int
+    + {static} <<extern>> InsertMenuItem(hMenu:IntPtr, uItem:uint, fByPosition:bool, lpmii:MENUITEMINFO) : bool
+    + {static} <<extern>> CreateMenu() : IntPtr
+    + {static} <<extern>> DestroyMenu(hMenu:IntPtr) : bool
+    + {static} <<extern>> CreatePopupMenu() : IntPtr
+    + {static} <<extern>> TranslateMessage(lpMsg:MSG) : bool
+    + {static} <<extern>> DispatchMessage(lpmsg:MSG) : IntPtr
+    + {static} HiWord(val:int) : int
+    + {static} LoWord(val:int) : int
+}
+class Shell32 {
+    + {static} <<extern>> SHAppBarMessage(dwMessage:APPBARMESSAGE, pData:APPBARDATA) : IntPtr
+}
+enum tagDESKBANDCID {
+    DBID_BANDINFOCHANGED= 0,
+    DBID_SHOWONLY= 1,
+    DBID_MAXIMIZEBAND= 2,
+    DBID_PUSHCHEVRON= 3,
+}
+class RECT <<struct>> {
+    + left : int
+    + top : int
+    + right : int
+    + bottom : int
+    + RECT(left:int, top:int, right:int, bottom:int)
+}
+enum QueryContextMenuFlags {
+    CMF_NORMAL= 0x00000000,
+    CMF_DEFAULTONLY= 0x00000001,
+    CMF_VERBSONLY= 0x00000002,
+    CMF_EXPLORE= 0x00000004,
+    CMF_NOVERBS= 0x00000008,
+    CMF_CANRENAME= 0x00000010,
+    CMF_NODEFAULT= 0x00000020,
+    CMF_ITEMMENU= 0x00000080,
+    CMF_EXTENDEDVERBS= 0x00000100,
+    CMF_DISABLEDVERBS= 0x00000200,
+    CMF_ASYNCVERBSTATE= 0x00000400,
+    CMF_OPTIMIZEFORINVOKE= 0x00000800,
+    CMF_SYNCCASCADEMENU= 0x00001000,
+    CMF_DONOTPICKDEFAULT= 0x00002000,
+    CMF_RESERVED= 0xffff0000,
+}
+class POINT <<struct>> {
+    + X : int
+    + Y : int
+}
+class OLECMDTEXT <<struct>> {
+    + cmdtextf : uint
+    + cwActual : uint
+    + cwBuf : uint
+    + rgwz : string
+}
+class OLECMD <<struct>> {
+    + cmdID : uint
+    + cmdf : uint
+}
+class MSG <<struct>> {
+    + hwnd : IntPtr
+    + message : uint
+    + wParam : uint
+    + lParam : int
+    + time : uint
+    + pt : POINT
+}
+class MENUITEMINFO <<struct>> {
+    + cbSize : int
+    + fMask : MIIM
+    + fType : MFT
+    + fState : MFS
+    + wID : uint
+    + hSubMenu : IntPtr
+    + hbmpChecked : IntPtr
+    + hbmpUnchecked : IntPtr
+    + dwItemData : IntPtr
+    + dwTypeData : string
+    + cch : uint
+    + hbmpItem : IntPtr
+}
+class HRESULT {
+    + {static} <<readonly>> S_OK : int = 0
+    + {static} <<readonly>> S_FALSE : int = 1
+    + {static} <<readonly>> E_NOTIMPL : int
+    + {static} <<readonly>> E_FAIL : int
+    + {static} MakeHResult(sev:uint, facility:uint, errorNo:uint) : int
+}
+class DESKBANDINFO <<struct>> {
+    + dwMask : DBIM
+    + ptMinSize : POINT
+    + ptMaxSize : POINT
+    + ptIntegral : POINT
+    + ptActual : POINT
+    + wszTitle : String
+    + dwModeFlags : DBIMF
+    + crBkgnd : COLORREF
+}
+class COLORREF <<struct>> {
+    + R : byte
+    + G : byte
+    + B : byte
+}
+class CMINVOKECOMMANDINFOEX <<struct>> {
+    + cbSize : uint
+    + fMask : CMIC
+    + hwnd : IntPtr
+    + lpVerb : IntPtr
+    + lpParameters : string
+    + lpDirectory : string
+    + nShow : int
+    + dwHotKey : uint
+    + hIcon : IntPtr
+    + lpTitle : string
+    + lpVerbW : IntPtr
+    + lpParametersW : string
+    + lpDirectoryW : string
+    + lpTitleW : string
+    + ptInvoke : POINT
+}
+class CMINVOKECOMMANDINFO {
+    + cbSize : int
+    + fMask : CMIC
+    + hwnd : IntPtr
+    + lpVerb : IntPtr
+    + lpParameters : string
+    + lpDirectory : string
+    + nShow : int
+    + dwHotKey : int
+    + hIcon : IntPtr
+}
+class CATEGORYINFO {
+    + catid : Guid
+    + lcidl : uint
+    + szDescription : string
+}
+class BANDSITEINFO <<struct>> {
+    + dwMask : BSIM
+    + dwState : BSSF
+    + dwStyle : BSIS
+}
+enum APPBARMESSAGE {
+    ABM_NEW= 0x00000000,
+    ABM_REMOVE= 0x00000001,
+    ABM_QUERYPOS= 0x00000002,
+    ABM_SETPOS= 0x00000003,
+    ABM_GETSTATE= 0x00000004,
+    ABM_GETTASKBARPOS= 0x00000005,
+    ABM_ACTIVATE= 0x00000006,
+    ABM_GETAUTOHIDEBAR= 0x00000007,
+    ABM_SETAUTOHIDEBAR= 0x00000008,
+    ABM_WINDOWPOSCHANGED= 0x00000009,
+    ABM_SETSTATE= 0x0000000A,
+    ABM_GETAUTOHIDEBAREX= 0x0000000B,
+    ABM_SETAUTOHIDEBAREX= 0x0000000C,
+}
+class APPBARDATA <<struct>> {
+    + cbSize : int
+    + hWnd : IntPtr
+    + uCallbackMessage : uint
+    + uEdge : uint
+    + rc : RECT
+    + lParam : int
+}
+class ComponentCategoryManager {
+    + {static} <<readonly>> CATID_DESKBAND : Guid
+    - {static} <<readonly>> _componentCategoryManager : Guid
+    - {static} <<readonly>> _catRegister : ICatRegister
+    - _classId : Guid
+    {static} ComponentCategoryManager()
+    - ComponentCategoryManager(classId:Guid)
+    + {static} For(classId:Guid) : ComponentCategoryManager
+    + RegisterCategories(categoryIds:Guid[]) : void
+    + UnRegisterCategories(categoryIds:Guid[]) : void
+}
+interface ICatRegister {
+    RegisterCategories(cCategories:uint, rgCategoryInfo:CATEGORYINFO[]) : void
+    RegisterClassImplCategories(rclsid:Guid, cCategories:uint, rgcatid:Guid[]) : void
+    RegisterClassReqCategories(rclsid:Guid, cCategories:uint, rgcatid:Guid[]) : void
+    UnRegisterCategories(cCategories:uint, rgcatid:Guid[]) : void
+    UnRegisterClassImplCategories(rclsid:Guid, cCategories:uint, rgcatid:Guid[]) : void
+    UnRegisterClassReqCategories(rclsid:Guid, cCategories:uint, rgcatid:Guid[]) : void
+}
+enum WindowStyles {
+    WS_BORDER= 0x800000,
+    WS_CAPTION= 0xc00000,
+    WS_CHILD= 0x40000000,
+    WS_CLIPCHILDREN= 0x2000000,
+    WS_CLIPSIBLINGS= 0x4000000,
+    WS_DISABLED= 0x8000000,
+    WS_DLGFRAME= 0x400000,
+    WS_GROUP= 0x20000,
+    WS_HSCROLL= 0x100000,
+    WS_MAXIMIZE= 0x1000000,
+    WS_MAXIMIZEBOX= 0x10000,
+    WS_MINIMIZE= 0x20000000,
+    WS_MINIMIZEBOX= 0x20000,
+    WS_OVERLAPPED= 0x0,
+    WS_OVERLAPPEDWINDOW= WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_SIZEFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX,
+    WS_POPUP= 0x80000000u,
+    WS_POPUPWINDOW= WS_POPUP | WS_BORDER | WS_SYSMENU,
+    WS_SIZEFRAME= 0x40000,
+    WS_SYSMENU= 0x80000,
+    WS_TABSTOP= 0x10000,
+    WS_VISIBLE= 0x10000000,
+    WS_VSCROLL= 0x200000,
+}
+enum WindowMessages {
+    WM_NCHITTEST= 0x0084,
+}
+enum HitTestMessageResults {
+    HTCLIENT= 1,
+    HTTRANSPARENT= -1,
+}
+abstract class DeskBandMenuItem {
+    <<internal>> {abstract} AddToMenu(menu:IntPtr, itemPosition:uint, itemId:uint, callbacks:Dictionary<uint, DeskBandMenuAction>) : void
+}
+class DeskBandMenuSeparator <<sealed>> {
+    - _menuiteminfo : MENUITEMINFO
+    <<internal>> <<override>> AddToMenu(menu:IntPtr, itemPosition:uint, itemId:uint, callbacks:Dictionary<uint, DeskBandMenuAction>) : void
+}
+class DeskBandMenuAction <<sealed>> {
+    - _menuiteminfo : MENUITEMINFO
+    + DeskBandMenuAction(text:string)
+    +  <<event>> Clicked : EventHandler 
+    + Checked : bool <<get>> <<set>> = false
+    + Enabled : bool <<get>> <<set>> = true
+    + Text : string <<get>> <<set>>
+    <<internal>> DoAction() : void
+    <<internal>> <<override>> AddToMenu(menu:IntPtr, itemPosition:uint, itemId:uint, callbacks:Dictionary<uint, DeskBandMenuAction>) : void
+}
+class DeskBandMenu <<sealed>> {
+    - _menu : IntPtr
+    - _menuiteminfo : MENUITEMINFO
+    + DeskBandMenu(text:string)
+    + DeskBandMenu(text:string, items:IEnumerable<DeskBandMenuItem>)
+    + Items : ICollection<DeskBandMenuItem> <<get>>
+    + Enabled : bool <<get>> <<set>> = true
+    + Text : string <<get>> <<set>>
+    <<internal>> <<override>> AddToMenu(menu:IntPtr, itemPosition:uint, itemId:uint, callbacks:Dictionary<uint, DeskBandMenuAction>) : void
+    - ClearMenu() : void
+}
+enum MIIM {
+    MIIM_BITMAP= 0x00000080,
+    MIIM_CHECKMARKS= 0x00000008,
+    MIIM_DATA= 0x00000020,
+    MIIM_FTYPE= 0x00000100,
+    MIIM_ID= 0x00000002,
+    MIIM_STATE= 0x00000001,
+    MIIM_STRING= 0x00000040,
+    MIIM_SUBMENU= 0x00000004,
+    MIIM_TYPE= 0x00000010,
+}
+enum MFT {
+    MFT_BITMAP= 0x00000004,
+    MFT_MENUBARBREAK= 0x00000020,
+    MFT_MENUBREAK= 0x00000040,
+    MFT_OWNERDRAW= 0x00000100,
+    MFT_RADIOCHECK= 0x00000200,
+    MFT_RIGHTJUSTIFY= 0x00004000,
+    MFT_RIGHTORDER= 0x00002000,
+    MFT_SEPARATOR= 0x00000800,
+    MFT_STRING= 0x00000000,
+}
+enum MFS {
+    MFS_CHECKED= 0x00000008,
+    MFS_DEFAULT= 0x00001000,
+    MFS_DISABLED= 0x00000003,
+    MFS_ENABLED= 0x00000000,
+    MFS_GRAYED= 0x00000003,
+    MFS_HILITE= 0x00000080,
+    MFS_UNCHECKED= 0x00000000,
+    MFS_UNHILITE= 0x00000000,
+}
+enum DBIF {
+    DBIF_VIEWMODE_NORMAL= 0x0000,
+    DBIF_VIEWMODE_VERTICAL= 0x0001,
+    DBIF_VIEWMODE_FLOATING= 0x0002,
+    DBIF_VIEWMODE_TRANSPARENT= 0x0004,
+}
+enum DBIM {
+    DBIM_MINSIZE= 0x0001,
+    DBIM_MAXSIZE= 0x0002,
+    DBIM_INTEGRAL= 0x0004,
+    DBIM_ACTUAL= 0x0008,
+    DBIM_TITLE= 0x0010,
+    DBIM_MODEFLAGS= 0x0020,
+    DBIM_BKCOLOR= 0x0040,
+}
+enum DBIMF {
+    DBIMF_NORMAL= 0x0000,
+    DBIMF_FIXED= 0x0001,
+    DBIMF_FIXEDBMP= 0x0004,
+    DBIMF_VARIABLEHEIGHT= 0x0008,
+    DBIMF_UNDELETEABLE= 0x0010,
+    DBIMF_DEBOSSED= 0x0020,
+    DBIMF_BKCOLOR= 0x0040,
+    DBIMF_USECHEVRON= 0x0080,
+    DBIMF_BREAK= 0x0100,
+    DBIMF_ADDTOFRONT= 0x0200,
+    DBIMF_TOPALIGN= 0x0400,
+    DBIMF_NOGRIPPER= 0x0800,
+    DBIMF_ALWAYSGRIPPER= 0x1000,
+    DBIMF_NOMARGINS= 0x2000,
+}
+enum CMIC {
+    CMIC_MASK_HOTKEY= 0x00000020,
+    CMIC_MASK_ICON= 0x00000010,
+    CMIC_MASK_FLAG_NO_UI= 0x00000400,
+    CMIC_MASK_UNICODE= 0x00004000,
+    CMIC_MASK_NO_CONSOLE= 0x00008000,
+    CMIC_MASK_ASYNCOK= 0x00100000,
+    CMIC_MASK_NOASYNC= 0x00000100,
+    CMIC_MASK_SHIFT_DOWN= 0x10000000,
+    CMIC_MASK_PTINVOKE= 0x20000000,
+    CMIC_MASK_CONTROL_DOWN= 0x40000000,
+    CMIC_MASK_FLAG_LOG_USAGE= 0x04000000,
+    CMIC_MASK_NOZONECHECKS= 0x00800000,
+}
+enum CMIC {
+    CMIC_MASK_HOTKEY= 0x00000020,
+    CMIC_MASK_ICON= 0x00000010,
+    CMIC_MASK_FLAG_NO_UI= 0x00000400,
+    CMIC_MASK_NO_CONSOLE= 0x00008000,
+    CMIC_MASK_ASYNCOK= 0x00100000,
+    CMIC_MASK_NOASYNC= 0x00000100,
+    CMIC_MASK_SHIFT_DOWN= 0x10000000,
+    CMIC_MASK_CONTROL_DOWN= 0x40000000,
+    CMIC_MASK_FLAG_LOG_USAGE= 0x04000000,
+    CMIC_MASK_NOZONECHECKS= 0x00800000,
+}
+enum BSIM {
+    BSIM_STATE= 0x00000001,
+    BSIM_STYLE= 0x00000002,
+}
+enum BSSF {
+    BSSF_VISIBLE= 0x00000001,
+    BSSF_NOTITLE= 0x00000002,
+    BSSF_UNDELETEABLE= 0x00001000,
+}
+enum BSIS {
+    BSIS_AUTOGRIPPER= 0x00000000,
+    BSIS_NOGRIPPER= 0x00000001,
+    BSIS_ALWAYSGRIPPER= 0x00000002,
+    BSIS_LEFTALIGN= 0x00000004,
+    BSIS_SINGLECLICK= 0x00000008,
+    BSIS_NOCONTEXTMENU= 0x00000010,
+    BSIS_NODROPTARGET= 0x00000020,
+    BSIS_NOCAPTION= 0x00000040,
+    BSIS_PREFERNOLINEBREAK= 0x00000080,
+    BSIS_LOCKED= 0x00000100,
+    BSIS_PRESERVEORDERDURINGLAYOUT= 0x00000200,
+    BSIS_FIXEDORDER= 0x00000400,
+}
+ICSDeskBand <|-- CSDeskBandImpl
+INotifyPropertyChanged <|-- CSDeskBandOptions
+Attribute <|-- CSDeskBandRegistrationAttribute
+INotifyPropertyChanged <|-- DeskBandSize
+IDeskBand2 <|-- ICSDeskBand
+IObjectWithSite <|-- ICSDeskBand
+IContextMenu3 <|-- ICSDeskBand
+IPersistStream <|-- ICSDeskBand
+IInputObject <|-- ICSDeskBand
+EventArgs <|-- TaskbarOrientationChangedEventArgs
+EventArgs <|-- TaskbarSizeChangedEventArgs
+EventArgs <|-- TaskbarEdgeChangedEventArgs
+IOleWindow <|-- IDockingWindow
+IDockingWindow <|-- IDeskBand
+IDeskBand <|-- IDeskBand2
+IContextMenu <|-- IContextMenu2
+IContextMenu2 <|-- IContextMenu3
+IPersist <|-- IPersistStream
+DeskBandMenuItem <|-- DeskBandMenuSeparator
+DeskBandMenuItem <|-- DeskBandMenuAction
+DeskBandMenuItem <|-- DeskBandMenu
+MENUITEMINFO +-- MIIM
+MENUITEMINFO +-- MFT
+MENUITEMINFO +-- MFS
+DESKBANDINFO +-- DBIF
+DESKBANDINFO +-- DBIM
+DESKBANDINFO +-- DBIMF
+CMINVOKECOMMANDINFOEX +-- CMIC
+CMINVOKECOMMANDINFO +-- CMIC
+BANDSITEINFO +-- BSIM
+BANDSITEINFO +-- BSSF
+BANDSITEINFO +-- BSIS
+@enduml

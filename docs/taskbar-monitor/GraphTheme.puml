@@ -1,0 +1,27 @@
+@startuml
+class GraphTheme {
+    + {static} <<readonly>> LATESTTHEMEVERSION : int = 1
+    + ThemeVersion : int
+    + BarColor : Color <<get>> <<set>>
+    + TextColor : Color <<get>> <<set>>
+    + TextShadowColor : Color <<get>> <<set>>
+    + TitleColor : Color <<get>> <<set>>
+    + TitleShadowColor : Color <<get>> <<set>>
+    + TitleFont : string <<get>> <<set>> = "Arial"
+    + TitleFontStyle : System.Drawing.FontStyle <<get>> <<set>>
+    + TitleSize : float <<get>> <<set>> = 7f
+    + CurrentValueFont : string <<get>> <<set>> = "Arial"
+    + CurrentValueFontStyle : System.Drawing.FontStyle <<get>> <<set>>
+    + CurrentValueSize : float <<get>> <<set>> = 7f
+    + StackedColors : List<Color> <<get>> <<set>>
+    + getNthColor(total:int, n:int) : Color
+    + GetColorGradient(from:Color, to:Color, totalNumberOfColors:int) : IEnumerable<Color>
+    + CopyTo(theme:GraphTheme) : void
+    + {static} DefaultDarkTheme() : GraphTheme
+    + {static} DefaultLightTheme() : GraphTheme
+    + {static} ReadFromDisk() : GraphTheme
+    + SaveToDisk() : bool
+    - Upgrade() : bool
+    + {static} IsCustom(theme:GraphTheme) : bool
+}
+@enduml

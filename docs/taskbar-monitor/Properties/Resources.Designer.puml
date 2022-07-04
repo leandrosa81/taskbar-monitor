@@ -1,0 +1,10 @@
+@startuml
+class Resources {
+    - {static} resourceMan : global::System.Resources.ResourceManager
+    - {static} resourceCulture : global::System.Globalization.CultureInfo
+    <<internal>> Resources()
+    <<internal>> {static} ResourceManager : global::System.Resources.ResourceManager <<get>>
+    <<internal>> {static} Culture : global::System.Globalization.CultureInfo <<get>> <<set>>
+    <<internal>> {static} Version : string <<get>>
+}
+@enduml

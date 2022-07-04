@@ -1,0 +1,18 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+SHOW_PERSON_OUTLINE()
+LAYOUT_LANDSCAPE()
+title Container Diagram for taskbar-monitor (Windows 11)
+System_Boundary(taskbarmonitor,"taskbar-monitor", $link="taskbar-monitor-CONTAINER_taskbarmonitor.html") {
+Container_Ext(taskbarmonitorappforwin11, "taskbar-monitor app for win11", ".net", "New taskbar with Windows 11 support")
+}
+Enterprise_Boundary(rnd20131,"Microsoft") {
+System_Boundary(windows11,"Windows 11", $link="taskbar-monitor-CONTAINER_windows11.html") {
+Container_Ext(taskbar11, "New Windows Taskbar", "", "")
+}
+}
+Rel(taskbarmonitorappforwin11, taskbar11, "inject the taskbar-control on the taskbar window.")
+
+@enduml

@@ -11,6 +11,7 @@ namespace TaskbarMonitor
     public class Deskband : CSDeskBand.CSDeskBandWin
     {
         private static Control _control;
+        public Size Size { get { return Options.MinHorizontalSize; } }
 
         [DllImport("user32.dll")]
         private static extern bool SetProcessDPIAware();
@@ -23,12 +24,17 @@ namespace TaskbarMonitor
                     SetProcessDPIAware();
 
                 Application.EnableVisualStyles();
+                AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
                 Options opt = TaskbarMonitor.Options.ReadFromDisk();
-
-
-                var ctl = new SystemWatcherControl(opt, true);
-                Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, 30);
+                TaskbarInfo.TaskbarSizeChanged += TaskbarInfo_TaskbarSizeChanged;
+                TaskbarInfo.TaskbarEdgeChanged += TaskbarInfo_TaskbarEdgeChanged;
+                TaskbarInfo.TaskbarOrientationChanged += TaskbarInfo_TaskbarOrientationChanged;
+                
+                var ctl = new SystemWatcherControl(opt, true, false, this);
+                Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, CSDeskBand.CSDeskBandOptions.TaskbarHorizontalHeightSmall);
+                
                 ctl.OnChangeSize += Ctl_OnChangeSize;
+                //Options.HeightCanChange = false;                
                 _control = ctl;
             }
             catch (Exception ex)
@@ -37,11 +43,32 @@ namespace TaskbarMonitor
             }
         }
 
-        private void Ctl_OnChangeSize(Size size)
+        static void OnProcessExit(object sender, EventArgs e)
         {
-            Options.MinHorizontalSize = new Size(size.Width, 30);
+            // remove other monitors
         }
 
-        protected override Control Control => _control;
+        private void TaskbarInfo_TaskbarOrientationChanged(object sender, CSDeskBand.TaskbarOrientationChangedEventArgs e)
+        {
+            
+        }
+
+        private void TaskbarInfo_TaskbarEdgeChanged(object sender, CSDeskBand.TaskbarEdgeChangedEventArgs e)
+        {
+            
+        }
+
+        private void TaskbarInfo_TaskbarSizeChanged(object sender, CSDeskBand.TaskbarSizeChangedEventArgs e)
+        {
+            
+        }
+
+        private void Ctl_OnChangeSize(Size size)
+        {                        
+            Options.MinHorizontalSize = new Size(size.Width, CSDeskBand.CSDeskBandOptions.TaskbarHorizontalHeightSmall);            
+            // Options.MaxHorizontalHeight = size.Height;
+        }
+
+        protected override Control Control => _control;         
     }
 }

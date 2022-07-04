@@ -1,0 +1,55 @@
+@startuml
+class WindowsInformation <<static>> {
+    + {static} IsWindows11() : bool
+}
+class WindowList <<static>> {
+    + {static} GetAllWindows() : List<WindowInformation>
+    + {static} GetAllWindowsExtendedInfo() : List<WindowInformation>
+    + {static} GetAllWindowsTree() : WindowInformation
+    - {static} <<extern>> EnumChildWindows(window:IntPtr, callback:EnumWindowProc, i:IntPtr) : bool
+    - {static} <<extern>> FindWindowEx(hwndParent:IntPtr, hwndChildAfter:IntPtr, lpszClass:string, lpszWindow:string) : IntPtr
+    - {static} <<extern>> GetClassName(hWnd:IntPtr, lpClassName:StringBuilder, nMaxCount:int) : int
+    - {static} <<extern>> GetDesktopWindow() : IntPtr
+    - {static} <<extern>> GetWindow(hWnd:IntPtr, uCmd:GetWindow_Cmd) : IntPtr
+    - {static} <<extern>> GetWindowText(hWnd:IntPtr, text:StringBuilder, count:int) : int
+    - {static} <<extern>> SendMessage(hwnd:IntPtr, wmConstant:WMConstants, wParam:int, sb:StringBuilder) : int
+    - {static} <<extern>> SendMessage(hwnd:IntPtr, wmConstant:WMConstants, wParam:IntPtr, lParam:IntPtr) : int
+    <<internal>> {static} <<extern>> InvalidateRect(hWnd:IntPtr, lpRect:IntPtr, bErase:bool) : bool
+    - {static} enumWindow(handle:IntPtr, pointer:IntPtr) : bool
+    - {static} getChildWindows(parent:IntPtr) : List<IntPtr>
+    - {static} getChildWindowsInfo(parent:WindowInformation) : List<WindowInformation>
+    - {static} winInfoExtendedInfoProcess(winInfo:WindowInformation) : List<WindowInformation>
+    - {static} winInfoGet(hWnd:IntPtr) : WindowInformation
+}
+class WindowInformation {
+    + WindowInformation()
+    + Caption : string
+    + Class : string
+    + ChildWindows : List<WindowInformation>
+    - {static} <<extern>> GetWindowThreadProcessId(hWnd:IntPtr, processId:int) : int
+    + <<override>> ToString() : string
+    + ChildWindowHandles : List<IntPtr> <<get>>
+    + Handle : IntPtr
+    + Parent : WindowInformation <<get>> <<set>>
+    + ParentHandle : IntPtr <<get>>
+    + Process : Process <<get>>
+    + SiblingWindows : List<WindowInformation>
+    + SiblingWindowHandles : List<IntPtr> <<get>>
+    + ThreadID : int <<get>>
+}
+enum GetWindow_Cmd {
+    GW_HWNDFIRST= 0,
+    GW_HWNDLAST= 1,
+    GW_HWNDNEXT= 2,
+    GW_HWNDPREV= 3,
+    GW_OWNER= 4,
+    GW_CHILD= 5,
+    GW_ENABLEDPOPUP= 6,
+}
+enum WMConstants {
+    WM_GETTEXT= 0x000D,
+    WM_GETTEXTLENGTH= 0x000E,
+}
+WindowList +-- GetWindow_Cmd
+WindowList +-- WMConstants
+@enduml

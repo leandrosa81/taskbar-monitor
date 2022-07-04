@@ -1,0 +1,13 @@
+@startuml
+class CounterMemory {
+    + CounterMemory(options:Options)
+    {static} <<extern>> GetPhysicallyInstalledSystemMemory(TotalMemoryInKilobytes:long) : bool
+    ramCounter : PerformanceCounter
+    totalMemory : long = 0
+    + <<override>> Initialize() : void
+    + <<override>> Update() : void
+    + <<override>> GetName() : string
+    + <<override>> GetCounterType() : CounterType
+}
+ICounter <|-- CounterMemory
+@enduml

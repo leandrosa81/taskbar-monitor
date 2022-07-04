@@ -1,0 +1,14 @@
+@startuml
+class Deskband {
+    - {static} _control : Control
+    + Size : Size <<get>>
+    - {static} <<extern>> SetProcessDPIAware() : bool
+    + Deskband()
+    {static} OnProcessExit(sender:object, e:EventArgs) : void
+    - TaskbarInfo_TaskbarOrientationChanged(sender:object, e:CSDeskBand.TaskbarOrientationChangedEventArgs) : void
+    - TaskbarInfo_TaskbarEdgeChanged(sender:object, e:CSDeskBand.TaskbarEdgeChangedEventArgs) : void
+    - TaskbarInfo_TaskbarSizeChanged(sender:object, e:CSDeskBand.TaskbarSizeChangedEventArgs) : void
+    - Ctl_OnChangeSize(size:Size) : void
+    # <<override>> Control : Control <<get>>
+}
+@enduml

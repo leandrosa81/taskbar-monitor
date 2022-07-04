@@ -1,0 +1,10 @@
+@startuml
+class RestartExplorer {
+    +  <<event>> ReportProgress : Action<string> 
+    +  <<event>> ReportPercentage : Action<uint> 
+    + Execute() : void
+    + Execute(action:Action) : void
+    - GetProcesses(name:string) : RM_UNIQUE_PROCESS[]
+}
+Win32Api <|-- RestartExplorer
+@enduml

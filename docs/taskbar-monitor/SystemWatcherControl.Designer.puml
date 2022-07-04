@@ -1,0 +1,8 @@
+@startuml
+class SystemWatcherControl <<partial>> {
+    - components : System.ComponentModel.IContainer = null
+    # <<override>> Dispose(disposing:bool) : void
+    - InitializeComponent() : void
+    - toolTip1 : System.Windows.Forms.ToolTip
+}
+@enduml

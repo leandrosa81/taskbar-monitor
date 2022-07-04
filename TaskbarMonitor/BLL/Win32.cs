@@ -8,6 +8,13 @@ using System.Text;
 namespace TaskbarMonitor.BLL
 {
 
+    public static class WindowsInformation
+    {
+        public static bool IsWindows11()
+        {
+            return System.Environment.OSVersion.Version.Major >= 10 && System.Environment.OSVersion.Version.Build >= 21996;
+        }
+    }
     /// <summary>
     /// Static class that lists all windows
     /// </summary>
@@ -15,6 +22,8 @@ namespace TaskbarMonitor.BLL
     {
 
         #region Call these to return window lists
+
+        
 
         /// <summary>
         /// Gets all windows with basic information: caption, class and handle.
@@ -159,6 +168,9 @@ namespace TaskbarMonitor.BLL
         [DllImport("User32.dll")]
         private static extern int SendMessage(IntPtr hwnd, WMConstants wmConstant, IntPtr wParam, IntPtr lParam);
 
+        [DllImport("User32.dll")]
+        internal static extern bool InvalidateRect(IntPtr hWnd, IntPtr lpRect,  bool bErase);
+
         #endregion
 
         #region Defnitions
@@ -289,9 +301,10 @@ namespace TaskbarMonitor.BLL
             }
             else
             {
-                caption = new StringBuilder(Convert.ToInt32(SendMessage(wi.Handle, WMConstants.WM_GETTEXTLENGTH, IntPtr.Zero, IntPtr.Zero)) + 1);
-                SendMessage(wi.Handle, WMConstants.WM_GETTEXT, caption.Capacity, caption);
-                wi.Caption = caption.ToString();
+                // caption = new StringBuilder(Convert.ToInt32(SendMessage(wi.Handle, WMConstants.WM_GETTEXTLENGTH, IntPtr.Zero, IntPtr.Zero)) + 1);
+                //SendMessage(wi.Handle, WMConstants.WM_GETTEXT, caption.Capacity, caption);
+                //wi.Caption = caption.ToString();
+                wi.Caption = hWnd.ToString();
             }
             return wi;
         }

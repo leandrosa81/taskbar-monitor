@@ -1,0 +1,54 @@
+workspace "taskbar-monitor" "taskbar architecture" {
+    model {                
+            user = person "User"
+        
+            taskbarmonitor = softwareSystem "taskbar-monitor" "taskbar-monitor software" {                                
+                taskbarmonitorapp = container "taskbar-monitor app" ".net" "Original taskbar-monitor for Windows 10" {                    
+                    control = component "SystemWatcherControl" "" {
+                        code "..\TaskbarMonitor\SystemWatcherControl.cs"
+                    }
+                    optionsfrm = component "OptionForm" "" {
+                        code "..\TaskbarMonitor\OptionForm.cs"
+                    }
+                    deskband = component "DeskBand" ""
+                    savefile = component "Settings File"
+                }
+                taskbarmonitorappforwin11 = container "taskbar-monitor app for win11" ".net" "New taskbar with Windows 11 support"
+                taskbarmonitorinstaller = container "taskbar-monitor installer" "App" "Installs one of the apps on the user computer, depending on windows version." {
+                    installer = component "installer component"
+                }
+            }  
+            
+            enterprise "Microsoft" {
+                windows10 = softwareSystem "Windows 10" {
+                    taskbar10 = container "Windows Taskbar"
+                }
+                windows11 = softwareSystem "Windows 11" {
+                    taskbar11 = container "New Windows Taskbar"
+                }
+            }
+          
+            # context & landscape
+            user -> taskbarmonitor "opera"
+            user -> taskbarmonitorinstaller "installs and uninstalls the software"
+            taskbarmonitor -> windows10 "hosts itself as a deskband on taskbar"
+            taskbarmonitor -> windows11 "inject the taskbar-control on the taskbar window."            
+
+            # container
+            taskbarmonitorapp -> taskbar10 "hosts itself as a deskband on taskbar"
+            taskbarmonitorappforwin11 -> taskbar11 "inject the taskbar-control on the taskbar window."
+            windows10 -> taskbarmonitorapp "starts on windows initialization as deskband."
+            windows11 -> taskbarmonitorappforwin11 "starts on windows initialization."
+
+            # component
+            installer -> windows10 "copy files, registers DLL and installer"
+            installer -> windows11 "copy files, registers installer"
+
+            deskband -> control "creates instance and hosts it"
+            control -> optionsfrm "opens form"
+            optionsfrm -> control "displays preview"
+            deskband -> taskbar10 "hosts itself on taskbar"
+            optionsfrm -> savefile "reads and saves settings"
+            control -> savefile "reads settings"
+    }    
+}

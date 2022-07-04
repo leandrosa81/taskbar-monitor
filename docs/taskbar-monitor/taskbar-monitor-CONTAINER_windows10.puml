@@ -1,0 +1,21 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+SHOW_PERSON_OUTLINE()
+LAYOUT_LANDSCAPE()
+title Container Diagram for taskbar-monitor (Windows 10)
+System_Boundary(taskbarmonitor,"taskbar-monitor", $link="taskbar-monitor-CONTAINER_taskbarmonitor.html") {
+Container_Boundary(taskbarmonitorapp,"taskbar-monitor app", $link="taskbar-monitor-COMPONENT_taskbarmonitorapp.html") {
+Component(deskband, "DeskBand", "", "")
+}
+}
+Enterprise_Boundary(rnd7658,"Microsoft") {
+System_Boundary(windows10,"Windows 10", $link="taskbar-monitor-CONTAINER_windows10.html") {
+Container_Ext(taskbar10, "Windows Taskbar", "", "")
+}
+}
+Rel(taskbarmonitorapp, taskbar10, "hosts itself as a deskband on taskbar")
+Rel(deskband, taskbar10, "hosts itself on taskbar")
+
+@enduml

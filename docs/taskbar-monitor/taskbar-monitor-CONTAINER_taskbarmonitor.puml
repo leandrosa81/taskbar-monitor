@@ -1,0 +1,28 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+SHOW_PERSON_OUTLINE()
+LAYOUT_LANDSCAPE()
+title Container Diagram for taskbar-monitor (taskbar-monitor)
+Person(user, "User", "")
+System_Boundary(taskbarmonitor,"taskbar-monitor", $link="taskbar-monitor-CONTAINER_taskbarmonitor.html") {
+Container(taskbarmonitorapp, "taskbar-monitor app", ".net", "Original taskbar-monitor for Windows 10", $link="taskbar-monitor-COMPONENT_taskbarmonitorapp.html")
+Container_Ext(taskbarmonitorappforwin11, "taskbar-monitor app for win11", ".net", "New taskbar with Windows 11 support")
+Container(taskbarmonitorinstaller, "taskbar-monitor installer", "App", "Installs one of the apps on the user computer, depending on windows version.", $link="taskbar-monitor-COMPONENT_taskbarmonitorinstaller.html")
+}
+Enterprise_Boundary(rnd35521,"Microsoft") {
+System_Boundary(windows10,"Windows 10", $link="taskbar-monitor-CONTAINER_windows10.html") {
+Container_Ext(taskbar10, "Windows Taskbar", "", "")
+}
+System_Boundary(windows11,"Windows 11", $link="taskbar-monitor-CONTAINER_windows11.html") {
+Container_Ext(taskbar11, "New Windows Taskbar", "", "")
+}
+}
+Rel(user, taskbarmonitorinstaller, "installs and uninstalls the software")
+Rel(taskbarmonitorapp, taskbar10, "hosts itself as a deskband on taskbar")
+Rel(taskbarmonitorappforwin11, taskbar11, "inject the taskbar-control on the taskbar window.")
+Rel(windows10, taskbarmonitorapp, "starts on windows initialization as deskband.")
+Rel(windows11, taskbarmonitorappforwin11, "starts on windows initialization.")
+
+@enduml

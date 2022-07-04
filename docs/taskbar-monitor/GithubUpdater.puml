@@ -1,0 +1,9 @@
+@startuml
+class GithubUpdater {
+    - user : string = ""
+    - project : string = ""
+    + GithubUpdater(user:string, project:string)
+    + GetURL() : string
+    + <<async>> GetLastestVersionAsync() : Task<Version>
+}
+@enduml

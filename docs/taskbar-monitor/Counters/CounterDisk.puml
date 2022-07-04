@@ -1,0 +1,12 @@
+@startuml
+class CounterDisk {
+    + CounterDisk(options:Options)
+    diskReadCounter : PerformanceCounter
+    diskWriteCounter : PerformanceCounter
+    + <<override>> Initialize() : void
+    + <<override>> Update() : void
+    + <<override>> GetName() : string
+    + <<override>> GetCounterType() : CounterType
+}
+ICounter <|-- CounterDisk
+@enduml

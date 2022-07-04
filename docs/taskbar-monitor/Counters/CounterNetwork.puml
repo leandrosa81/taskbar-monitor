@@ -1,0 +1,13 @@
+@startuml
+class CounterNetwork {
+    + CounterNetwork(options:Options)
+    netCountersSent : List<PerformanceCounter>
+    netCountersReceived : List<PerformanceCounter>
+    + <<override>> Initialize() : void
+    - ReadCounters() : void
+    + <<override>> Update() : void
+    + <<override>> GetName() : string
+    + <<override>> GetCounterType() : CounterType
+}
+ICounter <|-- CounterNetwork
+@enduml

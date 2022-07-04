@@ -1,0 +1,14 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+SHOW_PERSON_OUTLINE()
+LAYOUT_LANDSCAPE()
+title Component Diagram for taskbar-monitor (a external container)
+System_Boundary(a,"external", $link="taskbar-monitor-CONTAINER_a.html") {
+Container_Boundary(acontainer,"a external container", $link="taskbar-monitor-COMPONENT_acontainer.html") {
+Component(acontrol, "a external component", "", "")
+}
+}
+
+@enduml
