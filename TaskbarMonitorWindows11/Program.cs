@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -15,7 +16,8 @@ namespace TaskbarMonitorWindows11
         [DllImport("user32.dll")]
         private static extern bool SetProcessDPIAware();
 
-        private static TaskbarManager st;
+        private static TaskbarManager taskbarManager;
+        private static TaskbarMonitorApplicationContext ctx;
 
         /// <summary>
         /// The main entry point for the application.
@@ -33,36 +35,42 @@ namespace TaskbarMonitorWindows11
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            try
+            {
+                Options opt = TaskbarMonitor.Options.ReadFromDisk();
 
-            st = new TaskbarManager();
+                Monitor monitor = new Monitor(opt);
 
-            st.AddControlsWin11();
-            st.AddControlsExtraMonitors();
+                taskbarManager = new TaskbarManager(monitor);
 
-            Timer tm = new Timer();
-            tm.Interval = 500;
-            tm.Tick += Tm_Tick;
-            tm.Start();
+                taskbarManager.AddControlsWin11();
+                taskbarManager.AddControlsExtraMonitors();
+                 
+                AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
 
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
-            Application.Run(new MyCustomApplicationContext());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error starting taskbar-monitor: {ex.Message}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+             
+            
+            ctx = new TaskbarMonitorApplicationContext();
+            Application.Run(ctx);
         }
-
-        private static void Tm_Tick(object sender, EventArgs e)
-        {
-            st.UpdatePositions();
-        }
-
+         
         static void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
-            st.RemoveControls();
+            if (ctx != null)
+                ctx.Dispose();
+            taskbarManager.RemoveControls();
         }
 
-        public class MyCustomApplicationContext : ApplicationContext
+        public class TaskbarMonitorApplicationContext : ApplicationContext
         {
             private NotifyIcon trayIcon;
 
-            public MyCustomApplicationContext()
+            public TaskbarMonitorApplicationContext()
             {
                 // Initialize Tray Icon
                 trayIcon = new NotifyIcon()
@@ -80,16 +88,9 @@ namespace TaskbarMonitorWindows11
                 {
                     System.Diagnostics.Process.Start("resmon.exe");
                 }),                        
-                        new MenuItem(String.Format("About taskbar-monitor (v{0})...", st.MainControl.Version.ToString(3)), (e, a) => {
+                        new MenuItem(String.Format("About taskbar-monitor (v{0})...", taskbarManager.MainControl.Version.ToString(3)), (e, a) => {
                              OpenSettings(2);
-                        }),
-                        new MenuItem(String.Format("test"), (e, a) => {
-                           TaskbarMonitor.BLL.Win32Api.PostMessageA(st.MainControl.Handle, 0x0204, 0x0002, 0); // right
-                            //TaskbarMonitor.BLL.Win32Api.PostMessageA(st.OnTopControls.First(x => x != st.MainControl).Handle, 0x0204, 0x0002, 0); // right, second monitor
-                           //TaskbarMonitor.BLL.Win32Api.PostMessageA(st.MainControl.Handle, 0x0201, 0x0001, 0); // left
-                           // TaskbarMonitor.BLL.Win32Api.PostMessageA(st.MainControl.Handle, 0x0203, 0x0001, 0); // double
-                        }),
-
+                        }),                     
                         new MenuItem("Exit", Exit),
             }),
                     Visible = true
@@ -102,7 +103,7 @@ namespace TaskbarMonitorWindows11
                 OptionForm optForm = null;
                 if (qtd.Count() == 0)
                 {
-                    optForm = new OptionForm(st.MainControl.Options, st.MainControl.customTheme, st.MainControl.Version, st.MainControl);
+                    optForm = new OptionForm(taskbarManager.MainControl.Options, taskbarManager.MainControl.customTheme, taskbarManager.MainControl.Version, taskbarManager.MainControl);
                     optForm.Show();
                 }
                 else
@@ -115,10 +116,17 @@ namespace TaskbarMonitorWindows11
 
             void Exit(object sender, EventArgs e)
             {
+               
+
+                Application.Exit();
+            }
+
+            protected override void Dispose(bool disposing)
+            {
                 // Hide tray icon, otherwise it will remain shown until user mouses over it
                 trayIcon.Visible = false;
 
-                Application.Exit();
+                base.Dispose(disposing);
             }
         }
     }

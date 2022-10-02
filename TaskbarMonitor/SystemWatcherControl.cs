@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 // control architecture
@@ -28,11 +29,15 @@ namespace TaskbarMonitor
 
         private bool _previewMode = false;
         private ContextMenu _contextMenu = null;
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public Monitor Monitor { get; private set; }
         public bool VerticalTaskbarMode
         {
             get; private set;
         }
-        private System.Timers.Timer pollingTimer;
+        
         public bool PreviewMode
         {
             get
@@ -49,12 +54,12 @@ namespace TaskbarMonitor
         {
             get
             {
-                if (Counters == null) return 0;
+                if (Monitor?.Counters == null) return 0;
                 return Options.CounterOptions.Where(x => x.Value.Enabled == true).Count();
                 //return Counters.Count;
             }
         }
-        List<Counters.ICounter> Counters;
+        
         System.Drawing.Font fontCounter;
         Font fontTitle;
         int lastSize = 30;
@@ -69,60 +74,58 @@ namespace TaskbarMonitor
         Deskband AssociatedDeskband = null;
         TaskbarManager sTask;
 
-        public SystemWatcherControl(Options opt, bool addSecondControl = false, bool verticalMode = false, Deskband associatedDeskband = null)//CSDeskBand.CSDeskBandWin w, 
+        public SystemWatcherControl(Monitor monitor, bool verticalMode = false, Deskband associatedDeskband = null)//CSDeskBand.CSDeskBandWin w, 
         {
             this.VerticalTaskbarMode = verticalMode;
             this.AssociatedDeskband = associatedDeskband;
             this.SetStyle(ControlStyles.EnableNotifyMessage, true);
-            try
-            {
-                darkTheme = GraphTheme.DefaultDarkTheme();            
-                lightTheme = GraphTheme.DefaultLightTheme();
-                customTheme = GraphTheme.ReadFromDisk();
-                opt.Upgrade(customTheme);
-
-                Initialize(opt);
-                if (addSecondControl)
-                {
-                     sTask = new TaskbarManager();
-                     sTask.AddControlsExtraMonitors();
-                }
-                this.BackColor = Color.Transparent;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading SystemWatcherControl: {ex.Message}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            AttachMonitor(monitor);
         }
-
         public SystemWatcherControl()
-            :this(true)
-        {            
-        }
-        public SystemWatcherControl(bool addSecondControl = false)
+            :this(null)
         {
-            this.SetStyle(ControlStyles.EnableNotifyMessage, true);
-            try
-            {
-                Options opt = TaskbarMonitor.Options.ReadFromDisk();
-                darkTheme = GraphTheme.DefaultDarkTheme();
-                lightTheme = GraphTheme.DefaultLightTheme();
-                customTheme = GraphTheme.ReadFromDisk();
-                opt.Upgrade(customTheme);
+        }
 
-                Initialize(opt);
-                if (addSecondControl)
-                {
-                    TaskbarManager sTask = new TaskbarManager();
-                    sTask.AddControlsExtraMonitors();
-                }                
-                this.BackColor = Color.Transparent;
-            }
-            catch (Exception ex)
+        public SystemWatcherControl(Monitor monitor)
+        {
+            AttachMonitor(monitor); 
+        }
+
+        public void AttachMonitor(Monitor monitor)
+        {
+            this.Monitor = monitor;
+            if (this.Monitor != null)
             {
-                MessageBox.Show($"Error loading SystemWatcherControl: {ex.Message}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                monitor.OnMonitorUpdated += Monitor_OnMonitorUpdated;
+                this.SetStyle(ControlStyles.EnableNotifyMessage, true);
+                try
+                {
+                    Options opt = monitor.Options;
+                    darkTheme = GraphTheme.DefaultDarkTheme();
+                    lightTheme = GraphTheme.DefaultLightTheme();
+                    customTheme = GraphTheme.ReadFromDisk();
+                    opt.Upgrade(customTheme);
+
+                    Initialize(opt);
+                    this.BackColor = Color.Transparent;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error loading SystemWatcherControl: {ex.Message}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
+
+        private void Monitor_OnMonitorUpdated()
+        {
+            if (this.Options.ThemeType == Options.ThemeList.AUTOMATIC)
+            {
+                this.defaultTheme = GetTheme(this.Options);
+            }
+
+            this.Invalidate();
+        }
+
         protected override void OnHandleDestroyed(EventArgs e)
         {
             if(sTask != null)
@@ -149,17 +152,7 @@ namespace TaskbarMonitor
             return theme;
         }
 
-        private void PollingTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            UpdateGraphs();
-
-            if (this.Options.ThemeType == Options.ThemeList.AUTOMATIC)
-            {
-                this.defaultTheme = GetTheme(this.Options);
-            }
-
-            this.Invalidate();
-        }
+       
 
         public bool IsCustomTheme()
         {
@@ -208,7 +201,7 @@ namespace TaskbarMonitor
             }
             
             AdjustControlSize();
-            UpdateGraphs();
+            //UpdateGraphs();
             this.Invalidate();
 
         }
@@ -217,32 +210,7 @@ namespace TaskbarMonitor
 
             var theme = GetTheme(opt);
 
-            Counters = new List<Counters.ICounter>();
-            if (opt.CounterOptions.ContainsKey("CPU"))
-            {
-                var ct = new Counters.CounterCPU(opt);
-                ct.Initialize();
-                Counters.Add(ct);
-            }
-            if (opt.CounterOptions.ContainsKey("MEM"))
-            {
-                var ct = new Counters.CounterMemory(opt);
-                ct.Initialize();
-                Counters.Add(ct);
-            }
-            if (opt.CounterOptions.ContainsKey("DISK"))
-            {
-                var ct = new Counters.CounterDisk(opt);
-                ct.Initialize();
-                Counters.Add(ct);
-            }
-            if (opt.CounterOptions.ContainsKey("NET"))
-            {
-                var ct = new Counters.CounterNetwork(opt);
-                ct.Initialize();
-                Counters.Add(ct);
-            }
-
+           
             
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.ResizeRedraw, true);
@@ -257,12 +225,7 @@ namespace TaskbarMonitor
             AdjustControlSize();
 
             //BLL.Win32Api.SetWindowPos(this.Handle, new IntPtr(0), this.Left, this.Top, this.Width, this.Height, 0);
-
-            pollingTimer = new System.Timers.Timer(opt.PollTime * 1000);
-            pollingTimer.Enabled = true;
-            pollingTimer.Elapsed += PollingTimer_Elapsed;
-            pollingTimer.Start();
-
+             
         }
 
         private void AdjustControlSize()
@@ -306,16 +269,7 @@ namespace TaskbarMonitor
                     OnChangeSize(new Size(controlWidth, controlHeight));
             }
         }
-
-        private void UpdateGraphs()
-        {
-            foreach (var ct in Counters)
-            {
-                ct.Update();
-            }
-            if (pollingTimer != null && pollingTimer.Interval != Options.PollTime * 1000)
-                pollingTimer.Interval = Options.PollTime * 1000;
-        }
+         
 
         private void SystemWatcherControl_Paint(object sender, PaintEventArgs e)
         {
@@ -356,7 +310,7 @@ namespace TaskbarMonitor
                 {
                     var name = pair.Key;
                     var opt = pair.Value;
-                    var ct = Counters.Where(x => x.GetName() == name).Single();
+                    var ct = Monitor.Counters.Where(x => x.GetName() == name).Single();
                     var infos = ct.Infos;
                     //var opt = Options.CounterOptions[ct.GetName()];
                     //if (!opt.Enabled) continue;
@@ -624,12 +578,12 @@ namespace TaskbarMonitor
             }
         }
 
-        public static int GetTaskbarWidth()
+        private static int GetTaskbarWidth()
         {
             return Screen.PrimaryScreen.Bounds.Width - Screen.PrimaryScreen.WorkingArea.Width;
         }
 
-        public static int GetTaskbarHeight()
+        private static int GetTaskbarHeight()
         {
             return Screen.PrimaryScreen.Bounds.Height - Screen.PrimaryScreen.WorkingArea.Height;
         }
@@ -685,8 +639,10 @@ namespace TaskbarMonitor
 
         private void SystemWatcherControl_DoubleClick(object sender, EventArgs e)
         {
+#if(DEBUG)
             SHOW_DEBUG = !SHOW_DEBUG;
             this.Invalidate();
+#endif
         }
         protected override void OnNotifyMessage(Message m)
         {

@@ -73,6 +73,7 @@
     <Compile Include="DeskBand.cs" />
     <Compile Include="GithubUpdater.cs" />
     <Compile Include="GraphTheme.cs" />
+    <Compile Include="Monitor.cs" />
     <Compile Include="OptionForm.cs">
       <SubType>Form</SubType>
     </Compile>

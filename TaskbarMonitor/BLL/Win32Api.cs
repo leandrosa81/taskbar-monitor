@@ -83,6 +83,11 @@ namespace TaskbarMonitor.BLL
 
         [DllImport("user32.dll", EntryPoint = "SetParent")]
         internal static extern IntPtr SetParent(IntPtr windowHandle, IntPtr parentHandle);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern uint GetWindowLong(IntPtr hWnd, GWLParameter nIndex);
+
+
         [DllImport("user32.dll", EntryPoint = "BringWindowToTop")]
         internal static extern bool BringWindowToTop(IntPtr windowHandle);
 
