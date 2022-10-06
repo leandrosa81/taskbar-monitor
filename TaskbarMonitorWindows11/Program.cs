@@ -44,7 +44,7 @@ namespace TaskbarMonitorWindows11
                 taskbarManager = new TaskbarManager(monitor);
 
                 taskbarManager.AddControlsWin11();
-                taskbarManager.AddControlsExtraMonitors();
+                // taskbarManager.AddControlsExtraMonitors();
                  
                 AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
 

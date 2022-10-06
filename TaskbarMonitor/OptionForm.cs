@@ -12,6 +12,7 @@ namespace TaskbarMonitor
         private Options OriginalOptions;
         private GraphTheme OriginalTheme;
 
+        private Monitor monitor;
         private Options Options;
         private GraphTheme Theme;
 
@@ -39,6 +40,8 @@ namespace TaskbarMonitor
                 this.Options = new Options();
                 this.OriginalOptions = opt;
                 opt.CopyTo(this.Options);
+                monitor = new Monitor(this.Options);
+                
 
                 this.originalControl = originalControl;
 
@@ -95,6 +98,8 @@ namespace TaskbarMonitor
         private void Initialize()
         {
             initializing = true;
+            swcPreview.AttachMonitor(monitor);
+
             this.editHistorySize.Value = this.Options.HistorySize;
             this.editPollTime.Value = this.Options.PollTime;
             this.listThemeType.Text = this.Options.ThemeType.ToString();
@@ -166,11 +171,13 @@ namespace TaskbarMonitor
 
         private void EditHistorySize_ValueChanged(object sender, EventArgs e)
         {
+            if (initializing) return;
             Options.HistorySize = Convert.ToInt32(editHistorySize.Value);
             UpdatePreview();
         }
         private void editPollTime_ValueChanged(object sender, EventArgs e)
         {
+            if (initializing) return;
             Options.PollTime = Convert.ToInt32(editPollTime.Value);
             UpdatePreview();
         }
@@ -571,6 +578,7 @@ namespace TaskbarMonitor
 
         private void linkTitleFont_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
+            if (initializing) return;
             if (ChooseFont(sender as LinkLabel, ref ChosenTitleFont))
             {                
                 this.Theme.TitleFont = ChosenTitleFont.Name;
@@ -583,6 +591,7 @@ namespace TaskbarMonitor
 
         private void linkCurrentValueFont_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
+            if (initializing) return;
             if (ChooseFont(sender as LinkLabel, ref ChosenCurrentValueFont))
             {
                 this.Theme.CurrentValueFont = ChosenCurrentValueFont.Name;
@@ -595,6 +604,7 @@ namespace TaskbarMonitor
 
         private void listThemeType_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (initializing) return;
             Options.ThemeType = (Options.ThemeList)Enum.Parse(typeof(Options.ThemeList), listThemeType.Text);
             UpdatePreview();
             UpdateThemeOptions();

@@ -61,11 +61,19 @@ namespace TaskbarMonitor
                 if (taskbar.TrayWnd != IntPtr.Zero)
                 {
                     var rectTray = BLL.Win32Api.GetWindowSize(taskbar.TrayWnd);
-                    taskbar.TaskbarMonitorControl.Left = rect.Width - taskbar.TaskbarMonitorControl.Width - rectTray.Width;
+
+                    taskbar.TaskbarMonitorControl.Invoke((MethodInvoker)delegate
+                    {
+                        taskbar.TaskbarMonitorControl.Left = rect.Width - taskbar.TaskbarMonitorControl.Width - rectTray.Width;
+                    });
+                    
                 }
                 else
-                {
-                    taskbar.TaskbarMonitorControl.Left = rect.Width - taskbar.TaskbarMonitorControl.Width;
+                {                    
+                    taskbar.TaskbarMonitorControl.Invoke((MethodInvoker)delegate
+                    {
+                        taskbar.TaskbarMonitorControl.Left = rect.Width - taskbar.TaskbarMonitorControl.Width;
+                    });
                 }
             }
         }

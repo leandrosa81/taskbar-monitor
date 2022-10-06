@@ -159,12 +159,13 @@ namespace TaskbarMonitor
             return GraphTheme.IsCustom(this.defaultTheme);
         }
         public void ApplyOptions(Options Options)
-        {
+        {            
             ApplyOptions(Options, GetTheme(Options));
         }
 
         public void ApplyOptions(Options Options, GraphTheme theme)
         {
+            this.Monitor.UpdateOptions(Options);
             this.Options = Options;
             this.defaultTheme = theme;
 
@@ -181,23 +182,16 @@ namespace TaskbarMonitor
                 }));
                 _contextMenu.MenuItems.Add(new MenuItem(String.Format("About taskbar-monitor (v{0})...", Version.ToString(3)), MenuItem_About_onClick));
                 this.ContextMenu = _contextMenu;
+
+                this.BackColor = Color.Transparent;
             }
             else
             {
                 this.ContextMenu = null;
-            }
 
-
-            if (PreviewMode)
-            {
                 var pos = BLL.Win32Api.GetTaskbarPosition();
                 Color taskBarColour = BLL.Win32Api.GetColourAt(new Point(pos.Location.X + 1, pos.Location.Y + 1));
                 this.BackColor = taskBarColour;
-
-            }
-            else
-            {
-                this.BackColor = Color.Transparent;
             }
             
             AdjustControlSize();
@@ -257,7 +251,7 @@ namespace TaskbarMonitor
                 controlWidth = counterSize * countersPerLine;
                 controlHeight = Convert.ToInt32(Math.Ceiling((float)CountersCount / (float)countersPerLine)) * (30 + 10);
             }
-            if (!VerticalTaskbarMode && !PreviewMode)
+            if (!VerticalTaskbarMode)
             {
                 this.Top = 1;
                 controlHeight = controlHeight - 2;

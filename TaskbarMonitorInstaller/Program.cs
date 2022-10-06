@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using TaskbarMonitorInstaller.BLL;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TaskbarMonitorInstaller
 {
@@ -26,7 +27,9 @@ namespace TaskbarMonitorInstaller
             {
                 FilesToCopy = new Dictionary<string, byte[]> { 
                     { "TaskbarMonitor.dll", Properties.Resources.TaskbarMonitor }, 
-                    { "Newtonsoft.Json.dll", Properties.Resources.Newtonsoft_Json } 
+                    { "Newtonsoft.Json.dll", Properties.Resources.Newtonsoft_Json },
+                    { "TaskbarMonitorWindows11.exe", Properties.Resources.TaskbarMonitorWindows11 },
+                    { "TaskbarMonitorInstaller.exe", Properties.Resources.TaskbarMonitorInstaller }
                 },
                 FilesToRegister = new List<string> { "TaskbarMonitor.dll" },
                 //TargetPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "TaskbarMonitor")
@@ -46,15 +49,11 @@ namespace TaskbarMonitorInstaller
         static void Install(InstallInfo info)
         {
             Console.WriteLine("Installing taskbar-monitor on your computer, please wait.");
-            RestartExplorer restartExplorer = new RestartExplorer();                        
+            if (WindowsInformation.IsWindows11())
+                Console.WriteLine("Windows 11 detected.");
 
-            // Create directory
-            if (!Directory.Exists(info.TargetPath))
+            Action copyFiles = () =>
             {
-                Console.Write("Creating target directory... ");
-                Directory.CreateDirectory(info.TargetPath);
-                Console.WriteLine("OK.");
-
                 // First copy files to program files folder          
                 foreach (var file in info.FilesToCopy)
                 {
@@ -66,51 +65,95 @@ namespace TaskbarMonitorInstaller
                     //File.Copy(item, targetFilePath, true);
                     Console.WriteLine("OK.");
                 }
-                // copy the uninstaller too
-                File.Copy("TaskbarMonitorInstaller.exe", Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"));
+            };
+
+            // Create directory
+            if (!Directory.Exists(info.TargetPath))
+            {
+                Console.Write("Creating target directory... ");
+                Directory.CreateDirectory(info.TargetPath);
+                Console.WriteLine("OK.");
+
+                copyFiles();
             }
             else
             {
-                
-                restartExplorer.Execute(() =>
+                if (WindowsInformation.IsWindows11())
                 {
-                    // First copy files to program files folder          
-                    foreach (var file in info.FilesToCopy)
+                    // we unregister old versions
+                    foreach (var item in info.FilesToRegister)
                     {
-                        var item = file.Key;
-
                         var targetFilePath = Path.Combine(info.TargetPath, item);
-                        Console.Write($"Copying {item}... ");
-                        File.WriteAllBytes(targetFilePath, file.Value);
-                        //File.Copy(item, targetFilePath, true);
-                        Console.WriteLine("OK.");
+                        Console.Write($"Unregistering {item}... ");
+                        RegisterDLL(targetFilePath, false, false);
+                        RegisterDLL(targetFilePath, true, false);
                     }
-                    // copy the uninstaller too
-                    File.Copy("TaskbarMonitorInstaller.exe", Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"), true);
-                });
-            }
+                    // then we terminate existing processes
+                    KillProcess("TaskbarMonitorWindows11.exe");
 
-            // Register assemblies
-            //RegistrationServices regAsm = new RegistrationServices();
-            foreach (var item in info.FilesToRegister)
+                    // then copy files
+                    copyFiles();
+                }
+                else
+                {
+                    RestartExplorer restartExplorer = new RestartExplorer();
+                    restartExplorer.Execute(copyFiles);
+                }
+            }
+            
+            // if not on windows 11 we must register the DLLs to run on the deskband
+            if (!WindowsInformation.IsWindows11())
             {
-                var targetFilePath = Path.Combine(info.TargetPath, item);
-                Console.Write($"Registering {item}... ");
-                RegisterDLL(targetFilePath, true, false);
-                Console.WriteLine("OK.");
+                // Register assemblies
+                //RegistrationServices regAsm = new RegistrationServices();
+                foreach (var item in info.FilesToRegister)
+                {
+                    var targetFilePath = Path.Combine(info.TargetPath, item);
+                    Console.Write($"Registering {item}... ");
+                    RegisterDLL(targetFilePath, true, false);
+                    Console.WriteLine("OK.");
+                }
             }
 
+            // register the uninstaller
             Console.Write("Registering uninstaller... ");
             CreateUninstaller(Path.Combine(info.TargetPath, "TaskbarMonitorInstaller.exe"));
             Console.WriteLine("OK.");
 
-            // remove pending delete operations
+            // finally, remove pending delete operations
             {
                 Console.Write("Cleaning up previous pending uninstalls... ");
                 if (CleanUpPendingDeleteOperations(info.TargetPath, out string errorMessage))
                     Console.WriteLine("OK.");
                 else
                     Console.WriteLine("ERROR: " + errorMessage);
+            }
+
+            if (WindowsInformation.IsWindows11())
+            {
+                Console.Write("Registering on startup... ");
+                try
+                {
+                    SetStartup("taskbar-monitor", Path.Combine(info.TargetPath, "TaskbarMonitorWindows11.exe"));
+                    Console.WriteLine("OK.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("ERROR.");
+                    Console.WriteLine(" " + ex.Message);
+                }
+
+                Console.Write("Runnning... ");
+                try
+                {
+                    RunProgram(Path.Combine(info.TargetPath, "TaskbarMonitorWindows11.exe"), "", false);
+                    Console.WriteLine("OK.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("ERROR.");
+                    Console.WriteLine(" " + ex.Message);
+                }
             }
         }
 
@@ -127,20 +170,18 @@ namespace TaskbarMonitorInstaller
 
         static bool RollBack(InstallInfo info)
         {
-            // Unregister assembly
-            //RegistrationServices regAsm = new RegistrationServices();
+            // Unregister assemblies          
             foreach (var item in info.FilesToRegister)
-            {
+            {                
                 var targetFilePath = Path.Combine(info.TargetPath, item);
+                Console.Write($"Unregistering {item}... ");
                 RegisterDLL(targetFilePath, false, true);
                 RegisterDLL(targetFilePath, true, true);
+                Console.WriteLine("OK.");
             }
 
-            // Delete files
-            RestartExplorer restartExplorer = new RestartExplorer();
-            restartExplorer.Execute(() =>
-            {
-                // First copy files to program files folder          
+            Action deleteFiles = () =>
+            {                      
                 foreach (var file in info.FilesToCopy)
                 {
                     var item = file.Key;
@@ -148,36 +189,55 @@ namespace TaskbarMonitorInstaller
                     if (File.Exists(targetFilePath))
                     {
                         Console.Write($"Deleting {item}... ");
-                        File.Delete(targetFilePath);
+                        try
+                        {
+                            if (Win32Api.DeleteFile(Path.Combine(info.TargetPath, item)))
+                            {
+                                Console.WriteLine("OK.");
+                            }
+                            else
+                            {
+                                Win32Api.MoveFileEx(Path.Combine(info.TargetPath, item), null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
+                                Console.WriteLine("Scheduled for deletion after next reboot.");
+                            }
+                        }
+                        catch
+                        {
+                            Win32Api.MoveFileEx(Path.Combine(info.TargetPath, item), null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
+                            Console.WriteLine("Scheduled for deletion after next reboot.");
+                        }
                         Console.WriteLine("OK.");
                     }
                 }
-                
-            });
+            };
 
+            if (!WindowsInformation.IsWindows11())
             {
-                var item = "TaskbarMonitorInstaller.exe";
-                Console.Write($"Deleting {item}... ");
+                // Delete files
+                RestartExplorer restartExplorer = new RestartExplorer();
+                restartExplorer.Execute(deleteFiles);
+            }
+            else
+            {
+                // then we terminate existing processes
+                KillProcess("TaskbarMonitorWindows11.exe");
+
+                deleteFiles();
+
+                Console.Write("Unregistering startup... ");
                 try
                 {
-                    if (Win32Api.DeleteFile(Path.Combine(info.TargetPath, item)))
-                    {
-                        Console.WriteLine("OK.");
-                    }
-                    else
-                    {
-                        Win32Api.MoveFileEx(Path.Combine(info.TargetPath, item), null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
-                        Console.WriteLine("Scheduled for deletion after next reboot.");
-                    }
+                    DeleteStartup("taskbar-monitor");
+                    Console.WriteLine("OK.");
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Win32Api.MoveFileEx(Path.Combine(info.TargetPath, item), null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
-                    Console.WriteLine("Scheduled for deletion after next reboot.");
+                    Console.WriteLine("ERROR.");
+                    Console.WriteLine(" " + ex.Message);
                 }
-                
+
             }
-            
+             
             if (Directory.Exists(info.TargetPath))
             {
                 Console.Write("Deleting target directory... ");
@@ -199,7 +259,24 @@ namespace TaskbarMonitorInstaller
             return true;
         }
 
-        static string RunProgram(string path, string args)
+        static private void SetStartup(string appName, string path)
+        {
+            RegistryKey rk = Registry.CurrentUser.OpenSubKey
+                ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            
+                rk.SetValue(appName, path);            
+        }
+
+        static private void DeleteStartup(string appName)
+        {
+            RegistryKey rk = Registry.CurrentUser.OpenSubKey
+                ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);            
+
+            rk.DeleteValue(appName, false);
+
+        }
+
+        static string RunProgram(string path, string args, bool wait=true)
         {
             using (Process process = new Process())
             {
@@ -210,10 +287,33 @@ namespace TaskbarMonitorInstaller
                 process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 process.StartInfo.CreateNoWindow = true;
                 process.Start();
-                string output = process.StandardOutput.ReadToEnd();
-                process.WaitForExit();
+                if (wait)
+                {
+                    string output = process.StandardOutput.ReadToEnd();
+                    process.WaitForExit();
+                    return output;
+                }
 
-                return output;
+                return null;
+            }
+        }
+
+        static bool KillProcess(String name)
+        {
+            try
+            {
+                Process[] workers = Process.GetProcessesByName(name);
+                foreach (Process worker in workers)
+                {
+                    worker.Kill();
+                    worker.WaitForExit();
+                    worker.Dispose();
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
         static private void DeleteUninstaller()
@@ -325,6 +425,13 @@ namespace TaskbarMonitorInstaller
                 errorMessage = "An error occurred cleaning up previous uninstall information to the registry. The program might be partially uninstalled on the next reboot.";                
                 return false;                
             }
+        }
+    }
+    public static class WindowsInformation
+    {
+        public static bool IsWindows11()
+        {
+            return System.Environment.OSVersion.Version.Major >= 10 && System.Environment.OSVersion.Version.Build >= 21996;
         }
     }
 }
