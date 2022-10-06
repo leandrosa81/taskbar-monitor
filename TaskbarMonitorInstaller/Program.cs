@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using TaskbarMonitorInstaller.BLL;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -29,7 +30,7 @@ namespace TaskbarMonitorInstaller
                     { "TaskbarMonitor.dll", Properties.Resources.TaskbarMonitor }, 
                     { "Newtonsoft.Json.dll", Properties.Resources.Newtonsoft_Json },
                     { "TaskbarMonitorWindows11.exe", Properties.Resources.TaskbarMonitorWindows11 },
-                    { "TaskbarMonitorInstaller.exe", Properties.Resources.TaskbarMonitorInstaller }
+                    { "TaskbarMonitorInstaller.exe", File.ReadAllBytes(Assembly.GetExecutingAssembly().Location)        }
                 },
                 FilesToRegister = new List<string> { "TaskbarMonitor.dll" },
                 //TargetPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "TaskbarMonitor")

@@ -83,16 +83,6 @@ namespace TaskbarMonitorInstaller.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] TaskbarMonitorInstaller {
-            get {
-                object obj = ResourceManager.GetObject("TaskbarMonitorInstaller", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
         internal static byte[] TaskbarMonitorWindows11 {
             get {
                 object obj = ResourceManager.GetObject("TaskbarMonitorWindows11", resourceCulture);

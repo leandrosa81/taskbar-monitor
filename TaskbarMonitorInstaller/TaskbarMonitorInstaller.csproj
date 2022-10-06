@@ -78,7 +78,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
-    <None Include="Resources\TaskbarMonitorInstaller.exe" />
     <None Include="Resources\TaskbarMonitorWindows11.exe" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
