@@ -93,10 +93,10 @@ namespace TaskbarMonitor
 
         public void AttachMonitor(Monitor monitor)
         {
+            Disposed += OnDispose;
             this.Monitor = monitor;
             if (this.Monitor != null)
-            {
-                monitor.OnMonitorUpdated += Monitor_OnMonitorUpdated;
+            {                
                 this.SetStyle(ControlStyles.EnableNotifyMessage, true);
                 try
                 {
@@ -108,6 +108,7 @@ namespace TaskbarMonitor
 
                     Initialize(opt);
                     this.BackColor = Color.Transparent;
+                    monitor.OnMonitorUpdated += Monitor_OnMonitorUpdated;
                 }
                 catch (Exception ex)
                 {
@@ -116,9 +117,15 @@ namespace TaskbarMonitor
             }
         }
 
+        private void OnDispose(object sender, EventArgs e)
+        {
+            if(Monitor != null)
+                Monitor.OnMonitorUpdated -= Monitor_OnMonitorUpdated;
+        }
+
         private void Monitor_OnMonitorUpdated()
         {
-            if (this.Options.ThemeType == Options.ThemeList.AUTOMATIC)
+            if (Options != null && this.Options.ThemeType == Options.ThemeList.AUTOMATIC)
             {
                 this.defaultTheme = GetTheme(this.Options);
             }

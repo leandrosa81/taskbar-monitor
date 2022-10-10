@@ -61,8 +61,8 @@ namespace TaskbarMonitorWindows11
          
         static void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
-            if (ctx != null)
-                ctx.Dispose();
+            //if (ctx != null && ctx.is)
+                //ctx.Dispose();
             taskbarManager.RemoveControls();
         }
 
@@ -115,9 +115,7 @@ namespace TaskbarMonitorWindows11
             }
 
             void Exit(object sender, EventArgs e)
-            {
-               
-
+            {               
                 Application.Exit();
             }
 

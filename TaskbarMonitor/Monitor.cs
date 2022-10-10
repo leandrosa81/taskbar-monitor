@@ -77,7 +77,8 @@ namespace TaskbarMonitor
                 ct.Update();
             };
             
-            OnMonitorUpdated();
+            if(OnMonitorUpdated != null)
+                OnMonitorUpdated();
 
         }
 
