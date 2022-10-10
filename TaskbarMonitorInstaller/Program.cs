@@ -90,7 +90,7 @@ namespace TaskbarMonitorInstaller
                         RegisterDLL(targetFilePath, true, false);
                     }
                     // then we terminate existing processes
-                    KillProcess("TaskbarMonitorWindows11.exe");
+                    KillProcess("TaskbarMonitorWindows11");
 
                     // then copy files
                     copyFiles();
