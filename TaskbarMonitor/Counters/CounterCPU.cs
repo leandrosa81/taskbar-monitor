@@ -22,8 +22,8 @@ namespace TaskbarMonitor.Counters
 
         public override void Initialize()
         {
-            cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-            PerformanceCounterCategory cat = new PerformanceCounterCategory("Processor");
+            cpuCounter = new PerformanceCounter("Processor Information", "% Processor Utility", "_Total", true);
+            PerformanceCounterCategory cat = new PerformanceCounterCategory("Processor Information");
             var instances = cat.GetInstanceNames();
             /*
             info.Add(CounterType.SINGLE, new List<CounterInfo> {
@@ -46,17 +46,18 @@ namespace TaskbarMonitor.Counters
 
                     // info[CounterType.STACKED].Add(new CounterInfo() { Name = item, History = new List<float>(), MaximumValue = 100.0f });
                     Infos.Add(new CounterInfo() { Name = item, History = new List<float>(), MaximumValue = 100.0f });
-                    cpuCounterCores.Add(new PerformanceCounter("Processor", "% Processor Time", item));
+                    cpuCounterCores.Add(new PerformanceCounter("Processor Information", "% Processor Utility", item));
                 }
             }
             
         }
         public override void Update()
         {
-            currentValue = cpuCounter.NextValue();
+            
 
             lock (ThreadLock)
             {
+                currentValue = cpuCounter.NextValue();
                 InfoSummary.CurrentValue = currentValue;
                 InfoSummary.History.Add(currentValue);
                 if (InfoSummary.History.Count > Options.HistorySize) InfoSummary.History.RemoveAt(0);
@@ -72,7 +73,7 @@ namespace TaskbarMonitor.Counters
                     if (ct.History.Count > Options.HistorySize) ct.History.RemoveAt(0);
 
                     ct.CurrentStringValue = InfoSummary.CurrentStringValue;// same string value from summary
-                }
+                }                
             }
 
         }
