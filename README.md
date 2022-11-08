@@ -19,4 +19,4 @@ The reason for this is that this tool registers itself for all users, so the dll
     all users on the computer.</p>
 
 ## Uninstall
-To uninstall it, run the installer with a "/uninstall" parameter.
+To uninstall it, just use the uninstaller from the "Add or Remove Programs" list.
