@@ -58,10 +58,14 @@ namespace TaskbarMonitor.Counters
             lock (ThreadLock)
             {
                 currentValue = cpuCounter.NextValue();
+                // if (currentValue > 100.0f) currentValue = 100.0f;
                 InfoSummary.CurrentValue = currentValue;
                 InfoSummary.History.Add(currentValue);
                 if (InfoSummary.History.Count > Options.HistorySize) InfoSummary.History.RemoveAt(0);
-                InfoSummary.CurrentStringValue = InfoSummary.CurrentValue.ToString("0") + "%";
+                if(InfoSummary.CurrentValue <= InfoSummary.MaximumValue)
+                    InfoSummary.CurrentStringValue = InfoSummary.CurrentValue.ToString("0") + "%";
+                else
+                    InfoSummary.CurrentStringValue = InfoSummary.MaximumValue.ToString("0") + "% +" + (InfoSummary.MaximumValue - InfoSummary.CurrentValue).ToString("0");
 
                 foreach (var item in cpuCounterCores)
                 {
@@ -69,6 +73,7 @@ namespace TaskbarMonitor.Counters
 
                     //var ct = info[CounterType.STACKED].Find(x => x.Name == item.InstanceName);
                     ct.CurrentValue = item.NextValue();
+                    // if (ct.CurrentValue > 100.0f) ct.CurrentValue = 100.0f;
                     ct.History.Add(ct.CurrentValue);
                     if (ct.History.Count > Options.HistorySize) ct.History.RemoveAt(0);
 
