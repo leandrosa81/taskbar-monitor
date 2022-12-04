@@ -34,7 +34,7 @@ namespace TaskbarMonitor
             this.Options = opt;
 
             Counters = new List<Counters.ICounter>();
-            var counterNames = new List<string> { "CPU", "MEM", "DISK", "NET" };
+            var counterNames = new List<string> { "CPU", "GPU", "MEM", "DISK", "NET" };
             foreach(var counterName in counterNames)
             {
                 var q = Counters.Where(x => x.GetName() == counterName).SingleOrDefault();
@@ -45,6 +45,9 @@ namespace TaskbarMonitor
                     {
                         case "CPU":
                             ct = new Counters.CounterCPU(opt);
+                            break;
+                        case "GPU":
+                            ct = new Counters.CounterGPU(opt);
                             break;
                         case "MEM":
                             ct = new Counters.CounterMemory(opt);
