@@ -18,6 +18,7 @@ namespace TaskbarMonitorInstaller
             public Dictionary<string, byte[]> FilesToCopy { get; set; }
             public List<string> FilesToRegister { get; set; }
             public string TargetPath { get; set; }
+            public string LegacyTargetPath { get; set; }
         }
 
         static void Main(string[] args)
@@ -34,7 +35,8 @@ namespace TaskbarMonitorInstaller
                 },
                 FilesToRegister = new List<string> { "TaskbarMonitor.dll" },
                 //TargetPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "TaskbarMonitor")
-                TargetPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "TaskbarMonitor")
+                TargetPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "TaskbarMonitor"),
+                LegacyTargetPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "TaskbarMonitor")
             };
 
             if (args.Length > 0 && args[0].ToLower() == "/uninstall")
@@ -88,6 +90,10 @@ namespace TaskbarMonitorInstaller
                         Console.Write($"Unregistering {item}... ");
                         RegisterDLL(targetFilePath, false, false);
                         RegisterDLL(targetFilePath, true, false);
+
+                        targetFilePath = Path.Combine(info.LegacyTargetPath, item);                        
+                        RegisterDLL(targetFilePath, false, false);
+                        RegisterDLL(targetFilePath, true, false);
                     }
                     // then we terminate existing processes
                     KillProcess("TaskbarMonitorWindows11");
@@ -100,6 +106,11 @@ namespace TaskbarMonitorInstaller
                     RestartExplorer restartExplorer = new RestartExplorer();
                     restartExplorer.Execute(copyFiles);
                 }
+            }
+
+            if(Directory.Exists(info.LegacyTargetPath))
+            {
+                DeleteFiles(info, true);
             }
             
             // if not on windows 11 we must register the DLLs to run on the deskband
@@ -181,49 +192,22 @@ namespace TaskbarMonitorInstaller
                 Console.WriteLine("OK.");
             }
 
-            Action deleteFiles = () =>
-            {                      
-                foreach (var file in info.FilesToCopy)
-                {
-                    var item = file.Key;
-                    var targetFilePath = Path.Combine(info.TargetPath, item);
-                    if (File.Exists(targetFilePath))
-                    {
-                        Console.Write($"Deleting {item}... ");
-                        try
-                        {
-                            if (Win32Api.DeleteFile(Path.Combine(info.TargetPath, item)))
-                            {
-                                Console.WriteLine("OK.");
-                            }
-                            else
-                            {
-                                Win32Api.MoveFileEx(Path.Combine(info.TargetPath, item), null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
-                                Console.WriteLine("Scheduled for deletion after next reboot.");
-                            }
-                        }
-                        catch
-                        {
-                            Win32Api.MoveFileEx(Path.Combine(info.TargetPath, item), null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
-                            Console.WriteLine("Scheduled for deletion after next reboot.");
-                        }
-                        Console.WriteLine("OK.");
-                    }
-                }
-            };
-
             if (!WindowsInformation.IsWindows11())
             {
                 // Delete files
                 RestartExplorer restartExplorer = new RestartExplorer();
-                restartExplorer.Execute(deleteFiles);
+                restartExplorer.Execute(() => { DeleteFiles(info); });
             }
             else
             {
                 // then we terminate existing processes
                 KillProcess("TaskbarMonitorWindows11.exe");
 
-                deleteFiles();
+                DeleteFiles(info);
+                if (Directory.Exists(info.LegacyTargetPath))
+                {
+                    DeleteFiles(info, true);
+                }
 
                 Console.Write("Unregistering startup... ");
                 try
@@ -260,12 +244,44 @@ namespace TaskbarMonitorInstaller
             return true;
         }
 
+        private static void DeleteFiles (InstallInfo info, bool legacy = false)
+        {
+            var path = legacy ? info.LegacyTargetPath : info.TargetPath;
+            foreach (var file in info.FilesToCopy)
+            {
+                var item = file.Key;
+                var targetFilePath = Path.Combine(path, item);
+                if (File.Exists(targetFilePath))
+                {
+                    Console.Write($"Deleting {item}... ");
+                    try
+                    {
+                        if (Win32Api.DeleteFile(Path.Combine(path, item)))
+                        {
+                            Console.WriteLine("OK.");
+                        }
+                        else
+                        {
+                            Win32Api.MoveFileEx(Path.Combine(path, item), null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
+                            Console.WriteLine("Scheduled for deletion after next reboot.");
+                        }
+                    }
+                    catch
+                    {
+                        Win32Api.MoveFileEx(Path.Combine(path, item), null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
+                        Console.WriteLine("Scheduled for deletion after next reboot.");
+                    }
+                    Console.WriteLine("OK.");
+                }
+            }
+        }
+
         static private void SetStartup(string appName, string path)
         {
             RegistryKey rk = Registry.CurrentUser.OpenSubKey
                 ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
             
-                rk.SetValue(appName, path);            
+                rk.SetValue(appName, "\"" + path + "\"");
         }
 
         static private void DeleteStartup(string appName)
@@ -330,7 +346,22 @@ namespace TaskbarMonitorInstaller
                 string guidText = UninstallGuid.ToString("B");
                 parent.DeleteSubKeyTree(guidText, false);
             }
-        
+            using (RegistryKey localKey32 =
+    RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine,
+        RegistryView.Registry32))
+            {
+                using (Microsoft.Win32.RegistryKey parent = localKey32.OpenSubKey(
+                            UninstallRegKeyPath, true))
+                {
+                    if (parent == null)
+                    {
+                        throw new Exception("Uninstall registry key not found.");
+                    }
+                    string guidText = UninstallGuid.ToString("B");
+                    parent.DeleteSubKeyTree(guidText, false);
+                }
+            }
+
         }
         static private void CreateUninstaller(string pathToUninstaller)
         {
@@ -348,6 +379,7 @@ namespace TaskbarMonitorInstaller
 
                     try
                     {
+                        DeleteUninstaller();
                         string guidText = UninstallGuid.ToString("B");
                         key = parent.OpenSubKey(guidText, true) ??
                               parent.CreateSubKey(guidText);

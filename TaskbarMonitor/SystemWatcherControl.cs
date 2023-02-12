@@ -320,6 +320,9 @@ namespace TaskbarMonitor
 
                     lock (ct.ThreadLock)
                     {
+                        if (infos.Count == 0)
+                            continue;
+
                         if (ct.GetCounterType() == TaskbarMonitor.Counters.ICounter.CounterType.SINGLE)
                         {
                             var info = infos[0];
@@ -383,6 +386,7 @@ namespace TaskbarMonitor
                             }
                             formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), positions[opt.TitlePosition], sizeTitle.Width, maximumHeight), new StringFormat());
                         }
+                        //formGraphics.DrawString(this.Left.ToString(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), positions[opt.TitlePosition] + 10, sizeTitle.Width, maximumHeight), new StringFormat());
 
 
                         brushShadow.Dispose();
@@ -455,7 +459,8 @@ namespace TaskbarMonitor
                     }
 
                 }
-            }
+            }            
+            
             AdjustControlSize();
 
         }

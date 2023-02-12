@@ -8,6 +8,7 @@ using TaskbarMonitor.BLL;
 
 using System.Diagnostics;
 using System.Drawing;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace TaskbarMonitor
 {
@@ -15,18 +16,20 @@ namespace TaskbarMonitor
     {
         public IntPtr TargetWnd = IntPtr.Zero;
         public IntPtr TrayWnd = IntPtr.Zero;
+        public IntPtr ClockWnd = IntPtr.Zero;
         public SystemWatcherControl TaskbarMonitorControl;        
+        public Rectangle PreviousRect = Rectangle.Empty;
     }
     public class TaskbarManager: IDisposable
     {
 
-        public Monitor Monitor { get; private set; }        
-        private delegate void Execute();
+        public Monitor Monitor { get; private set; }                
 
         List<Taskbar> TaskbarList = new List<Taskbar>();
-        Taskbar MainTaskbar = null;
+        Taskbar MainTaskbar = null;        
 
         List<IntPtr> g_hook = new List<IntPtr>();
+        List<GCHandle> gchs = new List<GCHandle>();
         private System.Timers.Timer pollingTimer;
 
         public SystemWatcherControl MainControl
@@ -40,7 +43,7 @@ namespace TaskbarMonitor
         public TaskbarManager(Monitor monitor)
         {
             this.Monitor = monitor;
-
+             
             pollingTimer = new System.Timers.Timer(2000);            
             pollingTimer.Elapsed += PollingTimer_Elapsed;
             
@@ -48,8 +51,13 @@ namespace TaskbarMonitor
 
         private void PollingTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if(g_hook.Count == 0)
-                AddControlsWin11();
+            pollingTimer.Stop();
+
+            if (g_hook.Count == 0)
+            {
+               // TaskbarMonitor.BLL.WindowList.SendMessage(0xffff, 0x0210, IntPtr.Zero, IntPtr.Zero);
+            }
+
         }
 
         private void UpdatePositions()
@@ -60,35 +68,79 @@ namespace TaskbarMonitor
                 var rect = BLL.Win32Api.GetWindowSize(handle);
                 if (taskbar.TrayWnd != IntPtr.Zero && taskbar.TaskbarMonitorControl != null)
                 {
-                    var rectTray = BLL.Win32Api.GetWindowSize(taskbar.TrayWnd);                    
-                    taskbar.TaskbarMonitorControl.Invoke((MethodInvoker)delegate
+                    var rectTray = BLL.Win32Api.GetWindowSize(taskbar.TrayWnd);
+                    if(taskbar.PreviousRect.Width == 0)
+                        taskbar.PreviousRect = rectTray;
+                    //if (rectTray.Width < taskbar.PreviousRect.Width)
                     {
-                        taskbar.TaskbarMonitorControl.Left = rect.Width - taskbar.TaskbarMonitorControl.Width - rectTray.Width;
-                    });
+                        if (taskbar.TaskbarMonitorControl.IsHandleCreated)
+                        {
+                            taskbar.TaskbarMonitorControl.Invoke((MethodInvoker)delegate
+                            {
+                                /*
+                                RECT recDiff = new RECT();
+                                recDiff.left = rect.Width - taskbar.TaskbarMonitorControl.Width - taskbar.PreviousRect.Width;
+                                recDiff.top = 0;
+                                recDiff.right = rect.Width - taskbar.TaskbarMonitorControl.Width - rectTray.Width;
+                                recDiff.bottom = rect.Bottom;
+
+                                int rawsize = Marshal.SizeOf(recDiff);
+                                IntPtr ptr = Marshal.AllocHGlobal(rawsize);
+
+                                Marshal.StructureToPtr(recDiff, ptr, true);
+                                */
+                                taskbar.TaskbarMonitorControl.Left = rect.Width - taskbar.TaskbarMonitorControl.Width - rectTray.Width;
+                                var ret = BLL.WindowList.InvalidateRect(taskbar.TargetWnd, IntPtr.Zero, true);
+                            });
+                            
+                        }                        
+                    }
                     
                 }
-                else if (taskbar.TaskbarMonitorControl != null)
-                {                    
-                    taskbar.TaskbarMonitorControl.Invoke((MethodInvoker)delegate
+                else if (taskbar.ClockWnd != IntPtr.Zero && taskbar.TaskbarMonitorControl != null)
+                {
+                    var rectTray = BLL.Win32Api.GetWindowSize(taskbar.ClockWnd);
+                    if (rectTray.Width != taskbar.PreviousRect.Width)
                     {
-                        taskbar.TaskbarMonitorControl.Left = rect.Width - taskbar.TaskbarMonitorControl.Width;
-                    });
+                        taskbar.PreviousRect = rectTray;
+                        if (taskbar.TaskbarMonitorControl.IsHandleCreated)
+                        {
+                            taskbar.TaskbarMonitorControl.Invoke((MethodInvoker)delegate
+                            {
+                                taskbar.TaskbarMonitorControl.Left = rect.Width - taskbar.TaskbarMonitorControl.Width - rectTray.Width;
+                                var ret = BLL.WindowList.InvalidateRect(taskbar.TargetWnd, IntPtr.Zero, true);
+                            });
+                        }
+                    }
+
+                }
+                else if (taskbar.TaskbarMonitorControl != null)
+                {
+                    if (taskbar.TaskbarMonitorControl.IsHandleCreated)
+                    {
+                        taskbar.TaskbarMonitorControl.Invoke((MethodInvoker)delegate
+                        {
+                            taskbar.TaskbarMonitorControl.Left = rect.Width - taskbar.TaskbarMonitorControl.Width;
+                            var ret = BLL.WindowList.InvalidateRect(taskbar.TargetWnd, IntPtr.Zero, true);
+                        });
+                    }
                 }
             }
         }
 
-        public bool AddControlsWin11()
-        { 
+        public bool AddControlsWin11(bool restart = false)
+        {
+            Debug.WriteLine("AddControlsWin11");
             List<WindowInformation> windowListExtended = WindowList.GetAllWindowsExtendedInfo();
 
             var taskarea = windowListExtended.Where(w => w.Class == "Shell_TrayWnd").SingleOrDefault();
             
             if (taskarea == null)
             {
+                //PollingTimer.Start();
                 return false;
             }
-            if(pollingTimer.Enabled)
-                pollingTimer.Stop();
+           
 
             var tray = taskarea.ChildWindows.Where(x => x.Class == "TrayNotifyWnd").SingleOrDefault();
             var target = taskarea;
@@ -114,19 +166,33 @@ namespace TaskbarMonitor
 
             if (g_hook.Count == 0)
                 HookEvents();
-            
+
+            AddControlsExtraMonitors(restart);
+
             return true;
         }
         
-        public bool AddControlsExtraMonitors()
+        public bool AddControlsExtraMonitors(bool restart = false)
         {
-            List<WindowInformation> windowListExtended = WindowList.GetAllWindowsExtendedInfo();
+            Debug.WriteLine("AddControlsExtraMonitors");
 
-            var taskarea = windowListExtended.Where(w => w.Class == "Shell_SecondaryTrayWnd").SingleOrDefault();
-            if(taskarea == null)
+
+            WindowInformation taskarea = null;
+            do
             {
-                return false;
-            }
+                List<WindowInformation> windowListExtended = WindowList.GetAllWindowsExtendedInfo();
+                taskarea = windowListExtended.Where(w => w.Class == "Shell_SecondaryTrayWnd").SingleOrDefault();
+                
+                if(taskarea == null)
+                {
+                    if (!restart)
+                        return false;
+                    else
+                        Thread.Sleep(2000);
+                }                
+            } while (taskarea == null && restart);
+
+
 
             Taskbar tb = new Taskbar();
             TaskbarList.Add(tb);
@@ -136,13 +202,21 @@ namespace TaskbarMonitor
                 // item.ChildWindows.Where(x => x.Class == "Windows.UI.Composition.DesktopWindowContentBridge").SingleOrDefault();
                 if (taskarea != null)
                 {
-                    tb.TargetWnd = taskarea.Handle;                    
+                    tb.TargetWnd = taskarea.Handle;
+
+                    var clock = taskarea.ChildWindows.Where(x => x.Class == "Windows.UI.Composition.DesktopWindowContentBridge").LastOrDefault();
+                    var rectTray = Rectangle.Empty;
+                    if (clock != null)
+                    {
+                        tb.ClockWnd = clock.Handle;
+                        rectTray = BLL.Win32Api.GetWindowSize(clock.Handle);
+                    }
 
                     var rect = BLL.Win32Api.GetWindowSize(taskarea.Handle);
 
                     var OnTopControl = new SystemWatcherControl(this.Monitor);
                     OnTopControl.Name = "Secondary";
-                    OnTopControl.Left = rect.Width - OnTopControl.Width;
+                    OnTopControl.Left = rect.Width - OnTopControl.Width - rectTray.Width;
                     OnTopControl.Show();
                     
 
@@ -187,12 +261,14 @@ namespace TaskbarMonitor
 
         private void HookEvents()
         {
+            Debug.WriteLine("HookEvents");
             Dictionary<AccessibleEvents, BLL.Win32Api.WinEventProc> events = InitializeWinEventToHandlerMap();
 
             //Hook window close event - close our HoverContorl on Target window close.
             BLL.Win32Api.WinEventProc eventHandler = new BLL.Win32Api.WinEventProc(events[AccessibleEvents.LocationChange].Invoke);
 
             GCHandle gch = GCHandle.Alloc(eventHandler);
+            gchs.Add(gch);
 
             g_hook.Add(BLL.Win32Api.SetWinEventHook(AccessibleEvents.LocationChange,
        AccessibleEvents.LocationChange, IntPtr.Zero, eventHandler
@@ -202,28 +278,44 @@ namespace TaskbarMonitor
             eventHandler = new BLL.Win32Api.WinEventProc(events[AccessibleEvents.Destroy].Invoke);
 
             gch = GCHandle.Alloc(eventHandler);
+            gchs.Add(gch);
 
             g_hook.Add(BLL.Win32Api.SetWinEventHook(AccessibleEvents.Destroy,
                 AccessibleEvents.LocationChange, IntPtr.Zero, eventHandler
                 , 0, 0, BLL.Win32Api.SetWinEventHookParameter.WINEVENT_OUTOFCONTEXT));
         }
-         
 
-        public void RemoveControls()
+        private void UnhookEvents()
         {
-            //Removes an event hook function created by a previous call to 
+            Debug.WriteLine("UnhookEvents");
             foreach (var gh in g_hook)
             {
                 BLL.Win32Api.UnhookWinEvent(gh);
             }
             g_hook.Clear();
+            foreach (var gch in gchs)
+            {
+                gch.Free();
+            }
+        }
+         
 
-            //Close HoverControl window.
+        public void RemoveControls()
+        {
+            Debug.WriteLine("RemoveControls");
+            UnhookEvents();
+           
             foreach (var taskbar in TaskbarList)
             {
-                taskbar.TaskbarMonitorControl.Hide();
-                taskbar.TaskbarMonitorControl.Dispose();
-
+                if (taskbar.TaskbarMonitorControl.Created && taskbar.TaskbarMonitorControl.IsHandleCreated)
+                {
+                    taskbar.TaskbarMonitorControl?.Invoke((MethodInvoker)delegate
+                    {
+                        taskbar.TaskbarMonitorControl?.Hide();
+                        taskbar.TaskbarMonitorControl?.Dispose();
+                    });
+                }
+                 
                 var ret = BLL.WindowList.InvalidateRect(taskbar.TargetWnd, IntPtr.Zero, true);
             }
             TaskbarList.Clear();
@@ -231,26 +323,34 @@ namespace TaskbarMonitor
          
         private Dictionary<AccessibleEvents, BLL.Win32Api.WinEventProc> InitializeWinEventToHandlerMap()
         {
-            Dictionary<AccessibleEvents, BLL.Win32Api.WinEventProc> dictionary = new Dictionary<AccessibleEvents, BLL.Win32Api.WinEventProc>();
-
-            dictionary.Add(AccessibleEvents.LocationChange, new BLL.Win32Api.WinEventProc(this.LocationChangedCallback));
-            dictionary.Add(AccessibleEvents.Destroy, new BLL.Win32Api.WinEventProc(this.DestroyCallback));          
+            Dictionary<AccessibleEvents, BLL.Win32Api.WinEventProc> dictionary = new Dictionary<AccessibleEvents, BLL.Win32Api.WinEventProc>
+            {
+                { AccessibleEvents.LocationChange, new BLL.Win32Api.WinEventProc(this.LocationChangedCallback) },
+                { AccessibleEvents.Destroy, new BLL.Win32Api.WinEventProc(this.DestroyCallback) }
+            };
             return dictionary;
         }
 
         private void DestroyCallback(IntPtr winEventHookHandle, AccessibleEvents accEvent, IntPtr windowHandle, int objectId, int childId, uint eventThreadId, uint eventTimeInMilliseconds)
-        {             
+        {            
             if (accEvent == AccessibleEvents.Destroy &&  TaskbarList.Any(x => x.TargetWnd.ToInt32() == windowHandle.ToInt32()))
-            {                
-                ThreadPool.QueueUserWorkItem(new WaitCallback(this.DestroyHelper));
+            {
+                Debug.WriteLine("DestroyCallback");
+                UnhookEvents();
+                RemoveControls();
+                while (!AddControlsWin11())
+                {
+                    Thread.Sleep(2000);
+                }
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(this.DestroyHelper));                
             } 
         }
     
         private void DestroyHelper(object state)
         {
+            Debug.WriteLine("DestroyHelper");
             RemoveControls();
-
-            pollingTimer.Start();            
+            pollingTimer.Start();
         }
 
         private void LocationChangedCallback(IntPtr winEventHookHandle, AccessibleEvents accEvent, IntPtr windowHandle, int objectId, int childId, uint eventThreadId, uint eventTimeInMilliseconds)
