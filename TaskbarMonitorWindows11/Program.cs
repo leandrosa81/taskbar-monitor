@@ -42,18 +42,30 @@ namespace TaskbarMonitorWindows11
 
                 Monitor monitor = new Monitor(opt);
 
-                taskbarManager = new TaskbarManager(monitor);
-                taskbarManager.AddControlsWin11();
- 
-                AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);                
+                taskbarManager = new TaskbarManager(monitor);                
+                taskbarManager.AddControlsToTaskbars();
+
+                AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error starting taskbar-monitor: {ex.Message}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
               
-            ctx = new TaskbarMonitorApplicationContext();         
-            Application.Run(ctx);                       
+            try 
+            {
+                ctx = new TaskbarMonitorApplicationContext();
+                Application.Run(ctx);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show($"Error while running taskbar-monitor: {ex.Message}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally 
+            { 
+                taskbarManager.Dispose(); 
+            }
+            
         }
         
 
@@ -92,12 +104,14 @@ namespace TaskbarMonitorWindows11
                         new MenuItem(String.Format("About taskbar-monitor (v{0})...", taskbarManager.MainControl.Version.ToString(3)), (e, a) => {
                              OpenSettings(2);
                         }),
+                        /*
                         new MenuItem("Hide", (e, a) => {
                              taskbarManager.RemoveControls();
                         }),
                         new MenuItem("Show", (e, a) => {
-                             taskbarManager.AddControlsWin11();
-                        }),
+                             taskbarManager.AddControlsToTaskbars();
+                             //taskbarManager.AddControlsWin11();
+                        }),*/
                         new MenuItem("Exit", Exit),
                     }),
                     Visible = true
