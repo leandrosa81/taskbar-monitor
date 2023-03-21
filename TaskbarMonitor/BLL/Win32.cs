@@ -14,6 +14,11 @@ namespace TaskbarMonitor.BLL
         {
             return System.Environment.OSVersion.Version.Major >= 10 && System.Environment.OSVersion.Version.Build >= 21996;
         }
+
+        public static bool IsWindows11_22621()
+        {
+            return System.Environment.OSVersion.Version.Major >= 10 && System.Environment.OSVersion.Version.Build >= 22621;
+        }
     }
     /// <summary>
     /// Static class that lists all windows
