@@ -87,6 +87,12 @@ namespace TaskbarMonitor.BLL
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern uint GetWindowLong(IntPtr hWnd, GWLParameter nIndex);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern uint SetWindowLong(IntPtr hWnd, GWLParameter nIndex, uint pos);
+
+        [DllImport("user32.dll")]
+        internal static extern bool SetLayeredWindowAttributes(IntPtr hWnd, uint crKey, byte bAlpha, uint dwFlags );
+
 
         [DllImport("user32.dll", EntryPoint = "BringWindowToTop")]
         internal static extern bool BringWindowToTop(IntPtr windowHandle);
