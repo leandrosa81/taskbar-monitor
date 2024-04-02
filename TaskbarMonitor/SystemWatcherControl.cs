@@ -86,8 +86,8 @@ namespace TaskbarMonitor
         {
         }
 
-        public SystemWatcherControl(Monitor monitor)
-        {
+        public SystemWatcherControl(Monitor monitor)            
+        {            
             AttachMonitor(monitor); 
         }
 
@@ -172,7 +172,7 @@ namespace TaskbarMonitor
 
         public void ApplyOptions(Options Options, GraphTheme theme)
         {
-            this.Monitor.UpdateOptions(Options);
+            this.Monitor.UpdateOptions(Options);            
             this.Options = Options;
             this.defaultTheme = theme;
 
@@ -218,7 +218,8 @@ namespace TaskbarMonitor
             SetStyle(ControlStyles.DoubleBuffer, true);
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             SetStyle(ControlStyles.UserPaint, true);
-            SetStyle(ControlStyles.Opaque, true);            
+            SetStyle(ControlStyles.Opaque, true);
+            
             ApplyOptions(opt, theme);
             //Initialize();
 
@@ -270,11 +271,9 @@ namespace TaskbarMonitor
                     OnChangeSize(new Size(controlWidth, controlHeight));
             }
         }
-         
 
-        private void SystemWatcherControl_Paint(object sender, PaintEventArgs e)
+        protected override void OnPaint(PaintEventArgs e)
         {
-           
             var maximumHeight = this.Height;
 
             int graphPosition = 0;
@@ -283,12 +282,11 @@ namespace TaskbarMonitor
 
             System.Drawing.Graphics formGraphics = e.Graphics;// this.CreateGraphics();            
             formGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;//AntiAliasGridFit;
-            formGraphics.Clear(this.BackColor);
-            //formGraphics.Clear(Color.Transparent);
+            formGraphics.Clear(Color.Transparent);
             if (SHOW_DEBUG)
             {
                 using (SolidBrush BrushText = new SolidBrush(defaultTheme.TextColor))
-                {                    
+                {
                     formGraphics.DrawString($"w: {this.Width}, h: {this.Height}", fontCounter, BrushText, new RectangleF(2, 2, 400, 100), new StringFormat());
                     formGraphics.DrawString($"tb h: {this.taskbarHeight}", fontCounter, BrushText, new RectangleF(2, 10, 400, 100), new StringFormat());
 
@@ -459,13 +457,12 @@ namespace TaskbarMonitor
                     }
 
                 }
-            }            
-            
+            }
+
             AdjustControlSize();
-
+            base.OnPaint(e);
         }
-
-
+         
         private void drawGraph(System.Drawing.Graphics formGraphics, int x, int y, int maxH, bool invertido, TaskbarMonitor.Counters.CounterInfo info, GraphTheme theme, CounterOptions opt)
         {
             var pos = maxH - ((info.CurrentValue * maxH) / info.MaximumValue);
@@ -605,9 +602,9 @@ namespace TaskbarMonitor
         {
             mouseOver = false;
             this.Invalidate();
-        }
+        }        
         protected override void WndProc(ref Message m)
-        {
+        {            
             base.WndProc(ref m);
         }
 

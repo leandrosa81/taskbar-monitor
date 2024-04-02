@@ -129,10 +129,14 @@ namespace TaskbarMonitor
             btnColor1.BackColor = this.Theme.StackedColors[0];
             btnColor2.BackColor = this.Theme.StackedColors[1];
 
-            UpdatePreview();
+            chkEnableAllTaskbars.Checked = this.Options.EnableOnAllMonitors;
+            UpdateMonitorForm();
 
+            UpdatePreview();
+            
             initializing = false;
         }
+         
 
         private void UpdatePreview()
         {
@@ -622,6 +626,70 @@ namespace TaskbarMonitor
             btnColorCurrentValueShadow.Enabled = Options.ThemeType == Options.ThemeList.CUSTOM;
             linkTitleFont.Enabled = Options.ThemeType == Options.ThemeList.CUSTOM;
             linkCurrentValueFont.Enabled = Options.ThemeType == Options.ThemeList.CUSTOM;
+        }
+
+        private void UpdateMonitorForm()
+        {
+            Screen selectedScreen = screenPositioning1.SelectedScreen;
+            var opt = Options.MonitorOptions.ContainsKey(selectedScreen.DeviceName) ? Options.MonitorOptions[selectedScreen.DeviceName] : null;
+            if (opt == null)
+            {
+                chkMonitorEnabled.Checked = true;
+                listMonitorPosition.SelectedItem = MonitorOptions.DisplayPosition.RIGHT.ToString();
+            }
+            else
+            {
+                chkMonitorEnabled.Checked = opt.Enabled;
+                listMonitorPosition.SelectedItem = opt.Position.ToString();
+            }
+        }
+
+        private void screenPositioning1_OnSelectedScreenChange(Screen selectedScreen)
+        {
+            if (initializing) return;
+            UpdateMonitorForm();
+        }
+
+        private void chkEnableAllTaskbars_CheckedChanged(object sender, EventArgs e)
+        {
+            if (initializing) return;
+            Options.EnableOnAllMonitors = chkEnableAllTaskbars.Checked;
+        }
+
+        private void chkMonitorEnabled_CheckedChanged(object sender, EventArgs e)
+        {
+            if (initializing) return;
+            Screen selectedScreen = screenPositioning1.SelectedScreen;
+            var opt = Options.MonitorOptions.ContainsKey(selectedScreen.DeviceName) ? Options.MonitorOptions[selectedScreen.DeviceName] : null;
+            if (opt == null)
+            {
+                opt = new MonitorOptions();
+                Options.MonitorOptions.Add(selectedScreen.DeviceName, opt); 
+            }
+            opt.Enabled = chkMonitorEnabled.Checked;
+
+            if(opt.Enabled && opt.Position == MonitorOptions.DisplayPosition.RIGHT)
+            {
+                Options.MonitorOptions.Remove(selectedScreen.DeviceName);
+            }
+        }
+
+        private void listMonitorPosition_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (initializing) return;
+            Screen selectedScreen = screenPositioning1.SelectedScreen;
+            var opt = Options.MonitorOptions.ContainsKey(selectedScreen.DeviceName) ? Options.MonitorOptions[selectedScreen.DeviceName] : null;
+            if (opt == null)
+            {
+                opt = new MonitorOptions();
+                Options.MonitorOptions.Add(selectedScreen.DeviceName, opt);
+            }
+            opt.Position = (MonitorOptions.DisplayPosition)Enum.Parse(typeof(MonitorOptions.DisplayPosition), listMonitorPosition.SelectedItem.ToString());
+
+            if (opt.Enabled && opt.Position == MonitorOptions.DisplayPosition.RIGHT)
+            {
+                Options.MonitorOptions.Remove(selectedScreen.DeviceName);
+            }
         }
     }
 }

@@ -71,7 +71,17 @@ namespace TaskbarMonitorWindows11.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 0.3.6.
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap iconpng {
+            get {
+                object obj = ResourceManager.GetObject("iconpng", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 0.4.2.
         /// </summary>
         internal static string Version {
             get {

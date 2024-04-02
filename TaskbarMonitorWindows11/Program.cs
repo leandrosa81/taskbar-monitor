@@ -26,18 +26,23 @@ namespace TaskbarMonitorWindows11
         [STAThread]
         static void Main()
         {
-            if (Environment.OSVersion.Version.Major >= 6)
-                SetProcessDPIAware();
-            if(!TaskbarMonitor.BLL.WindowsInformation.IsWindows11())
-            {
-                MessageBox.Show("Please use this application on Windows 11+ devices only.");
-                return;
-            }
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-
             try
             {
+                if (Environment.OSVersion.Version.Major >= 6)
+                    SetProcessDPIAware();
+                if (!TaskbarMonitor.BLL.WindowsInformation.IsWindows11())
+                {
+                    MessageBox.Show("Please use this application on Windows 11+ devices only.");
+                    return;
+                }
+
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+#if (!DEBUG)
+                Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);                    
+                Application.ThreadException += Application_ThreadException;
+#endif
+
                 Options opt = TaskbarMonitor.Options.ReadFromDisk();
 
                 Monitor monitor = new Monitor(opt);
@@ -46,20 +51,16 @@ namespace TaskbarMonitorWindows11
                 taskbarManager.AddControlsToTaskbars();
 
                 AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error starting taskbar-monitor: {ex.Message}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-              
-            try 
-            {
-                ctx = new TaskbarMonitorApplicationContext();
-                Application.Run(ctx);
+             
+                using (ctx = new TaskbarMonitorApplicationContext())
+                {                    
+                    Application.Run(ctx);
+                }
             }
             catch(Exception ex)
             {
-                MessageBox.Show($"Error while running taskbar-monitor: {ex.Message}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //MessageBox.Show($"Error while running taskbar-monitor: {ex.Message}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                OpenReportForm(ex);
             }
             finally 
             { 
@@ -67,12 +68,23 @@ namespace TaskbarMonitorWindows11
             }
             
         }
-        
+
+        private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            OpenReportForm(e.Exception);
+        }
+
+        private static void OpenReportForm(Exception ex)
+        {
+            using (var r = new ReportErrorForm(ex))
+            {
+                r.Show();
+                r.Run();
+            }
+        }
 
         static void CurrentDomain_ProcessExit(object sender, EventArgs e)
-        {
-            //if (ctx != null && ctx.is)
-                //ctx.Dispose();
+        {            
             taskbarManager.RemoveControls();
         }
 
@@ -85,7 +97,7 @@ namespace TaskbarMonitorWindows11
                 // Initialize Tray Icon
                 trayIcon = new NotifyIcon()
                 {
-                    Icon = Resources.icon,
+                    Icon = (System.Drawing.Icon)Resources.icon,
                     ContextMenu = new ContextMenu(new MenuItem[] {
                         new MenuItem("Settings...", (e, a) => {
                              OpenSettings();
@@ -101,22 +113,23 @@ namespace TaskbarMonitorWindows11
                         {
                             System.Diagnostics.Process.Start("resmon.exe");
                         }),
-                        new MenuItem(String.Format("About taskbar-monitor (v{0})...", taskbarManager.MainControl.Version.ToString(3)), (e, a) => {
+                        new MenuItem(String.Format("About taskbar-monitor (v{0})...", new Version(Properties.Resources.Version).ToString(3)), (e, a) => {
                              OpenSettings(2);
                         }),
-                        /*
+                        
                         new MenuItem("Hide", (e, a) => {
-                             taskbarManager.RemoveControls();
-                        }),
+                             //taskbarManager.RemoveControls();
+                             throw new Exception("test exception");
+                        }),/*
                         new MenuItem("Show", (e, a) => {
                              taskbarManager.AddControlsToTaskbars();
                              //taskbarManager.AddControlsWin11();
-                        }),*/
+                        }),*/   
                         new MenuItem("Exit", Exit),
                     }),
                     Visible = true
                 };              
-            }
+            }            
  
             private void OpenSettings(int activeIndex = 0)
             {
@@ -141,10 +154,8 @@ namespace TaskbarMonitorWindows11
             }
 
             protected override void Dispose(bool disposing)
-            {
-                // Hide tray icon, otherwise it will remain shown until user mouses over it
+            {                
                 trayIcon.Visible = false;
-
                 base.Dispose(disposing);
             }
         }
