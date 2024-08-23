@@ -16,12 +16,15 @@ namespace TaskbarMonitor
             LIGHT,
             CUSTOM            
         }
-        public static readonly int LATESTOPTIONSVERSION = 2;
+        public static readonly int LATESTOPTIONSVERSION = 3;
         public int OptionsVersion = LATESTOPTIONSVERSION;
         public Dictionary<string, CounterOptions> CounterOptions { get; set; }
         public int HistorySize { get; set; } = 50;
         public int PollTime { get; set; } = 3;
         public ThemeList ThemeType { get; set; } = ThemeList.AUTOMATIC;
+
+        public bool EnableOnAllMonitors { get; set; } = true;
+        public Dictionary<string, MonitorOptions> MonitorOptions { get; set; } = new Dictionary<string, MonitorOptions>();
 
         public void CopyTo(Options opt)
         {
@@ -30,7 +33,7 @@ namespace TaskbarMonitor
             opt.ThemeType = this.ThemeType;
             if(opt.CounterOptions == null)
                 opt.CounterOptions = new Dictionary<string, CounterOptions>();
-
+            
             foreach (var item in this.CounterOptions)
             {
                 if (!opt.CounterOptions.ContainsKey(item.Key))
@@ -48,6 +51,28 @@ namespace TaskbarMonitor
                 opt.CounterOptions[item.Key].SeparateScales = item.Value.SeparateScales;
                 opt.CounterOptions[item.Key].GraphType = item.Value.GraphType;                
             }
+
+            opt.EnableOnAllMonitors = this.EnableOnAllMonitors;
+
+            if (opt.MonitorOptions == null)
+                opt.MonitorOptions = new Dictionary<string, MonitorOptions>();
+            foreach (var item in this.MonitorOptions)
+            {
+                if (!opt.MonitorOptions.ContainsKey(item.Key))
+                    opt.MonitorOptions.Add(item.Key, new TaskbarMonitor.MonitorOptions());
+
+                opt.MonitorOptions[item.Key].Enabled = item.Value.Enabled;
+                opt.MonitorOptions[item.Key].Position = item.Value.Position;
+            }
+            for(int i = 0; i < opt.MonitorOptions.Count; i++)
+            {
+                if (!this.MonitorOptions.ContainsKey(opt.MonitorOptions.Keys.ToList()[i]))
+                {
+                    opt.MonitorOptions.Remove(opt.MonitorOptions.Keys.ToList()[i]);
+                    i--;
+                }
+            }
+
         }
         public static Options DefaultOptions()
         {
@@ -63,7 +88,9 @@ namespace TaskbarMonitor
                 },
                 HistorySize = 50,
                 PollTime = 3,
-                ThemeType = ThemeList.DARK
+                ThemeType = ThemeList.DARK,
+                EnableOnAllMonitors = true,
+                MonitorOptions = new Dictionary<string, MonitorOptions>()
             };
         }
         public static Options ReadFromDisk()
@@ -146,5 +173,16 @@ namespace TaskbarMonitor
         public bool InvertOrder { get; set; } = false;
         public bool SeparateScales { get; set; } = true;
         public TaskbarMonitor.Counters.ICounter.CounterType GraphType { get; set; }      
+    }
+
+    public class MonitorOptions
+    {
+        public enum DisplayPosition
+        {
+            LEFT,
+            RIGHT
+        }
+        public bool Enabled { get; set; } = true;
+        public DisplayPosition Position { get; set; } = DisplayPosition.RIGHT; 
     }
 }

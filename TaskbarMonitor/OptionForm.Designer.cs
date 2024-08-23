@@ -36,7 +36,8 @@
             this.editHistorySize = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.panelMenu = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnMenuMultiMonitor = new System.Windows.Forms.Button();
+            this.btnMenuAbout = new System.Windows.Forms.Button();
             this.btnMenuCounters = new System.Windows.Forms.Button();
             this.btnMenuGeneral = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
@@ -102,6 +103,15 @@
             this.editPollTime = new System.Windows.Forms.NumericUpDown();
             this.label16 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.chkMonitorEnabled = new System.Windows.Forms.CheckBox();
+            this.label38 = new System.Windows.Forms.Label();
+            this.label37 = new System.Windows.Forms.Label();
+            this.listMonitorPosition = new System.Windows.Forms.ComboBox();
+            this.screenPositioning1 = new TaskbarMonitor.ScreenPositioning();
+            this.chkEnableAllTaskbars = new System.Windows.Forms.CheckBox();
+            this.label36 = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.linkLatestVersion = new System.Windows.Forms.LinkLabel();
             this.btnCheckUpdate = new System.Windows.Forms.Button();
@@ -139,6 +149,8 @@
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editPollTime)).BeginInit();
             this.tabPage2.SuspendLayout();
+            this.tabPage4.SuspendLayout();
+            this.groupBox6.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.panelFooter.SuspendLayout();
             this.SuspendLayout();
@@ -207,7 +219,8 @@
             // panelMenu
             // 
             this.panelMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.panelMenu.Controls.Add(this.button1);
+            this.panelMenu.Controls.Add(this.btnMenuMultiMonitor);
+            this.panelMenu.Controls.Add(this.btnMenuAbout);
             this.panelMenu.Controls.Add(this.btnMenuCounters);
             this.panelMenu.Controls.Add(this.btnMenuGeneral);
             this.panelMenu.Dock = System.Windows.Forms.DockStyle.Left;
@@ -217,19 +230,33 @@
             this.panelMenu.Size = new System.Drawing.Size(164, 560);
             this.panelMenu.TabIndex = 1;
             // 
-            // button1
+            // btnMenuMultiMonitor
             // 
-            this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.ForeColor = System.Drawing.Color.White;
-            this.button1.Location = new System.Drawing.Point(0, 105);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(164, 54);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "ABOUT";
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.btnMenu_Click);
+            this.btnMenuMultiMonitor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.btnMenuMultiMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMenuMultiMonitor.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnMenuMultiMonitor.ForeColor = System.Drawing.Color.White;
+            this.btnMenuMultiMonitor.Location = new System.Drawing.Point(0, 105);
+            this.btnMenuMultiMonitor.Name = "btnMenuMultiMonitor";
+            this.btnMenuMultiMonitor.Size = new System.Drawing.Size(164, 54);
+            this.btnMenuMultiMonitor.TabIndex = 3;
+            this.btnMenuMultiMonitor.Text = "MULTI MONITORS\r\n&& POSITIONING";
+            this.btnMenuMultiMonitor.UseVisualStyleBackColor = false;
+            this.btnMenuMultiMonitor.Click += new System.EventHandler(this.btnMenu_Click);
+            // 
+            // btnMenuAbout
+            // 
+            this.btnMenuAbout.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.btnMenuAbout.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMenuAbout.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnMenuAbout.ForeColor = System.Drawing.Color.White;
+            this.btnMenuAbout.Location = new System.Drawing.Point(0, 155);
+            this.btnMenuAbout.Name = "btnMenuAbout";
+            this.btnMenuAbout.Size = new System.Drawing.Size(164, 54);
+            this.btnMenuAbout.TabIndex = 2;
+            this.btnMenuAbout.Text = "ABOUT";
+            this.btnMenuAbout.UseVisualStyleBackColor = false;
+            this.btnMenuAbout.Click += new System.EventHandler(this.btnMenu_Click);
             // 
             // btnMenuCounters
             // 
@@ -627,6 +654,7 @@
             this.tabControl1.Appearance = System.Windows.Forms.TabAppearance.FlatButtons;
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage4);
             this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.ItemSize = new System.Drawing.Size(0, 1);
@@ -965,6 +993,108 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
             // 
+            // tabPage4
+            // 
+            this.tabPage4.BackColor = System.Drawing.Color.Transparent;
+            this.tabPage4.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("tabPage4.BackgroundImage")));
+            this.tabPage4.Controls.Add(this.groupBox6);
+            this.tabPage4.Controls.Add(this.screenPositioning1);
+            this.tabPage4.Controls.Add(this.chkEnableAllTaskbars);
+            this.tabPage4.Controls.Add(this.label36);
+            this.tabPage4.Font = new System.Drawing.Font("Calibri", 9F);
+            this.tabPage4.Location = new System.Drawing.Point(4, 5);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Size = new System.Drawing.Size(590, 551);
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "tabPage4";
+            // 
+            // groupBox6
+            // 
+            this.groupBox6.Controls.Add(this.chkMonitorEnabled);
+            this.groupBox6.Controls.Add(this.label38);
+            this.groupBox6.Controls.Add(this.label37);
+            this.groupBox6.Controls.Add(this.listMonitorPosition);
+            this.groupBox6.Location = new System.Drawing.Point(362, 70);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Size = new System.Drawing.Size(200, 219);
+            this.groupBox6.TabIndex = 10;
+            this.groupBox6.TabStop = false;
+            this.groupBox6.Text = "Options for this display";
+            // 
+            // chkMonitorEnabled
+            // 
+            this.chkMonitorEnabled.AutoSize = true;
+            this.chkMonitorEnabled.Location = new System.Drawing.Point(173, 31);
+            this.chkMonitorEnabled.Name = "chkMonitorEnabled";
+            this.chkMonitorEnabled.Size = new System.Drawing.Size(15, 14);
+            this.chkMonitorEnabled.TabIndex = 15;
+            this.chkMonitorEnabled.UseVisualStyleBackColor = true;
+            this.chkMonitorEnabled.CheckedChanged += new System.EventHandler(this.chkMonitorEnabled_CheckedChanged);
+            // 
+            // label38
+            // 
+            this.label38.AutoSize = true;
+            this.label38.Location = new System.Drawing.Point(12, 30);
+            this.label38.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label38.Name = "label38";
+            this.label38.Size = new System.Drawing.Size(55, 14);
+            this.label38.TabIndex = 14;
+            this.label38.Text = "Enabled:";
+            // 
+            // label37
+            // 
+            this.label37.AutoSize = true;
+            this.label37.Location = new System.Drawing.Point(12, 70);
+            this.label37.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label37.Name = "label37";
+            this.label37.Size = new System.Drawing.Size(54, 14);
+            this.label37.TabIndex = 6;
+            this.label37.Text = "Position:";
+            // 
+            // listMonitorPosition
+            // 
+            this.listMonitorPosition.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.listMonitorPosition.FormattingEnabled = true;
+            this.listMonitorPosition.Items.AddRange(new object[] {
+            "RIGHT",
+            "LEFT"});
+            this.listMonitorPosition.Location = new System.Drawing.Point(96, 62);
+            this.listMonitorPosition.Margin = new System.Windows.Forms.Padding(2);
+            this.listMonitorPosition.Name = "listMonitorPosition";
+            this.listMonitorPosition.Size = new System.Drawing.Size(92, 22);
+            this.listMonitorPosition.TabIndex = 7;
+            this.listMonitorPosition.SelectedIndexChanged += new System.EventHandler(this.listMonitorPosition_SelectedIndexChanged);
+            // 
+            // screenPositioning1
+            // 
+            this.screenPositioning1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.screenPositioning1.Location = new System.Drawing.Point(13, 70);
+            this.screenPositioning1.Name = "screenPositioning1";
+            this.screenPositioning1.Size = new System.Drawing.Size(330, 219);
+            this.screenPositioning1.TabIndex = 9;
+            this.screenPositioning1.OnSelectedScreenChange += new TaskbarMonitor.ScreenPositioning.SelectedScreenChangeHandler(this.screenPositioning1_OnSelectedScreenChange);
+            // 
+            // chkEnableAllTaskbars
+            // 
+            this.chkEnableAllTaskbars.AutoSize = true;
+            this.chkEnableAllTaskbars.Location = new System.Drawing.Point(13, 46);
+            this.chkEnableAllTaskbars.Name = "chkEnableAllTaskbars";
+            this.chkEnableAllTaskbars.Size = new System.Drawing.Size(240, 18);
+            this.chkEnableAllTaskbars.TabIndex = 8;
+            this.chkEnableAllTaskbars.Text = "Enable taskbar-monitor on all taskbars";
+            this.chkEnableAllTaskbars.UseVisualStyleBackColor = true;
+            this.chkEnableAllTaskbars.CheckedChanged += new System.EventHandler(this.chkEnableAllTaskbars_CheckedChanged);
+            // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Font = new System.Drawing.Font("Calibri", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label36.Location = new System.Drawing.Point(8, 6);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(279, 27);
+            this.label36.TabIndex = 7;
+            this.label36.Text = "Multi Monitors && Positioning";
+            // 
             // tabPage3
             // 
             this.tabPage3.BackColor = System.Drawing.Color.Transparent;
@@ -1247,6 +1377,10 @@
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editPollTime)).EndInit();
             this.tabPage2.ResumeLayout(false);
+            this.tabPage4.ResumeLayout(false);
+            this.tabPage4.PerformLayout();
+            this.groupBox6.ResumeLayout(false);
+            this.groupBox6.PerformLayout();
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
             this.panelFooter.ResumeLayout(false);
@@ -1279,7 +1413,7 @@
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnMenuAbout;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label lblVersion;
@@ -1350,5 +1484,15 @@
         private System.Windows.Forms.ComboBox listThemeType;
         private System.Windows.Forms.Label label35;
         private System.Windows.Forms.Panel panelCustomTheme;
+        private System.Windows.Forms.Button btnMenuMultiMonitor;
+        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.Label label36;
+        private System.Windows.Forms.CheckBox chkEnableAllTaskbars;
+        private System.Windows.Forms.GroupBox groupBox6;
+        private System.Windows.Forms.CheckBox chkMonitorEnabled;
+        private System.Windows.Forms.Label label38;
+        private System.Windows.Forms.Label label37;
+        private System.Windows.Forms.ComboBox listMonitorPosition;
+        private ScreenPositioning screenPositioning1;
     }
 }

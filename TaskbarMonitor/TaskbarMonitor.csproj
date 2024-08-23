@@ -20,6 +20,7 @@
     <DefineConstants>TRACE;DEBUG;DESKBAND_WINFORMS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +29,7 @@
     <DefineConstants>TRACE;DESKBAND_WINFORMS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
@@ -87,6 +89,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ScreenPositioning.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ScreenPositioning.Designer.cs">
+      <DependentUpon>ScreenPositioning.cs</DependentUpon>
+    </Compile>
     <Compile Include="TaskbarManager.cs" />
     <Compile Include="SystemWatcherControl.cs">
       <SubType>UserControl</SubType>
@@ -104,6 +112,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ScreenPositioning.resx">
+      <DependentUpon>ScreenPositioning.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SystemWatcherControl.resx">
       <DependentUpon>SystemWatcherControl.cs</DependentUpon>

@@ -12,6 +12,9 @@ namespace TaskbarMonitor
         public delegate void NotifyUpdate();
         public event NotifyUpdate OnMonitorUpdated;
 
+        public delegate void OptionsUpdate();
+        public event OptionsUpdate OnOptionsUpdated;
+
         public Options Options { get; private set; }
 
         public List<Counters.ICounter> Counters;
@@ -67,7 +70,10 @@ namespace TaskbarMonitor
                 {
                     Counters.Remove(q);
                 }
-            }            
+            }
+
+            if (OnOptionsUpdated != null)
+                OnOptionsUpdated();
         }
         
         private void PollingTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)

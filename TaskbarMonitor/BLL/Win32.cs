@@ -14,6 +14,11 @@ namespace TaskbarMonitor.BLL
         {
             return System.Environment.OSVersion.Version.Major >= 10 && System.Environment.OSVersion.Version.Build >= 21996;
         }
+
+        public static bool IsWindows11_22621()
+        {
+            return System.Environment.OSVersion.Version.Major >= 10 && System.Environment.OSVersion.Version.Build >= 22621;
+        }
     }
     /// <summary>
     /// Static class that lists all windows
@@ -166,7 +171,7 @@ namespace TaskbarMonitor.BLL
         /// <param name="lParam">IntPtr.Zero</param>
         /// <returns></returns>
         [DllImport("User32.dll")]
-        private static extern int SendMessage(IntPtr hwnd, WMConstants wmConstant, IntPtr wParam, IntPtr lParam);
+        public static extern int SendMessage(int hwnd, int msg, IntPtr wParam, IntPtr lParam);
 
         [DllImport("User32.dll")]
         internal static extern bool InvalidateRect(IntPtr hWnd, IntPtr lpRect,  bool bErase);
