@@ -53,6 +53,12 @@ namespace TaskbarMonitor
                     TaskbarMonitor.Counters.ICounter.CounterType.STACKED
                 }
                 },
+                {"GPU",  new List<TaskbarMonitor.Counters.ICounter.CounterType>
+                {
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED
+                }
+                },
                 {"MEM",  new List<TaskbarMonitor.Counters.ICounter.CounterType>
                 {
                     TaskbarMonitor.Counters.ICounter.CounterType.SINGLE
