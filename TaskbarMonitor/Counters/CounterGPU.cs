@@ -20,7 +20,7 @@ namespace TaskbarMonitor.Counters
             {
                 InfoSummary = new CounterInfo() { Name = "GPU Summary", History = new List<float>(), MaximumValue = 100.0f };
                 Infos = new List<CounterInfo>();
-                Infos.Add(new CounterInfo() { Name = "GPUM", History = new List<float>(), MaximumValue = 100.0f });
+                Infos.Add(new CounterInfo() { Name = "GPU3D", History = new List<float>(), MaximumValue = 100.0f });
             }
         }
         public override void Update()
@@ -32,7 +32,7 @@ namespace TaskbarMonitor.Counters
                 var category = new PerformanceCounterCategory("GPU Engine");
                 var counterNames = category.GetInstanceNames();
 
-                List<PerformanceCounter> gpuCounters =gpuCounters = counterNames
+                List<PerformanceCounter> gpuCounters = counterNames
                                         .Where(counterName => counterName.EndsWith("engtype_3D"))
                                         .SelectMany(counterName => category.GetCounters(counterName))
                                         .Where(counter => counter.CounterName.Equals("Utilization Percentage"))
@@ -55,7 +55,7 @@ namespace TaskbarMonitor.Counters
                 InfoSummary.CurrentStringValue = (InfoSummary.CurrentValue).ToString("0") + "%";
 
                 {
-                    var info = Infos.Where(x => x.Name == "GPUM").Single();
+                    var info = Infos.Where(x => x.Name == "GPU3D").Single();
                     info.CurrentValue = currentValue;
                     info.History.Add(currentValue);
                     if (info.History.Count > Options.HistorySize) info.History.RemoveAt(0);
