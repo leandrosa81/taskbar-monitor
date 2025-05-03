@@ -178,16 +178,17 @@ namespace TaskbarMonitor
 
         private MonitorOptions GetOptionsForTaskbar(Taskbar tb)
         {
-            MonitorOptions mopt = null;            
+            MonitorOptions mopt = null;
             var pos = BLL.Win32Api.GetWindowSize(tb.TargetWnd);
             foreach (var item in this.Monitor.Options.MonitorOptions)
             {
-                if (pos.IntersectsWith(Screen.AllScreens.Where(x => x.DeviceName == item.Key).Single().Bounds))                
-                {                    
+                var screen = Screen.AllScreens.SingleOrDefault(x => x.DeviceName == item.Key);
+                if (screen != null && pos.IntersectsWith(screen.Bounds))
+                {
                     mopt = item.Value;
                 }
             }
-            return mopt;            
+            return mopt;
         }
 
         private bool AddControlToTaskbar(WindowInformation taskbarArea, WindowInformation trayArea, bool isMainTaskbar)
