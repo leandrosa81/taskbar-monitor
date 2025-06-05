@@ -281,7 +281,9 @@ namespace TaskbarMonitor
 
 
             System.Drawing.Graphics formGraphics = e.Graphics;// this.CreateGraphics();            
-            formGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;//AntiAliasGridFit;
+            formGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
+
+            //formGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;//AntiAliasGridFit;
             formGraphics.Clear(Color.Transparent);
             if (SHOW_DEBUG)
             {
@@ -309,7 +311,9 @@ namespace TaskbarMonitor
                 {
                     var name = pair.Key;
                     var opt = pair.Value;
-                    var ct = Monitor.Counters.Where(x => x.GetName() == name).Single();
+                    var ct = Monitor.Counters.Where(x => x.GetName() == name).SingleOrDefault();
+                    if (ct == null) continue;
+
                     var infos = ct.Infos;
                     //var opt = Options.CounterOptions[ct.GetName()];
                     //if (!opt.Enabled) continue;
@@ -380,7 +384,7 @@ namespace TaskbarMonitor
                         {
                             if ((opt.ShowTitle == CounterOptions.DisplayType.HOVER && mouseOver) || opt.ShowTitle == CounterOptions.DisplayType.SHOW)
                             {
-                                formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) + 1, positions[opt.TitlePosition] + 1, sizeTitle.Width, maximumHeight), new StringFormat());
+                               formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) + 1, positions[opt.TitlePosition] + 1, sizeTitle.Width, maximumHeight), new StringFormat());
                             }
                             formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), positions[opt.TitlePosition], sizeTitle.Width, maximumHeight), new StringFormat());
                         }
