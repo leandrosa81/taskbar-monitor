@@ -116,11 +116,16 @@ namespace TaskbarMonitorWindows11
                         new MenuItem(String.Format("About taskbar-monitor (v{0})...", new Version(Properties.Resources.Version).ToString(3)), (e, a) => {
                              OpenSettings(2);
                         }),
-                        
-                        new MenuItem("Hide", (e, a) => {
+                        /*
+                        new MenuItem("Update position", (e, a) => {
+                             //taskbarManager.RemoveControls();
+                             taskbarManager.UpdateAllPositions();
+                             //throw new Exception("test exception");
+                        }),
+                         new MenuItem("Hide", (e, a) => {
                              //taskbarManager.RemoveControls();
                              throw new Exception("test exception");
-                        }),/*
+                        }),
                         new MenuItem("Show", (e, a) => {
                              taskbarManager.AddControlsToTaskbars();
                              //taskbarManager.AddControlsWin11();

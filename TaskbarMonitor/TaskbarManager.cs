@@ -29,7 +29,7 @@ namespace TaskbarMonitor
     public class TaskbarManager: IDisposable
     {
         const int timeoutToRegisterAttemptAfterTaskbarRestart = 10000;
-        private const int intervalToMonitorTaskbars = 3000;
+        private const int intervalToMonitorTaskbars = 4000;
 
         public Monitor Monitor { get; private set; }                
 
@@ -50,11 +50,11 @@ namespace TaskbarMonitor
         }
 
         public TaskbarManager(Monitor monitor)
-        {
-            System.Timers.Timer timer = new System.Timers.Timer(intervalToMonitorTaskbars);
+        {            
+            timer = new System.Timers.Timer(intervalToMonitorTaskbars);
             timer.AutoReset = true;
             timer.Elapsed += Timer_Elapsed;
-            timer.Start();
+            //timer.Start(); // we start only after first taskbars are create
 
             this.Monitor = monitor;
             this.Monitor.OnOptionsUpdated += Monitor_OnOptionsUpdated;                
@@ -63,8 +63,8 @@ namespace TaskbarMonitor
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (TaskbarList.Count > 0)
-            {
-                TaskbarList[0].TaskbarMonitorControl.Invoke(new Func<bool>(() => { return AddControlsToTaskbars(); }));
+            {                
+                TaskbarList[0].TaskbarMonitorControl?.Invoke(new Func<bool>(() => { return AddControlsToTaskbars(); }));
             }
         }
 
@@ -76,6 +76,14 @@ namespace TaskbarMonitor
                 UpdatePosition(item, true);                
                 
             }
+        }
+
+        public void UpdateAllPositions()
+        {
+            foreach (var item in TaskbarList)
+            {
+                UpdatePosition(item, true);
+            }            
         }
 
         private void UpdatePosition(Taskbar taskbar, bool force = false)
@@ -171,8 +179,12 @@ namespace TaskbarMonitor
                 }
             }
 
-            if(everythingOK)
-                HookEvents();
+            if (everythingOK)
+            {
+               HookEvents();
+                if (!timer.Enabled)
+                    timer.Start();
+            }
             return everythingOK;
         }
 
@@ -182,10 +194,20 @@ namespace TaskbarMonitor
             var pos = BLL.Win32Api.GetWindowSize(tb.TargetWnd);
             foreach (var item in this.Monitor.Options.MonitorOptions)
             {
-                if (pos.IntersectsWith(Screen.AllScreens.Where(x => x.DeviceName == item.Key).Single().Bounds))                
+                var monitor = Screen.AllScreens.Where(x => x.DeviceName == item.Key).SingleOrDefault();
+                if (monitor == null)
+                    continue;
+                if (pos.IntersectsWith(monitor.Bounds))                
                 {                    
                     mopt = item.Value;
                 }
+            }
+            if(mopt == null)
+            {
+                if(this.Monitor.Options.MonitorOptions.Count == 1)
+                    return this.Monitor.Options.MonitorOptions.Values.FirstOrDefault();
+                else
+                    return new MonitorOptions();
             }
             return mopt;            
         }
@@ -194,10 +216,16 @@ namespace TaskbarMonitor
         {
             Debug.WriteLine("AddControlToTaskbar");
 
-            if (TaskbarList.Any(x => x.TaskbarMonitorControl.Name == "taskbarMonitorFor" + taskbarArea.Handle))
+            if (TaskbarList.Any(x => x.TaskbarMonitorControl?.Name == "taskbarMonitorFor" + taskbarArea.Handle))
                 return true;
-               
-            Taskbar tb = new Taskbar(isMainTaskbar);
+
+            Taskbar tb = TaskbarList.Where(x => x.TargetWnd == taskbarArea.Handle).SingleOrDefault();
+            if(tb == null)
+            {
+                tb = new Taskbar(isMainTaskbar);
+                TaskbarList.Add(tb);
+                tb.TargetWnd = taskbarArea.Handle;
+            }
 
             if(isMainTaskbar && WindowsInformation.IsWindows11_22621())
             {
@@ -206,12 +234,10 @@ namespace TaskbarMonitor
             }
             
             
-            tb.TargetWnd = taskbarArea.Handle;
+            
             var mopt = GetOptionsForTaskbar(tb);
             //if (!this.Monitor.Options.EnableOnAllMonitors || (mopt != null && !mopt.Enabled))
                 //return true;
-
-            TaskbarList.Add(tb);
 
 
             if (isMainTaskbar)
