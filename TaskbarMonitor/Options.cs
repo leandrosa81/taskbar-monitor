@@ -168,6 +168,17 @@ namespace TaskbarMonitor
                     ShowTitleShadowOnHover = true
                 });
             }
+            if (BLL.WindowsInformation.IsWindows11())
+            {
+                foreach (var item in opt.CounterOptions)
+                {
+                    if (item.Value.ShowTitle == TaskbarMonitor.CounterOptions.DisplayType.HOVER)
+                        item.Value.ShowTitle = TaskbarMonitor.CounterOptions.DisplayType.SHOW;
+
+                    if (item.Value.ShowCurrentValue == TaskbarMonitor.CounterOptions.DisplayType.HOVER)
+                        item.Value.ShowCurrentValue = TaskbarMonitor.CounterOptions.DisplayType.SHOW;
+                }
+            }
             return opt;
         }
         public static Options ReadFromDisk()
@@ -257,10 +268,22 @@ namespace TaskbarMonitor
                                     ShowTitleShadowOnHover = true
                                 });
                         }
+                        
                         ret = true;
                         break;
                     default:
                         break;
+                }
+            }
+            if (BLL.WindowsInformation.IsWindows11())
+            {
+                foreach (var item in this.CounterOptions)
+                {
+                    if(item.Value.ShowTitle == TaskbarMonitor.CounterOptions.DisplayType.HOVER)
+                        item.Value.ShowTitle = TaskbarMonitor.CounterOptions.DisplayType.SHOW;
+
+                    if (item.Value.ShowCurrentValue == TaskbarMonitor.CounterOptions.DisplayType.HOVER)
+                        item.Value.ShowCurrentValue = TaskbarMonitor.CounterOptions.DisplayType.SHOW;
                 }
             }
             return ret;

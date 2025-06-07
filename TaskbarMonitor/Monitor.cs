@@ -21,7 +21,20 @@ namespace TaskbarMonitor
 
         private System.Timers.Timer pollingTimer;
 
-        public Monitor(Options opt)
+        private static Monitor _instance = null;
+        private static object instanceLock = new object();
+        public static Monitor GetInstance(Options opt)
+        {
+            lock (instanceLock)
+            {
+                if (_instance == null) _instance = new Monitor(opt);
+            }
+            return _instance;
+        }
+
+        private static object updateLock = new object();
+        private static bool updating = false;
+        private Monitor(Options opt)
         {
             UpdateOptions(opt);            
 
@@ -84,14 +97,30 @@ namespace TaskbarMonitor
             if (pollingTimer != null && pollingTimer.Interval != Options.PollTime * 1000)
                 pollingTimer.Interval = Options.PollTime * 1000;
 
-            foreach (var ct in Counters)
+            lock(updateLock)
             {
-                ct.Update();
-            };
-            
-            if(OnMonitorUpdated != null)
-                OnMonitorUpdated();
+                if (updating)
+                    return;
+                updating = true;
+            }
+            try
+            {
+                foreach (var ct in Counters)
+                {
+                    ct.Update();
+                }
+                ;
 
+                if (OnMonitorUpdated != null)
+                    OnMonitorUpdated();
+            }
+            finally
+            {
+                lock (updateLock)
+                {
+                    updating = false;
+                }
+            }
         }
 
         public void Dispose()

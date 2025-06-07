@@ -56,7 +56,7 @@ namespace TaskbarMonitor
             timer.Elapsed += Timer_Elapsed;
             //timer.Start(); // we start only after first taskbars are create
             Options opt = TaskbarMonitor.Options.ReadFromDisk();
-            this.Monitor = new Monitor(opt);
+            this.Monitor = Monitor.GetInstance(opt);
             this.Monitor.OnOptionsUpdated += Monitor_OnOptionsUpdated;                
         }
 

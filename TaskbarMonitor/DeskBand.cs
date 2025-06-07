@@ -29,7 +29,7 @@ namespace TaskbarMonitor
                 TaskbarInfo.TaskbarSizeChanged += TaskbarInfo_TaskbarSizeChanged;
                 TaskbarInfo.TaskbarEdgeChanged += TaskbarInfo_TaskbarEdgeChanged;
                 TaskbarInfo.TaskbarOrientationChanged += TaskbarInfo_TaskbarOrientationChanged;
-                Monitor monitor = new Monitor(opt);
+                Monitor monitor = Monitor.GetInstance(opt);
                 var ctl = new SystemWatcherControl(monitor, false, this);
                 Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, CSDeskBand.CSDeskBandOptions.TaskbarHorizontalHeightSmall);
                 

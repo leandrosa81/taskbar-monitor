@@ -43,7 +43,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.listCounters = new System.Windows.Forms.ListBox();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.buttonReplicateSettings = new TaskbarMonitor.Controls.MenuButton();
             this.contextMenuStripReplicateSettings = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -109,7 +108,6 @@
             this.label38 = new System.Windows.Forms.Label();
             this.label37 = new System.Windows.Forms.Label();
             this.listMonitorPosition = new System.Windows.Forms.ComboBox();
-            this.screenPositioning1 = new TaskbarMonitor.ScreenPositioning();
             this.chkEnableAllTaskbars = new System.Windows.Forms.CheckBox();
             this.label36 = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
@@ -129,10 +127,13 @@
             this.label9 = new System.Windows.Forms.Label();
             this.panelFooter = new System.Windows.Forms.Panel();
             this.label17 = new System.Windows.Forms.Label();
-            this.swcPreview = new TaskbarMonitor.SystemWatcherControl();
-            this.button3 = new System.Windows.Forms.Button();
+            this.buttonOK = new System.Windows.Forms.Button();
             this.buttonResetDefaults = new System.Windows.Forms.Button();
             this.buttonApply = new System.Windows.Forms.Button();
+            this.buttonCancel = new System.Windows.Forms.Button();
+            this.swcPreview = new TaskbarMonitor.SystemWatcherControl();
+            this.buttonReplicateSettings = new TaskbarMonitor.Controls.MenuButton();
+            this.screenPositioning1 = new TaskbarMonitor.ScreenPositioning();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editHistorySize)).BeginInit();
             this.panelMenu.SuspendLayout();
@@ -320,17 +321,6 @@
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(415, 426);
             this.panel3.TabIndex = 2;
-            // 
-            // buttonReplicateSettings
-            // 
-            this.buttonReplicateSettings.Location = new System.Drawing.Point(249, 355);
-            this.buttonReplicateSettings.Menu = this.contextMenuStripReplicateSettings;
-            this.buttonReplicateSettings.Name = "buttonReplicateSettings";
-            this.buttonReplicateSettings.ShowMenuUnderCursor = true;
-            this.buttonReplicateSettings.Size = new System.Drawing.Size(154, 23);
-            this.buttonReplicateSettings.TabIndex = 2;
-            this.buttonReplicateSettings.Text = "Replicate Settings";
-            this.buttonReplicateSettings.UseVisualStyleBackColor = true;
             // 
             // contextMenuStripReplicateSettings
             // 
@@ -998,9 +988,9 @@
             this.tabPage4.BackColor = System.Drawing.Color.Transparent;
             this.tabPage4.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("tabPage4.BackgroundImage")));
             this.tabPage4.Controls.Add(this.groupBox6);
-            this.tabPage4.Controls.Add(this.screenPositioning1);
             this.tabPage4.Controls.Add(this.chkEnableAllTaskbars);
             this.tabPage4.Controls.Add(this.label36);
+            this.tabPage4.Controls.Add(this.screenPositioning1);
             this.tabPage4.Font = new System.Drawing.Font("Calibri", 9F);
             this.tabPage4.Location = new System.Drawing.Point(4, 5);
             this.tabPage4.Name = "tabPage4";
@@ -1064,15 +1054,6 @@
             this.listMonitorPosition.Size = new System.Drawing.Size(92, 22);
             this.listMonitorPosition.TabIndex = 7;
             this.listMonitorPosition.SelectedIndexChanged += new System.EventHandler(this.listMonitorPosition_SelectedIndexChanged);
-            // 
-            // screenPositioning1
-            // 
-            this.screenPositioning1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.screenPositioning1.Location = new System.Drawing.Point(13, 70);
-            this.screenPositioning1.Name = "screenPositioning1";
-            this.screenPositioning1.Size = new System.Drawing.Size(330, 219);
-            this.screenPositioning1.TabIndex = 9;
-            this.screenPositioning1.OnSelectedScreenChange += new TaskbarMonitor.ScreenPositioning.SelectedScreenChangeHandler(this.screenPositioning1_OnSelectedScreenChange);
             // 
             // chkEnableAllTaskbars
             // 
@@ -1266,9 +1247,10 @@
             // panelFooter
             // 
             this.panelFooter.BackColor = System.Drawing.Color.Transparent;
+            this.panelFooter.Controls.Add(this.buttonCancel);
             this.panelFooter.Controls.Add(this.label17);
             this.panelFooter.Controls.Add(this.swcPreview);
-            this.panelFooter.Controls.Add(this.button3);
+            this.panelFooter.Controls.Add(this.buttonOK);
             this.panelFooter.Controls.Add(this.buttonResetDefaults);
             this.panelFooter.Controls.Add(this.buttonApply);
             this.panelFooter.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -1287,27 +1269,16 @@
             this.label17.TabIndex = 5;
             this.label17.Text = "Preview:";
             // 
-            // swcPreview
+            // buttonOK
             // 
-            this.swcPreview.BackColor = System.Drawing.Color.Transparent;
-            this.swcPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.swcPreview.Location = new System.Drawing.Point(15, 39);
-            this.swcPreview.Name = "swcPreview";
-            this.swcPreview.PreviewMode = true;
-            this.swcPreview.Size = new System.Drawing.Size(240, 30);
-            this.swcPreview.TabIndex = 4;
-            this.swcPreview.Version = ((System.Version)(resources.GetObject("swcPreview.Version")));
-            // 
-            // button3
-            // 
-            this.button3.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button3.Location = new System.Drawing.Point(343, 85);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(120, 23);
-            this.button3.TabIndex = 2;
-            this.button3.Text = "Cancel";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.buttonOK.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonOK.Location = new System.Drawing.Point(219, 87);
+            this.buttonOK.Name = "buttonOK";
+            this.buttonOK.Size = new System.Drawing.Size(120, 23);
+            this.buttonOK.TabIndex = 2;
+            this.buttonOK.Text = "OK";
+            this.buttonOK.UseVisualStyleBackColor = true;
+            this.buttonOK.Click += new System.EventHandler(this.buttonOK_Click);
             // 
             // buttonResetDefaults
             // 
@@ -1324,13 +1295,56 @@
             // 
             this.buttonApply.BackColor = System.Drawing.Color.White;
             this.buttonApply.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonApply.Location = new System.Drawing.Point(471, 85);
+            this.buttonApply.Location = new System.Drawing.Point(471, 87);
             this.buttonApply.Name = "buttonApply";
             this.buttonApply.Size = new System.Drawing.Size(120, 23);
             this.buttonApply.TabIndex = 0;
             this.buttonApply.Text = "Apply";
             this.buttonApply.UseVisualStyleBackColor = false;
             this.buttonApply.Click += new System.EventHandler(this.buttonApply_Click);
+            // 
+            // buttonCancel
+            // 
+            this.buttonCancel.BackColor = System.Drawing.Color.White;
+            this.buttonCancel.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonCancel.Location = new System.Drawing.Point(345, 87);
+            this.buttonCancel.Name = "buttonCancel";
+            this.buttonCancel.Size = new System.Drawing.Size(120, 23);
+            this.buttonCancel.TabIndex = 6;
+            this.buttonCancel.Text = "Cancel";
+            this.buttonCancel.UseVisualStyleBackColor = false;
+            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
+            // 
+            // swcPreview
+            // 
+            this.swcPreview.BackColor = System.Drawing.Color.Transparent;
+            this.swcPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.swcPreview.Location = new System.Drawing.Point(15, 39);
+            this.swcPreview.Name = "swcPreview";
+            this.swcPreview.PreviewMode = true;
+            this.swcPreview.Size = new System.Drawing.Size(240, 30);
+            this.swcPreview.TabIndex = 4;
+            this.swcPreview.Version = ((System.Version)(resources.GetObject("swcPreview.Version")));
+            // 
+            // buttonReplicateSettings
+            // 
+            this.buttonReplicateSettings.Location = new System.Drawing.Point(249, 355);
+            this.buttonReplicateSettings.Menu = this.contextMenuStripReplicateSettings;
+            this.buttonReplicateSettings.Name = "buttonReplicateSettings";
+            this.buttonReplicateSettings.ShowMenuUnderCursor = true;
+            this.buttonReplicateSettings.Size = new System.Drawing.Size(154, 23);
+            this.buttonReplicateSettings.TabIndex = 2;
+            this.buttonReplicateSettings.Text = "Replicate Settings";
+            this.buttonReplicateSettings.UseVisualStyleBackColor = true;
+            // 
+            // screenPositioning1
+            // 
+            this.screenPositioning1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.screenPositioning1.Location = new System.Drawing.Point(13, 70);
+            this.screenPositioning1.Name = "screenPositioning1";
+            this.screenPositioning1.Size = new System.Drawing.Size(330, 219);
+            this.screenPositioning1.TabIndex = 9;
+            this.screenPositioning1.OnSelectedScreenChange += new TaskbarMonitor.ScreenPositioning.SelectedScreenChangeHandler(this.screenPositioning1_OnSelectedScreenChange);
             // 
             // OptionForm
             // 
@@ -1457,7 +1471,7 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.Button buttonResetDefaults;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.CheckBox checkEnabled;
         private System.Windows.Forms.Label label32;
         private System.Windows.Forms.GroupBox groupBox5;
@@ -1494,5 +1508,6 @@
         private System.Windows.Forms.Label label37;
         private System.Windows.Forms.ComboBox listMonitorPosition;
         private ScreenPositioning screenPositioning1;
+        private System.Windows.Forms.Button buttonCancel;
     }
 }

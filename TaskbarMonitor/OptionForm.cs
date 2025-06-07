@@ -41,7 +41,7 @@ namespace TaskbarMonitor
                 this.Options = new Options();
                 this.OriginalOptions = opt;
                 opt.CopyTo(this.Options);
-                monitor = new Monitor(this.Options);
+                monitor = Monitor.GetInstance(this.Options);
 
                 //this.originalControl = originalControl;
                 this.manager = manager;
@@ -116,8 +116,13 @@ namespace TaskbarMonitor
             this.editPollTime.Value = this.Options.PollTime;
             this.listThemeType.Text = this.Options.ThemeType.ToString();
             this.listCounters.DataSource = this.Options.CounterOptions.Keys.AsEnumerable().ToList();
-            this.listShowTitle.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayType));
-            this.listShowCurrentValue.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayType));
+            var items = Enum.GetValues(typeof(CounterOptions.DisplayType)).OfType<CounterOptions.DisplayType>().ToList();
+            if (BLL.WindowsInformation.IsWindows11())
+            {
+                items.Remove(CounterOptions.DisplayType.HOVER);
+            }
+            this.listShowTitle.DataSource = items;            
+            this.listShowCurrentValue.DataSource = items;
             this.listSummaryPosition.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayPosition));
             this.listTitlePosition.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayPosition));
 
@@ -260,7 +265,7 @@ namespace TaskbarMonitor
             initializing = false;
             this.listGraphType.Text = ActiveCounter.GraphType.ToString();
             checkEnabled.Checked = ActiveCounter.Enabled;
-            listShowTitle.Text = ActiveCounter.ShowTitle.ToString();
+            listShowTitle.Text = ActiveCounter.ShowTitle.ToString();            
             listShowCurrentValue.Text = ActiveCounter.ShowCurrentValue.ToString();
             checkShowSummary.Checked = ActiveCounter.CurrentValueAsSummary;            
             listSummaryPosition.Text = ActiveCounter.SummaryPosition.ToString();
@@ -288,7 +293,7 @@ namespace TaskbarMonitor
         }
 
         private void UpdateFormShow()
-        {
+        {            
             checkTitleShadowHover.Enabled = listShowTitle.Text == "HOVER";
             checkValueShadowHover.Enabled = listShowCurrentValue.Text == "HOVER";
             listTitlePosition.Enabled = listShowTitle.Text != "HIDDEN";
@@ -561,12 +566,7 @@ namespace TaskbarMonitor
             GithubUpdater update = new GithubUpdater("leandrosa81", "taskbar-monitor");
             System.Diagnostics.Process.Start(update.GetURL());
         }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
+ 
         private void buttonResetDefaults_Click(object sender, EventArgs e)
         {
             Options.DefaultOptions().CopyTo(this.Options);
@@ -581,17 +581,7 @@ namespace TaskbarMonitor
             UpdatePreview();
         }
 
-        private void buttonApply_Click(object sender, EventArgs e)
-        {
-            this.Options.CopyTo(this.OriginalOptions);
-            this.Options.SaveToDisk();
-
-            this.Theme.CopyTo(this.OriginalTheme);
-            this.Theme.SaveToDisk();
-            this.Close();
-            manager.ApplyOptions(this.OriginalOptions);
-            //originalControl.ApplyOptions(this.OriginalOptions);
-        }
+        
 
         private void linkTitleFont_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
@@ -703,6 +693,33 @@ namespace TaskbarMonitor
             {
                 Options.MonitorOptions.Remove(selectedScreen.DeviceName);
             }
+        }
+
+        private void buttonCancel_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void buttonApply_Click(object sender, EventArgs e)
+        {
+            this.Options.CopyTo(this.OriginalOptions);
+            this.Options.SaveToDisk();
+
+            this.Theme.CopyTo(this.OriginalTheme);
+            this.Theme.SaveToDisk();
+            manager.ApplyOptions(this.OriginalOptions);
+            //originalControl.ApplyOptions(this.OriginalOptions);
+        }
+
+        private void buttonOK_Click(object sender, EventArgs e)
+        {
+            this.Options.CopyTo(this.OriginalOptions);
+            this.Options.SaveToDisk();
+
+            this.Theme.CopyTo(this.OriginalTheme);
+            this.Theme.SaveToDisk();
+            this.Close();
+            manager.ApplyOptions(this.OriginalOptions);
         }
     }
 }
