@@ -120,10 +120,10 @@ namespace TaskbarMonitor
         {
             return new GraphTheme
             {
-                BarColor = Color.FromArgb(255, 0, 0, 0),
-                TextColor = Color.FromArgb(200, 255, 0, 128),
+                BarColor = Color.FromArgb(255, 255, 0, 128),
+                TextColor = Color.FromArgb(255, 0, 128, 192),
                 TextShadowColor = Color.FromArgb(255, 207, 207, 207),
-                TitleColor = Color.FromArgb(255, 0, 0, 0),
+                TitleColor = Color.FromArgb(255, 255, 0, 128),
                 TitleShadowColor = Color.FromArgb(255, 214, 214, 214),
                 TitleFont = "Arial",
                 TitleFontStyle = FontStyle.Bold,
@@ -133,8 +133,8 @@ namespace TaskbarMonitor
                 CurrentValueSize = 7f,
                 StackedColors = new List<Color>
                 {
-                    Color.FromArgb(255, 102, 102, 102) ,
-                    Color.FromArgb(255, 145, 145, 145)
+                    Color.FromArgb(255, 162, 162, 162) ,
+                    Color.FromArgb(255, 200, 200, 200)
                 }
             };
         }
@@ -161,7 +161,7 @@ namespace TaskbarMonitor
             if (!System.IO.Directory.Exists(folder))
                 System.IO.Directory.CreateDirectory(folder);
 
-            System.IO.File.WriteAllText(origin, JsonConvert.SerializeObject(this));
+            System.IO.File.WriteAllText(origin, JsonConvert.SerializeObject(this, Formatting.Indented));
             return true;
         }
         private bool Upgrade()
@@ -185,34 +185,41 @@ namespace TaskbarMonitor
         {
             var light = DefaultLightTheme();
             var dark = DefaultDarkTheme();
-            if (theme.BarColor.ToArgb() != light.BarColor.ToArgb() && theme.BarColor.ToArgb() != dark.BarColor.ToArgb())
-                return true;
-            if (theme.TextColor.ToArgb() != light.TextColor.ToArgb() && theme.TextColor.ToArgb() != dark.TextColor.ToArgb())
-                return true;
-            if (theme.TextShadowColor.ToArgb() != light.TextShadowColor.ToArgb() && theme.TextShadowColor.ToArgb() != dark.TextShadowColor.ToArgb())
-                return true;
-            if (theme.TitleColor.ToArgb() != light.TitleColor.ToArgb() && theme.TitleColor.ToArgb() != dark.TitleColor.ToArgb())
-                return true;
-            if (theme.TitleShadowColor.ToArgb() != light.TitleShadowColor.ToArgb() && theme.TitleShadowColor.ToArgb() != dark.TitleShadowColor.ToArgb())
-                return true;
-            if (!theme.TitleFont.Equals(light) && !theme.TitleFont.Equals(dark))
-                return true;
-            if (!theme.TitleSize.Equals(light) && !theme.TitleSize.Equals(dark))
-                return true;
 
-            int i = 0;
-            
-            foreach (var item in theme.StackedColors)
-            {
-                if (light.StackedColors.Count <= i ) return true;
-                if (dark.StackedColors.Count <= i ) return true;
-                if (item.ToArgb() != light.StackedColors[i].ToArgb() && item.ToArgb() != dark.StackedColors[i].ToArgb())
-                    return true;
-                i++;
-            }
-
-            return false;
+            return !IsThemeEqual(theme, light) && !IsThemeEqual(theme, dark);
         }
 
+        private static bool IsThemeEqual(GraphTheme a, GraphTheme b)
+        {
+            if (a == null || b == null) return false;
+
+            if (a.BarColor.ToArgb() != b.BarColor.ToArgb()) return false;
+            if (a.TextColor.ToArgb() != b.TextColor.ToArgb()) return false;
+            if (a.TextShadowColor.ToArgb() != b.TextShadowColor.ToArgb()) return false;
+            if (a.TitleColor.ToArgb() != b.TitleColor.ToArgb()) return false;
+            if (a.TitleShadowColor.ToArgb() != b.TitleShadowColor.ToArgb()) return false;
+            if (!string.Equals(a.TitleFont, b.TitleFont, StringComparison.Ordinal)) return false;
+            if (a.TitleFontStyle != b.TitleFontStyle) return false;
+            if (a.TitleSize != b.TitleSize) return false;
+            if (!string.Equals(a.CurrentValueFont, b.CurrentValueFont, StringComparison.Ordinal)) return false;
+            if (a.CurrentValueFontStyle != b.CurrentValueFontStyle) return false;
+            if (a.CurrentValueSize != b.CurrentValueSize) return false;
+
+            if (!AreStackedColorsEqual(a.StackedColors, b.StackedColors)) return false;
+
+            return true;
+        }
+
+        private static bool AreStackedColorsEqual(List<Color> a, List<Color> b)
+        {
+            if (a == null && b == null) return true;
+            if (a == null || b == null) return false;
+            if (a.Count != b.Count) return false;
+            for (int i = 0; i < a.Count; i++)
+            {
+                if (a[i].ToArgb() != b[i].ToArgb()) return false;
+            }
+            return true;
+        }
     }
 }

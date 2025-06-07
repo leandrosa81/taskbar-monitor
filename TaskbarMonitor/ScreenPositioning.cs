@@ -106,8 +106,14 @@ namespace TaskbarMonitor
 
         private Rectangle GetAdjustedSize(Rectangle bounds)
         {
-            int maxWidth = Convert.ToInt32(Screen.AllScreens.Max(x => x.Bounds.Right));
-            int maxHeight = Convert.ToInt32(Screen.AllScreens.Max(x => x.Bounds.Bottom));
+            // Find the bounding rectangle of all screens
+            int minX = Screen.AllScreens.Min(x => x.Bounds.Left);
+            int minY = Screen.AllScreens.Min(x => x.Bounds.Top);
+            int maxX = Screen.AllScreens.Max(x => x.Bounds.Right);
+            int maxY = Screen.AllScreens.Max(x => x.Bounds.Bottom);
+
+            int totalWidth = maxX - minX;
+            int totalHeight = maxY - minY;
 
             int adjustedMaxWidth = Convert.ToInt32(this.Size.Width * 0.6);
             int adjustedMaxHeight = Convert.ToInt32(this.Size.Height * 0.6);
@@ -115,12 +121,16 @@ namespace TaskbarMonitor
             int offsetX = (this.Size.Width / 2) - (adjustedMaxWidth / 2);
             int offsetY = (this.Size.Height / 2) - (adjustedMaxHeight / 2);
 
+            // Avoid division by zero
+            if (totalWidth == 0) totalWidth = 1;
+            if (totalHeight == 0) totalHeight = 1;
+
             Rectangle adjustedSize = new Rectangle(
-                    ((adjustedMaxWidth * bounds.Left) / maxWidth) + offsetX,
-                    ((adjustedMaxHeight * bounds.Top) / maxHeight) + offsetY,
-                    (adjustedMaxWidth * (bounds.Right - bounds.Left)) / maxWidth,
-                    (adjustedMaxHeight * (bounds.Bottom - bounds.Top)) / maxHeight
-                    );
+                ((adjustedMaxWidth * (bounds.Left - minX)) / totalWidth) + offsetX,
+                ((adjustedMaxHeight * (bounds.Top - minY)) / totalHeight) + offsetY,
+                (adjustedMaxWidth * bounds.Width) / totalWidth,
+                (adjustedMaxHeight * bounds.Height) / totalHeight
+            );
 
             return adjustedSize;
         }

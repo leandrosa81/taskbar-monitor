@@ -42,12 +42,8 @@ namespace TaskbarMonitorWindows11
                 Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);                    
                 Application.ThreadException += Application_ThreadException;
 #endif
-
-                Options opt = TaskbarMonitor.Options.ReadFromDisk();
-
-                Monitor monitor = new Monitor(opt);
-
-                taskbarManager = new TaskbarManager(monitor);                
+                
+                taskbarManager = TaskbarManager.GetInstance();                
                 taskbarManager.AddControlsToTaskbars();
 
                 AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
@@ -114,7 +110,7 @@ namespace TaskbarMonitorWindows11
                             System.Diagnostics.Process.Start("resmon.exe");
                         }),
                         new MenuItem(String.Format("About taskbar-monitor (v{0})...", new Version(Properties.Resources.Version).ToString(3)), (e, a) => {
-                             OpenSettings(2);
+                             OpenSettings(3);
                         }),
                         /*
                         new MenuItem("Update position", (e, a) => {
@@ -142,7 +138,7 @@ namespace TaskbarMonitorWindows11
                 OptionForm optForm = null;
                 if (qtd.Count() == 0)
                 {
-                    optForm = new OptionForm(taskbarManager.MainControl.Options, taskbarManager.MainControl.customTheme, taskbarManager.MainControl.Version, taskbarManager.MainControl);
+                    optForm = new OptionForm(taskbarManager.MainControl.Options, taskbarManager.MainControl.customTheme, taskbarManager.MainControl.Version, taskbarManager);
                     optForm.Show();
                 }
                 else

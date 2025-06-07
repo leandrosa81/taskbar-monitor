@@ -49,14 +49,14 @@ namespace TaskbarMonitor
             }
         }
 
-        public TaskbarManager(Monitor monitor)
+        private TaskbarManager()
         {            
             timer = new System.Timers.Timer(intervalToMonitorTaskbars);
             timer.AutoReset = true;
             timer.Elapsed += Timer_Elapsed;
             //timer.Start(); // we start only after first taskbars are create
-
-            this.Monitor = monitor;
+            Options opt = TaskbarMonitor.Options.ReadFromDisk();
+            this.Monitor = new Monitor(opt);
             this.Monitor.OnOptionsUpdated += Monitor_OnOptionsUpdated;                
         }
 
@@ -190,7 +190,16 @@ namespace TaskbarMonitor
 
         private MonitorOptions GetOptionsForTaskbar(Taskbar tb)
         {
-            MonitorOptions mopt = null;            
+            MonitorOptions mopt = null;           
+            
+            // if there is no device that match options and the system returns single setting or default settings if none exists
+            if(!this.Monitor.Options.MonitorOptions.Any(x => Screen.AllScreens.Select(y => y.DeviceName).ToList().Any(y=> y == x.Key)))
+            {
+                if(this.Monitor.Options.MonitorOptions.Count == 1)
+                    return this.Monitor.Options.MonitorOptions.Values.FirstOrDefault();
+                else
+                    return new MonitorOptions();
+            }
             var pos = BLL.Win32Api.GetWindowSize(tb.TargetWnd);
             foreach (var item in this.Monitor.Options.MonitorOptions)
             {
@@ -203,11 +212,8 @@ namespace TaskbarMonitor
                 }
             }
             if(mopt == null)
-            {
-                if(this.Monitor.Options.MonitorOptions.Count == 1)
-                    return this.Monitor.Options.MonitorOptions.Values.FirstOrDefault();
-                else
-                    return new MonitorOptions();
+            {                
+                return new MonitorOptions();
             }
             return mopt;            
         }
@@ -273,6 +279,15 @@ namespace TaskbarMonitor
 
             UpdatePosition(tb);
 
+            return true;
+        }
+
+        public bool ApplyOptions(Options options)
+        {
+            foreach (var taskbar in this.TaskbarList)
+            {
+                taskbar.TaskbarMonitorControl.ApplyOptions(options);
+            }
             return true;
         }
          
@@ -410,6 +425,12 @@ namespace TaskbarMonitor
             UnhookEvents();
             timer.Stop();
             timer.Dispose();    
+        }
+        private static TaskbarManager _instance = null;
+        public static TaskbarManager GetInstance()
+        {
+            if (_instance == null) _instance = new TaskbarManager();
+            return _instance;
         }
     }
 }

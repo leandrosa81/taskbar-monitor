@@ -44,5 +44,10 @@ namespace TaskbarMonitor.Counters
         public abstract CounterType GetCounterType();
 
         //public abstract List<CounterInfo> GetValues();
+
+        public static bool IsAvailable()
+        {
+            return true;
+        }
     }
 }

@@ -22,12 +22,13 @@ namespace TaskbarMonitor
         private bool initializing = true;
         Dictionary<string, IList<TaskbarMonitor.Counters.ICounter.CounterType>> AvailableGraphTypes;
 
-        SystemWatcherControl originalControl = null;
+        //SystemWatcherControl originalControl = null;
+        TaskbarManager manager;
 
         private Font ChosenTitleFont;
         private Font ChosenCurrentValueFont;
 
-        public OptionForm(Options opt, GraphTheme theme, Version version, SystemWatcherControl originalControl)
+        public OptionForm(Options opt, GraphTheme theme, Version version, TaskbarManager manager/*, SystemWatcherControl originalControl*/)
         {
             try
             {
@@ -41,10 +42,9 @@ namespace TaskbarMonitor
                 this.OriginalOptions = opt;
                 opt.CopyTo(this.Options);
                 monitor = new Monitor(this.Options);
-                
 
-                this.originalControl = originalControl;
-
+                //this.originalControl = originalControl;
+                this.manager = manager;
                 AvailableGraphTypes = new Dictionary<string, IList<Counters.ICounter.CounterType>>
             {
                 {"CPU",  new List<TaskbarMonitor.Counters.ICounter.CounterType>
@@ -52,13 +52,7 @@ namespace TaskbarMonitor
                     TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
                     TaskbarMonitor.Counters.ICounter.CounterType.STACKED
                 }
-                },
-                {"GPU",  new List<TaskbarMonitor.Counters.ICounter.CounterType>
-                {
-                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED
-                }
-                },
+                },                
                 {"MEM",  new List<TaskbarMonitor.Counters.ICounter.CounterType>
                 {
                     TaskbarMonitor.Counters.ICounter.CounterType.SINGLE
@@ -76,6 +70,18 @@ namespace TaskbarMonitor
                     TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
                     TaskbarMonitor.Counters.ICounter.CounterType.STACKED,
                     TaskbarMonitor.Counters.ICounter.CounterType.MIRRORED
+                }
+                },
+                {"GPU 3D",  new List<TaskbarMonitor.Counters.ICounter.CounterType>
+                {
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED
+                }
+                },
+                {"GPU MEM",  new List<TaskbarMonitor.Counters.ICounter.CounterType>
+                {
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED
                 }
                 }
             };
@@ -120,6 +126,7 @@ namespace TaskbarMonitor
             ActiveCounter = this.Options.CounterOptions.First().Value;
             UpdateForm();
             UpdateReplicateSettingsMenu();
+            UpdateThemeOptions();
             btnColorBar.BackColor = this.Theme.BarColor;
             btnColorCurrentValue.BackColor = this.Theme.TextColor;
             btnColorCurrentValueShadow.BackColor = this.Theme.TextShadowColor;
@@ -582,8 +589,8 @@ namespace TaskbarMonitor
             this.Theme.CopyTo(this.OriginalTheme);
             this.Theme.SaveToDisk();
             this.Close();
-
-            originalControl.ApplyOptions(this.OriginalOptions);
+            manager.ApplyOptions(this.OriginalOptions);
+            //originalControl.ApplyOptions(this.OriginalOptions);
         }
 
         private void linkTitleFont_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

@@ -147,7 +147,11 @@ namespace TaskbarMonitor
             if (opt.ThemeType == Options.ThemeList.LIGHT)
                 theme = lightTheme;
             else if (opt.ThemeType == Options.ThemeList.CUSTOM)
+            {
+                customTheme = GraphTheme.ReadFromDisk();
+                opt.Upgrade(customTheme);
                 theme = customTheme;
+            }
             else if (opt.ThemeType == Options.ThemeList.AUTOMATIC)
             {
                 Color taskBarColour = BLL.Win32Api.GetColourAt(BLL.Win32Api.GetTaskbarPosition().Location);
@@ -618,7 +622,7 @@ namespace TaskbarMonitor
             OptionForm optForm = null;
             if (qtd.Count() == 0)
             {
-                optForm = new OptionForm(this.Options, this.customTheme, this.Version, this);
+                optForm = new OptionForm(this.Options, this.customTheme, this.Version, TaskbarManager.GetInstance());
                 optForm.Show();
             }
             else

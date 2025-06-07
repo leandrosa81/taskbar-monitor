@@ -16,7 +16,7 @@ namespace TaskbarMonitor
             LIGHT,
             CUSTOM            
         }
-        public static readonly int LATESTOPTIONSVERSION = 3;
+        public static readonly int LATESTOPTIONSVERSION = 4;
         public int OptionsVersion = LATESTOPTIONSVERSION;
         public Dictionary<string, CounterOptions> CounterOptions { get; set; }
         public int HistorySize { get; set; } = 50;
@@ -76,22 +76,99 @@ namespace TaskbarMonitor
         }
         public static Options DefaultOptions()
         {
-            return new Options
+            var opt = new Options
             {
                 CounterOptions = new Dictionary<string, CounterOptions>
                 {
-                    { "CPU", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
-                    { "GPU", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
-                    { "MEM", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
-                    { "DISK", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } },
-                    { "NET", new CounterOptions { GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE } }
+                    { "CPU", new CounterOptions { 
+                        GraphType = TaskbarMonitor.Counters.ICounter.CounterType.STACKED, 
+                        SeparateScales =true, 
+                        InvertOrder = false, 
+                        SummaryPosition = TaskbarMonitor.CounterOptions.DisplayPosition.TOP,
+                        CurrentValueAsSummary = true,
+                        ShowCurrentValueShadowOnHover = true,
+                        ShowCurrentValue = TaskbarMonitor.CounterOptions.DisplayType.SHOW,
+                        TitlePosition = TaskbarMonitor.CounterOptions.DisplayPosition.MIDDLE,
+                        ShowTitle = TaskbarMonitor.CounterOptions.DisplayType.HOVER,
+                        Enabled = true,
+                        ShowTitleShadowOnHover = true 
+                    } },
+                    { "MEM", new CounterOptions {
+                        GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                        SeparateScales =true,
+                        InvertOrder = false,
+                        SummaryPosition = TaskbarMonitor.CounterOptions.DisplayPosition.TOP,
+                        CurrentValueAsSummary = true,
+                        ShowCurrentValueShadowOnHover = true,
+                        ShowCurrentValue = TaskbarMonitor.CounterOptions.DisplayType.SHOW,
+                        TitlePosition = TaskbarMonitor.CounterOptions.DisplayPosition.MIDDLE,
+                        ShowTitle = TaskbarMonitor.CounterOptions.DisplayType.HOVER,
+                        Enabled = true,
+                        ShowTitleShadowOnHover = true
+                    } },
+                    { "DISK", new CounterOptions { 
+                        GraphType = TaskbarMonitor.Counters.ICounter.CounterType.STACKED,
+                        SeparateScales =true,
+                        InvertOrder = false,
+                        SummaryPosition = TaskbarMonitor.CounterOptions.DisplayPosition.TOP,
+                        CurrentValueAsSummary = true,
+                        ShowCurrentValueShadowOnHover = true,
+                        ShowCurrentValue = TaskbarMonitor.CounterOptions.DisplayType.SHOW,
+                        TitlePosition = TaskbarMonitor.CounterOptions.DisplayPosition.MIDDLE,
+                        ShowTitle = TaskbarMonitor.CounterOptions.DisplayType.HOVER,
+                        Enabled = true,
+                        ShowTitleShadowOnHover = true 
+                    } },
+                    { "NET", new CounterOptions {
+                        GraphType = TaskbarMonitor.Counters.ICounter.CounterType.STACKED,
+                        SeparateScales =true,
+                        InvertOrder = false,
+                        SummaryPosition = TaskbarMonitor.CounterOptions.DisplayPosition.TOP,
+                        CurrentValueAsSummary = true,
+                        ShowCurrentValueShadowOnHover = true,
+                        ShowCurrentValue = TaskbarMonitor.CounterOptions.DisplayType.SHOW,
+                        TitlePosition = TaskbarMonitor.CounterOptions.DisplayPosition.MIDDLE,
+                        ShowTitle = TaskbarMonitor.CounterOptions.DisplayType.HOVER,
+                        Enabled = true,
+                        ShowTitleShadowOnHover = true
+                    } },
                 },
-                HistorySize = 50,
-                PollTime = 3,
-                ThemeType = ThemeList.DARK,
+                HistorySize = 40,
+                PollTime = 1,
+                ThemeType = ThemeList.AUTOMATIC,
                 EnableOnAllMonitors = true,
                 MonitorOptions = new Dictionary<string, MonitorOptions>()
             };
+            if (Counters.CounterGPU.IsAvailable())
+            {
+                opt.CounterOptions.Add("GPU 3D", new CounterOptions {
+                    GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                    SeparateScales = true,
+                    InvertOrder = false,
+                    SummaryPosition = TaskbarMonitor.CounterOptions.DisplayPosition.TOP,
+                    CurrentValueAsSummary = true,
+                    ShowCurrentValueShadowOnHover = true,
+                    ShowCurrentValue = TaskbarMonitor.CounterOptions.DisplayType.SHOW,
+                    TitlePosition = TaskbarMonitor.CounterOptions.DisplayPosition.MIDDLE,
+                    ShowTitle = TaskbarMonitor.CounterOptions.DisplayType.HOVER,
+                    Enabled = true,
+                    ShowTitleShadowOnHover = true
+                });
+                opt.CounterOptions.Add("GPU MEM", new CounterOptions {
+                    GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                    SeparateScales = true,
+                    InvertOrder = false,
+                    SummaryPosition = TaskbarMonitor.CounterOptions.DisplayPosition.TOP,
+                    CurrentValueAsSummary = true,
+                    ShowCurrentValueShadowOnHover = true,
+                    ShowCurrentValue = TaskbarMonitor.CounterOptions.DisplayType.SHOW,
+                    TitlePosition = TaskbarMonitor.CounterOptions.DisplayPosition.MIDDLE,
+                    ShowTitle = TaskbarMonitor.CounterOptions.DisplayType.HOVER,
+                    Enabled = true,
+                    ShowTitleShadowOnHover = true
+                });
+            }
+            return opt;
         }
         public static Options ReadFromDisk()
         {
@@ -103,6 +180,11 @@ namespace TaskbarMonitor
             {
                 opt = JsonConvert.DeserializeObject<Options>(System.IO.File.ReadAllText(origin));
                 
+            }
+            else
+            {
+                // save to disk with default options
+                opt.SaveToDisk();
             }
             return opt;
         }
@@ -121,11 +203,12 @@ namespace TaskbarMonitor
             if (!System.IO.Directory.Exists(folder))
                 System.IO.Directory.CreateDirectory(folder);
 
-            System.IO.File.WriteAllText(origin, JsonConvert.SerializeObject(this));
+            System.IO.File.WriteAllText(origin, JsonConvert.SerializeObject(this, Formatting.Indented));
             return true;
         }
         private bool _Upgrade(GraphTheme graphTheme)
         {
+            var ret = false;
             if (Options.LATESTOPTIONSVERSION > this.OptionsVersion)
             {
                 switch (this.OptionsVersion)
@@ -139,12 +222,48 @@ namespace TaskbarMonitor
                         else
                             this.ThemeType = ThemeList.AUTOMATIC;
                         this.OptionsVersion = LATESTOPTIONSVERSION;
-                        return true;
+                        ret = true;
+                        break;
+                    case 2:
+                    case 3:
+                        if (Counters.CounterGPU.IsAvailable())
+                        {
+                            if(!this.CounterOptions.ContainsKey("GPU 3D"))
+                                this.CounterOptions.Add("GPU 3D", new CounterOptions {
+                                    GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                                    SeparateScales = true,
+                                    InvertOrder = false,
+                                    SummaryPosition = TaskbarMonitor.CounterOptions.DisplayPosition.TOP,
+                                    CurrentValueAsSummary = true,
+                                    ShowCurrentValueShadowOnHover = true,
+                                    ShowCurrentValue = TaskbarMonitor.CounterOptions.DisplayType.SHOW,
+                                    TitlePosition = TaskbarMonitor.CounterOptions.DisplayPosition.MIDDLE,
+                                    ShowTitle = TaskbarMonitor.CounterOptions.DisplayType.HOVER,
+                                    Enabled = true,
+                                    ShowTitleShadowOnHover = true
+                                });
+                            if (!this.CounterOptions.ContainsKey("GPU MEM"))
+                                this.CounterOptions.Add("GPU MEM", new CounterOptions {
+                                    GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
+                                    SeparateScales = true,
+                                    InvertOrder = false,
+                                    SummaryPosition = TaskbarMonitor.CounterOptions.DisplayPosition.TOP,
+                                    CurrentValueAsSummary = true,
+                                    ShowCurrentValueShadowOnHover = true,
+                                    ShowCurrentValue = TaskbarMonitor.CounterOptions.DisplayType.SHOW,
+                                    TitlePosition = TaskbarMonitor.CounterOptions.DisplayPosition.MIDDLE,
+                                    ShowTitle = TaskbarMonitor.CounterOptions.DisplayType.HOVER,
+                                    Enabled = true,
+                                    ShowTitleShadowOnHover = true
+                                });
+                        }
+                        ret = true;
+                        break;
                     default:
                         break;
                 }
             }
-            return false;
+            return ret;
         }
     }
 
