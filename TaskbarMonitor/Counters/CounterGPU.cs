@@ -17,8 +17,9 @@ namespace TaskbarMonitor.Counters
         }
 
         public GPUType GPUCounterType { get; private set; }
-        List<PerformanceCounter> gpuCounters3D = null;
-        List<PerformanceCounter> gpuCountersMem = null;
+        PerformanceCounterCategory categoryGPU3D = null;
+        PerformanceCounterCategory categoryGPUMEM = null;
+               
         public CounterGPU(Options options, GPUType t = GPUType.GPU3D)
             : base(options)
         {
@@ -30,14 +31,8 @@ namespace TaskbarMonitor.Counters
             float max = 100.0f;
             if (GPUCounterType == GPUType.GPU3D)
             {
-                var category = new PerformanceCounterCategory("GPU Engine");
-                var counterNames = category.GetInstanceNames();
-
-                gpuCounters3D = counterNames
-                                        .Where(counterName => counterName.EndsWith("engtype_3D"))
-                                        .SelectMany(counterName => category.GetCounters(counterName))
-                                        .Where(counter => counter.CounterName.Equals("Utilization Percentage"))
-                                        .ToList();
+                categoryGPU3D = new PerformanceCounterCategory("GPU Engine");
+               
             }
             if (GPUCounterType == GPUType.MEMORY) 
             {
@@ -53,14 +48,7 @@ namespace TaskbarMonitor.Counters
                 gpuCounters.ForEach(x => x.NextValue());
                 max = gpuCounters.Sum(x => x.NextValue()) / 1024;
 
-                category = new PerformanceCounterCategory("GPU Adapter Memory");
-                counterNames = category.GetInstanceNames();
-
-                gpuCountersMem = counterNames
-                                        //.Where(counterName => counterName.EndsWith("engtype_3D"))
-                                        .SelectMany(counterName => category.GetCounters(counterName))
-                                        .Where(counter => counter.CounterName.Equals("Dedicated Usage"))
-                                        .ToList();
+                categoryGPUMEM = new PerformanceCounterCategory("GPU Adapter Memory");
             }
 
 
@@ -78,12 +66,29 @@ namespace TaskbarMonitor.Counters
             try
             {
                 if (GPUCounterType == GPUType.GPU3D)
-                {                    
-                    //gpuCounters3D.ForEach(x => x.NextValue());
+                {
+                    var counterNames = categoryGPU3D.GetInstanceNames();
+
+                    List<PerformanceCounter> gpuCounters3D = counterNames
+                                            .Where(counterName => counterName.EndsWith("engtype_3D"))
+                                            .SelectMany(counterName => categoryGPU3D.GetCounters(counterName))
+                                            .Where(counter => counter.CounterName.Equals("Utilization Percentage"))
+
+                                            .ToList();
+                    gpuCounters3D.ForEach(x => x.NextValue());
                     currentValue = gpuCounters3D.Sum(x => x.NextValue());
                 }
                 else if(GPUCounterType == GPUType.MEMORY)
-                {                    
+                {
+                    
+                    var counterNames = categoryGPUMEM.GetInstanceNames();
+
+                    List<PerformanceCounter> gpuCountersMem = counterNames
+                                            //.Where(counterName => counterName.EndsWith("engtype_3D"))
+                                            .SelectMany(counterName => categoryGPUMEM.GetCounters(counterName))
+                                            .Where(counter => counter.CounterName.Equals("Dedicated Usage"))
+                                            .ToList();
+
                     //gpuCountersMem.ForEach(x => x.NextValue());
                     currentValue = gpuCountersMem.Sum(x => x.NextValue()) / 1024 / 1024 / 1024;
                 }
