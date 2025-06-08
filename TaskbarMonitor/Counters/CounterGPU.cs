@@ -73,7 +73,6 @@ namespace TaskbarMonitor.Counters
                                             .Where(counterName => counterName.EndsWith("engtype_3D"))
                                             .SelectMany(counterName => categoryGPU3D.GetCounters(counterName))
                                             .Where(counter => counter.CounterName.Equals("Utilization Percentage"))
-
                                             .ToList();
                     gpuCounters3D.ForEach(x => x.NextValue());
                     currentValue = gpuCounters3D.Sum(x => x.NextValue());
@@ -83,8 +82,7 @@ namespace TaskbarMonitor.Counters
                     
                     var counterNames = categoryGPUMEM.GetInstanceNames();
 
-                    List<PerformanceCounter> gpuCountersMem = counterNames
-                                            //.Where(counterName => counterName.EndsWith("engtype_3D"))
+                    List<PerformanceCounter> gpuCountersMem = counterNames                                            
                                             .SelectMany(counterName => categoryGPUMEM.GetCounters(counterName))
                                             .Where(counter => counter.CounterName.Equals("Dedicated Usage"))
                                             .ToList();

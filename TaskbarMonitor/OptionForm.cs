@@ -115,14 +115,19 @@ namespace TaskbarMonitor
             this.editHistorySize.Value = this.Options.HistorySize;
             this.editPollTime.Value = this.Options.PollTime;
             this.listThemeType.Text = this.Options.ThemeType.ToString();
-            this.listCounters.DataSource = this.Options.CounterOptions.Keys.AsEnumerable().ToList();
+            this.listCounters.DataSource = this.Options.CounterOptions.OrderBy(x => x.Value.Order).Select(x=> x.Key).ToList();
             var items = Enum.GetValues(typeof(CounterOptions.DisplayType)).OfType<CounterOptions.DisplayType>().ToList();
             if (BLL.WindowsInformation.IsWindows11())
             {
-                items.Remove(CounterOptions.DisplayType.HOVER);
+                //items.Remove(CounterOptions.DisplayType.HOVER);
             }
-            this.listShowTitle.DataSource = items;            
-            this.listShowCurrentValue.DataSource = items;
+            this.listShowTitle.DataSource = items;
+            var items2 = Enum.GetValues(typeof(CounterOptions.DisplayType)).OfType<CounterOptions.DisplayType>().ToList();
+            if (BLL.WindowsInformation.IsWindows11())
+            {
+                //items2.Remove(CounterOptions.DisplayType.HOVER);
+            }
+            this.listShowCurrentValue.DataSource = items2;
             this.listSummaryPosition.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayPosition));
             this.listTitlePosition.DataSource = Enum.GetValues(typeof(CounterOptions.DisplayPosition));
 
@@ -206,11 +211,64 @@ namespace TaskbarMonitor
 
         private void ListCounters_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (initializing) return;
+            if (initializing || String.IsNullOrEmpty(listCounters.Text)) return;
             ActiveCounter = Options.CounterOptions[listCounters.Text];
             UpdateReplicateSettingsMenu();
             UpdateForm();
             UpdatePreview();
+        }
+
+        private void buttonUp_Click(object sender, EventArgs e)
+        {
+            if (listCounters.SelectedIndex <= 0) return;
+
+            var keys = Options.CounterOptions.Keys.ToList();
+            int idx = listCounters.SelectedIndex;
+
+            // Swap the selected item with the one above
+            var temp = keys[idx - 1];
+            keys[idx - 1] = keys[idx];
+            keys[idx] = temp;
+
+            // Rebuild CounterOptions dictionary in new order
+            var newDict = new Dictionary<string, CounterOptions>();
+            for (int i = 0; i < keys.Count; i++)
+            {
+                newDict[keys[i]] = Options.CounterOptions[keys[i]];                
+                newDict[keys[i]].Order = i;
+            }
+            Options.CounterOptions = newDict;
+
+            // Refresh ListBox
+            listCounters.DataSource = null;
+            listCounters.DataSource = keys;
+            listCounters.SelectedIndex = idx - 1;
+        }
+
+        private void buttonDown_Click(object sender, EventArgs e)
+        {
+            var keys = Options.CounterOptions.Keys.ToList();
+            int idx = listCounters.SelectedIndex;
+            if (idx < 0 || idx >= keys.Count - 1) return;
+
+            // Swap the selected item with the one below
+            var temp = keys[idx + 1];
+            keys[idx + 1] = keys[idx];
+            keys[idx] = temp;
+
+            // Rebuild CounterOptions dictionary in new order
+            var newDict = new Dictionary<string, CounterOptions>();
+            for (int i = 0; i < keys.Count; i++)
+            {
+                newDict[keys[i]] = Options.CounterOptions[keys[i]];                
+                newDict[keys[i]].Order = i;
+            }
+            Options.CounterOptions = newDict;
+
+            // Refresh ListBox
+            listCounters.DataSource = null;
+            listCounters.DataSource = keys;
+            listCounters.SelectedIndex = idx + 1;
         }
 
         private void UpdateReplicateSettingsMenu()
@@ -274,6 +332,8 @@ namespace TaskbarMonitor
             checkTitleShadowHover.Checked = ActiveCounter.ShowTitleShadowOnHover;
             checkValueShadowHover.Checked = ActiveCounter.ShowCurrentValueShadowOnHover;
             listTitlePosition.Text = ActiveCounter.TitlePosition.ToString();
+            buttonUp.Enabled = listCounters.SelectedIndex > 0;
+            buttonDown.Enabled = listCounters.SelectedIndex < listCounters.Items.Count - 1;
             UpdateFormScales();
             UpdateFormOrder();
              
@@ -721,5 +781,7 @@ namespace TaskbarMonitor
             this.Close();
             manager.ApplyOptions(this.OriginalOptions);
         }
+
+        
     }
 }

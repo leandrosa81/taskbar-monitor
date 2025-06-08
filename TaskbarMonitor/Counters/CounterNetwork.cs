@@ -18,7 +18,7 @@ namespace TaskbarMonitor.Counters
         }
         List<PerformanceCounter> netCountersSent;
         List<PerformanceCounter> netCountersReceived;
-         
+        string[] instances = null;
         //Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
 
         public override void Initialize()
@@ -37,14 +37,22 @@ namespace TaskbarMonitor.Counters
         private void ReadCounters()
         {
             PerformanceCounterCategory pcg = new PerformanceCounterCategory("Network Interface");
-            string[] instances = pcg.GetInstanceNames();
-
-            netCountersSent = new List<PerformanceCounter>();
-            netCountersReceived = new List<PerformanceCounter>();
-            foreach (var instance in instances)
+            string[] newinstances = pcg.GetInstanceNames();
+            bool changed = instances == null
+                || newinstances.Length != instances.Length
+                || !newinstances.SequenceEqual(instances);
+            if (changed)
             {
-                netCountersSent.Add(new PerformanceCounter("Network Interface", "Bytes Sent/sec", instance));
-                netCountersReceived.Add(new PerformanceCounter("Network Interface", "Bytes Received/sec", instance));
+                instances = newinstances;
+                netCountersSent = new List<PerformanceCounter>();
+                netCountersReceived = new List<PerformanceCounter>();
+                foreach (var instance in instances)
+                {
+                    netCountersSent.Add(new PerformanceCounter("Network Interface", "Bytes Sent/sec", instance));
+                    netCountersReceived.Add(new PerformanceCounter("Network Interface", "Bytes Received/sec", instance));
+                }
+                netCountersSent.ForEach(x => x.NextValue());
+                netCountersReceived.ForEach(x => x.NextValue());
             }
         }
        
@@ -72,14 +80,17 @@ namespace TaskbarMonitor.Counters
                 {
                     float currentSent = 0;
                     float currentReceived = 0;
-                    foreach (var netCounter in netCountersSent)
+                    ReadCounters();
+                    currentSent = netCountersSent.Sum(x => x.NextValue());
+                    currentReceived = netCountersReceived.Sum(x => x.NextValue());
+                    /*foreach (var netCounter in netCountersSent)
                     {
                         currentSent += netCounter.NextValue();
                     }
                     foreach (var netCounter in netCountersReceived)
                     {
                         currentReceived += netCounter.NextValue();
-                    }
+                    }*/
 
                     lock (ThreadLock)
                     {

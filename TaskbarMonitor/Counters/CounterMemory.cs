@@ -22,8 +22,7 @@ namespace TaskbarMonitor.Counters
         static extern bool GetPhysicallyInstalledSystemMemory(out long TotalMemoryInKilobytes);
 
         PerformanceCounter ramCounter;        
-        long totalMemory = 0;
-        //Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
+        long totalMemory = 0;        
 
         public override void Initialize()
         {
@@ -35,11 +34,7 @@ namespace TaskbarMonitor.Counters
                 InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = totalMemory / 1024 };
                 Infos = new List<CounterInfo>();
                 Infos.Add(new CounterInfo() { Name = "U", History = new List<float>(), MaximumValue = totalMemory / 1024 });
-            }
-            /*
-            info.Add(CounterType.SINGLE, new List<CounterInfo> {
-                new CounterInfo() { Name = "default", History = new List<float>(), MaximumValue = totalMemory / 1024 }
-            });*/
+            }           
         }
         public override void Update()
         {

@@ -126,11 +126,13 @@
             this.label10 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.panelFooter = new System.Windows.Forms.Panel();
+            this.buttonCancel = new System.Windows.Forms.Button();
             this.label17 = new System.Windows.Forms.Label();
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonResetDefaults = new System.Windows.Forms.Button();
             this.buttonApply = new System.Windows.Forms.Button();
-            this.buttonCancel = new System.Windows.Forms.Button();
+            this.buttonUp = new System.Windows.Forms.Button();
+            this.buttonDown = new System.Windows.Forms.Button();
             this.swcPreview = new TaskbarMonitor.SystemWatcherControl();
             this.buttonReplicateSettings = new TaskbarMonitor.Controls.MenuButton();
             this.screenPositioning1 = new TaskbarMonitor.ScreenPositioning();
@@ -630,6 +632,8 @@
             // panel4
             // 
             this.panel4.BackColor = System.Drawing.Color.Transparent;
+            this.panel4.Controls.Add(this.buttonDown);
+            this.panel4.Controls.Add(this.buttonUp);
             this.panel4.Controls.Add(this.label2);
             this.panel4.Controls.Add(this.listCounters);
             this.panel4.Dock = System.Windows.Forms.DockStyle.Left;
@@ -1259,6 +1263,18 @@
             this.panelFooter.Size = new System.Drawing.Size(598, 122);
             this.panelFooter.TabIndex = 6;
             // 
+            // buttonCancel
+            // 
+            this.buttonCancel.BackColor = System.Drawing.Color.White;
+            this.buttonCancel.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonCancel.Location = new System.Drawing.Point(345, 87);
+            this.buttonCancel.Name = "buttonCancel";
+            this.buttonCancel.Size = new System.Drawing.Size(120, 23);
+            this.buttonCancel.TabIndex = 6;
+            this.buttonCancel.Text = "Cancel";
+            this.buttonCancel.UseVisualStyleBackColor = false;
+            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
+            // 
             // label17
             // 
             this.label17.AutoSize = true;
@@ -1303,17 +1319,25 @@
             this.buttonApply.UseVisualStyleBackColor = false;
             this.buttonApply.Click += new System.EventHandler(this.buttonApply_Click);
             // 
-            // buttonCancel
+            // buttonUp
             // 
-            this.buttonCancel.BackColor = System.Drawing.Color.White;
-            this.buttonCancel.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonCancel.Location = new System.Drawing.Point(345, 87);
-            this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(120, 23);
-            this.buttonCancel.TabIndex = 6;
-            this.buttonCancel.Text = "Cancel";
-            this.buttonCancel.UseVisualStyleBackColor = false;
-            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
+            this.buttonUp.Location = new System.Drawing.Point(20, 262);
+            this.buttonUp.Name = "buttonUp";
+            this.buttonUp.Size = new System.Drawing.Size(48, 23);
+            this.buttonUp.TabIndex = 2;
+            this.buttonUp.Text = "up";
+            this.buttonUp.UseVisualStyleBackColor = true;
+            this.buttonUp.Click += new System.EventHandler(this.buttonUp_Click);
+            // 
+            // buttonDown
+            // 
+            this.buttonDown.Location = new System.Drawing.Point(87, 262);
+            this.buttonDown.Name = "buttonDown";
+            this.buttonDown.Size = new System.Drawing.Size(51, 23);
+            this.buttonDown.TabIndex = 3;
+            this.buttonDown.Text = "down";
+            this.buttonDown.UseVisualStyleBackColor = true;
+            this.buttonDown.Click += new System.EventHandler(this.buttonDown_Click);
             // 
             // swcPreview
             // 
@@ -1509,5 +1533,7 @@
         private System.Windows.Forms.ComboBox listMonitorPosition;
         private ScreenPositioning screenPositioning1;
         private System.Windows.Forms.Button buttonCancel;
+        private System.Windows.Forms.Button buttonDown;
+        private System.Windows.Forms.Button buttonUp;
     }
 }

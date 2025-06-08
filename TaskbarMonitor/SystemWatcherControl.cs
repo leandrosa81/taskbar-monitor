@@ -121,6 +121,7 @@ namespace TaskbarMonitor
         {
             if(Monitor != null)
                 Monitor.OnMonitorUpdated -= Monitor_OnMonitorUpdated;
+            StopMousePolling();
         }
 
         private void Monitor_OnMonitorUpdated()
@@ -145,7 +146,9 @@ namespace TaskbarMonitor
             GraphTheme theme = darkTheme;
 
             if (opt.ThemeType == Options.ThemeList.LIGHT)
+            {
                 theme = lightTheme;
+            }
             else if (opt.ThemeType == Options.ThemeList.CUSTOM)
             {
                 customTheme = GraphTheme.ReadFromDisk();
@@ -154,16 +157,65 @@ namespace TaskbarMonitor
             }
             else if (opt.ThemeType == Options.ThemeList.AUTOMATIC)
             {
-                Color taskBarColour = BLL.Win32Api.GetColourAt(BLL.Win32Api.GetTaskbarPosition().Location);
-                if (taskBarColour.R + taskBarColour.G + taskBarColour.B > 382)
-                    theme = lightTheme;
+                // Try to detect Windows app mode (light/dark) from registry
+                bool? isLightTheme = null;
+                try
+                {
+                    using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+                        @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"))
+                    {
+                        if (key != null)
+                        {
+                            object regValue = key.GetValue("AppsUseLightTheme");
+                            if (regValue != null)
+                            {
+                                isLightTheme = ((int)regValue) > 0;
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    // Ignore registry errors, fallback to color detection
+                }
+
+                if (isLightTheme.HasValue)
+                {
+                    theme = isLightTheme.Value ? lightTheme : darkTheme;
+                }
                 else
-                    theme = darkTheme;
+                {
+                    // Sample several points along the taskbar and average their luminance
+                    var taskbarRect = BLL.Win32Api.GetTaskbarPosition();
+                    int sampleCount = 5;
+                    double totalLuminance = 0;
+                    for (int i = 0; i < sampleCount; i++)
+                    {
+                        int x, y;
+                        if (taskbarRect.Width > taskbarRect.Height)
+                        {
+                            // Horizontal taskbar (bottom or top)
+                            x = taskbarRect.Left + (i * taskbarRect.Width) / (sampleCount - 1);
+                            y = taskbarRect.Top + taskbarRect.Height / 2;
+                        }
+                        else
+                        {
+                            // Vertical taskbar (left or right)
+                            x = taskbarRect.Left + taskbarRect.Width / 2;
+                            y = taskbarRect.Top + (i * taskbarRect.Height) / (sampleCount - 1);
+                        }
+                        Color color = BLL.Win32Api.GetColourAt(new Point(x, y));
+                        double luminance = 0.2126 * color.R + 0.7152 * color.G + 0.0722 * color.B;
+                        totalLuminance += luminance;
+                    }
+                    double avgLuminance = totalLuminance / sampleCount;
+                    theme = avgLuminance > 128 ? lightTheme : darkTheme;
+                }
             }
             return theme;
         }
 
-       
+
 
         public bool IsCustomTheme()
         {
@@ -229,9 +281,9 @@ namespace TaskbarMonitor
 
             InitializeComponent();
             AdjustControlSize();
-
+            StartMousePolling();
             //BLL.Win32Api.SetWindowPos(this.Handle, new IntPtr(0), this.Left, this.Top, this.Width, this.Height, 0);
-             
+
         }
 
         private void AdjustControlSize()
@@ -311,7 +363,12 @@ namespace TaskbarMonitor
             }
             else
             {
-                foreach (var pair in Options.CounterOptions.Where(x => x.Value.Enabled == true))
+                if (Options == null)
+                {
+                    base.OnPaint(e);
+                    return;
+                }
+                foreach (var pair in Options.CounterOptions.Where(x => x.Value.Enabled == true).OrderBy(x => x.Value.Order))
                 {
                     var name = pair.Key;
                     var opt = pair.Value;
@@ -370,30 +427,37 @@ namespace TaskbarMonitor
                         usedPosition = opt.TitlePosition;
                         var titleShadow = defaultTheme.TitleShadowColor;
                         var titleColor = defaultTheme.TitleColor;
-
-                        if (opt.ShowTitle == CounterOptions.DisplayType.HOVER && !mouseOver)
-                        {
-                            titleColor = Color.FromArgb(40, titleColor.R, titleColor.G, titleColor.B);
+                        
+                        if (opt.ShowTitle == CounterOptions.DisplayType.HOVER && mouseOver)
+                        {                            
+                            //titleShadow = Color.FromArgb(40, titleShadow.R, titleShadow.G, titleShadow.B);
                         }
-
+                        
 
                         System.Drawing.SolidBrush brushShadow = new System.Drawing.SolidBrush(titleShadow);
                         System.Drawing.SolidBrush brushTitle = new System.Drawing.SolidBrush(titleColor);
 
-                        if (
+                        /*if (
                             (opt.ShowTitleShadowOnHover && opt.ShowTitle == CounterOptions.DisplayType.HOVER && !mouseOver)
                             || (opt.ShowTitle == CounterOptions.DisplayType.HOVER && mouseOver)
                             || opt.ShowTitle == CounterOptions.DisplayType.SHOW
                            )
-                        {
+                        {*/
+                            // show shadow only on SHOW, or (HOVER and mouseover) or (HOVER and !mousever and showTitleShadow)
+                            if ((opt.ShowTitle == CounterOptions.DisplayType.HOVER && opt.ShowTitleShadowOnHover) || mouseOver)
+                            {
+                            int offset = 1;
+                            if (!mouseOver)
+                                offset = 0;
+                               formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) + offset, positions[opt.TitlePosition] + offset, sizeTitle.Width, maximumHeight), new StringFormat());
+                            }
+                            // show title only on SHOW, or (HOVER and mouseover)
                             if ((opt.ShowTitle == CounterOptions.DisplayType.HOVER && mouseOver) || opt.ShowTitle == CounterOptions.DisplayType.SHOW)
                             {
-                               formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) + 1, positions[opt.TitlePosition] + 1, sizeTitle.Width, maximumHeight), new StringFormat());
+                                formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), positions[opt.TitlePosition], sizeTitle.Width, maximumHeight), new StringFormat());
                             }
-                            formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), positions[opt.TitlePosition], sizeTitle.Width, maximumHeight), new StringFormat());
-                        }
-                        //formGraphics.DrawString(this.Left.ToString(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), positions[opt.TitlePosition] + 10, sizeTitle.Width, maximumHeight), new StringFormat());
-
+                        //}
+                        
 
                         brushShadow.Dispose();
                         brushTitle.Dispose();
@@ -427,30 +491,35 @@ namespace TaskbarMonitor
                             var sizeString = formGraphics.MeasureString(text, fontCounter);
                             float ypos = positions[item.Key];
 
-                            var titleShadow = defaultTheme.TextShadowColor;
-                            var titleColor = defaultTheme.TextColor;
+                            var textShadow = defaultTheme.TextShadowColor;
+                            var textColor = defaultTheme.TextColor;
 
-                            if (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && !mouseOver)
+                            if (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver)
                             {
-                                titleColor = Color.FromArgb(40, titleColor.R, titleColor.G, titleColor.B);
-                                //titleShadow = Color.FromArgb(40, titleShadow.R, titleShadow.G, titleShadow.B);
+                                //textShadow = Color.FromArgb(40, textShadow.R, textShadow.G, textShadow.B);
                             }
 
-                            SolidBrush BrushText = new SolidBrush(titleColor);
-                            SolidBrush BrushTextShadow = new SolidBrush(titleShadow);
+                            SolidBrush BrushText = new SolidBrush(textColor);
+                            SolidBrush BrushTextShadow = new SolidBrush(textShadow);
 
-                            if (
+                            /*if (
                             (opt.ShowCurrentValueShadowOnHover && opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && !mouseOver)
                             || (opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver)
                             || opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW
                            )
+                            {*/
+                            if ((opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && opt.ShowCurrentValueShadowOnHover) || mouseOver)
                             {
-                                if ((opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver) || opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW)
-                                {
-                                    formGraphics.DrawString(text, fontCounter, BrushTextShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2) + 1, ypos + 1, sizeString.Width, maximumHeight), new StringFormat());
-                                }
+                                int offset = 1;
+                                if (!mouseOver)
+                                    offset = 0;
+                                formGraphics.DrawString(text, fontCounter, BrushTextShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2) + offset, ypos + offset, sizeString.Width, maximumHeight), new StringFormat());
+                            }
+                            if ((opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver) || opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW)
+                            { 
                                 formGraphics.DrawString(text, fontCounter, BrushText, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2), ypos, sizeString.Width, maximumHeight), new StringFormat());
                             }
+                            //}
                             BrushText.Dispose();
                             BrushTextShadow.Dispose();
                         }
@@ -610,7 +679,47 @@ namespace TaskbarMonitor
         {
             mouseOver = false;
             this.Invalidate();
-        }        
+        }
+        private System.Windows.Forms.Timer mousePollTimer;
+        private bool lastMouseOver = false;
+
+        private void StartMousePolling()
+        {
+            mousePollTimer = new System.Windows.Forms.Timer();
+            mousePollTimer.Interval = 50; // ms
+            mousePollTimer.Tick += MousePollTimer_Tick;
+            mousePollTimer.Start();
+        }
+
+        private void StopMousePolling()
+        {
+            if (mousePollTimer != null)
+            {
+                mousePollTimer.Stop();
+                mousePollTimer.Tick -= MousePollTimer_Tick;
+                mousePollTimer.Dispose();
+                mousePollTimer = null;
+            }
+        }
+
+        private void MousePollTimer_Tick(object sender, EventArgs e)
+        {
+            var cursorPos = Cursor.Position;
+            if (this.Disposing || this.IsDisposed) return;
+            var clientRect = this.RectangleToScreen(this.ClientRectangle);
+            bool isOver = clientRect.Contains(cursorPos);
+
+            if (isOver && !lastMouseOver)
+            {
+                lastMouseOver = true;
+                SystemWatcherControl_MouseEnter(this, EventArgs.Empty);
+            }
+            else if (!isOver && lastMouseOver)
+            {
+                lastMouseOver = false;
+                SystemWatcherControl_MouseLeave(this, EventArgs.Empty);
+            }
+        }
         protected override void WndProc(ref Message m)
         {            
             base.WndProc(ref m);

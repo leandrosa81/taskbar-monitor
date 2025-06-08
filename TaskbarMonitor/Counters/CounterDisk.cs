@@ -26,20 +26,6 @@ namespace TaskbarMonitor.Counters
             diskReadCounter = new PerformanceCounter("PhysicalDisk", "Disk Read Bytes/sec", "_Total");
             diskWriteCounter = new PerformanceCounter("PhysicalDisk", "Disk Write Bytes/sec", "_Total");
 
-            /*
-            info.Add(CounterType.SINGLE, new List<CounterInfo> {
-                new CounterInfo() { Name = "default", History = new List<float>(), MaximumValue = 1 }
-            });
-
-            info.Add(CounterType.MIRRORED, new List<CounterInfo> {
-                new CounterInfo() { Name = "R", History = new List<float>(), MaximumValue = 1 },
-                new CounterInfo() { Name = "W", History = new List<float>(), MaximumValue = 1 }
-            });
-
-            info.Add(CounterType.STACKED, new List<CounterInfo> {
-                new CounterInfo() { Name = "R", History = new List<float>(), MaximumValue = 1 },
-                new CounterInfo() { Name = "W", History = new List<float>(), MaximumValue = 1 }
-            });*/
             lock (ThreadLock)
             {
                 InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = 1 };
