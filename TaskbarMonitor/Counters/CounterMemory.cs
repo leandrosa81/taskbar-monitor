@@ -17,6 +17,23 @@ namespace TaskbarMonitor.Counters
 
         }
 
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        private class MEMORYSTATUSEX
+        {
+            public uint dwLength = (uint)Marshal.SizeOf(typeof(MEMORYSTATUSEX));
+            public uint dwMemoryLoad;
+            public ulong ullTotalPhys;
+            public ulong ullAvailPhys;
+            public ulong ullTotalPageFile;
+            public ulong ullAvailPageFile;
+            public ulong ullTotalVirtual;
+            public ulong ullAvailVirtual;
+            public ulong ullAvailExtendedVirtual;
+        }
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern bool GlobalMemoryStatusEx([In, Out] MEMORYSTATUSEX lpBuffer);
+
         [DllImport("kernel32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool GetPhysicallyInstalledSystemMemory(out long TotalMemoryInKilobytes);
@@ -28,7 +45,15 @@ namespace TaskbarMonitor.Counters
         {
             ramCounter = new PerformanceCounter("Memory", "Available MBytes");
             
-            GetPhysicallyInstalledSystemMemory(out totalMemory);
+            if (!GetPhysicallyInstalledSystemMemory(out totalMemory) || totalMemory == 0)
+            {                
+                var memStatus = new MEMORYSTATUSEX();
+                if (GlobalMemoryStatusEx(memStatus))
+                {
+                    totalMemory = (long)(memStatus.ullTotalPhys / 1024); // in KB
+                }
+            }
+
             lock (ThreadLock)
             {
                 InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = totalMemory / 1024 };
@@ -36,6 +61,7 @@ namespace TaskbarMonitor.Counters
                 Infos.Add(new CounterInfo() { Name = "U", History = new List<float>(), MaximumValue = totalMemory / 1024 });
             }           
         }
+
         public override void Update()
         {
             float currentValue = (totalMemory / 1024) - ramCounter.NextValue();
