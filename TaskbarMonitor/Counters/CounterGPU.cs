@@ -19,7 +19,13 @@ namespace TaskbarMonitor.Counters
         public GPUType GPUCounterType { get; private set; }
         PerformanceCounterCategory categoryGPU3D = null;
         PerformanceCounterCategory categoryGPUMEM = null;
-               
+
+        private List<PerformanceCounter> gpuCounters3D = new List<PerformanceCounter>();
+        private string[] lastCounterNames = new string[0];
+        private DateTime lastRefresh = DateTime.MinValue;
+        private readonly TimeSpan refreshInterval = TimeSpan.FromSeconds(30);
+
+
         public CounterGPU(Options options, GPUType t = GPUType.GPU3D)
             : base(options)
         {
@@ -67,14 +73,25 @@ namespace TaskbarMonitor.Counters
             {
                 if (GPUCounterType == GPUType.GPU3D)
                 {
+                    // Refresh counters only if enough time has passed or if instance names have changed
                     var counterNames = categoryGPU3D.GetInstanceNames();
+                    bool needRefresh = (DateTime.Now - lastRefresh) > refreshInterval ||
+                                       !counterNames.SequenceEqual(lastCounterNames);
 
-                    List<PerformanceCounter> gpuCounters3D = counterNames
-                                            .Where(counterName => counterName.EndsWith("engtype_3D"))
-                                            .SelectMany(counterName => categoryGPU3D.GetCounters(counterName))
-                                            .Where(counter => counter.CounterName.Equals("Utilization Percentage"))
-                                            .ToList();
-                    gpuCounters3D.ForEach(x => x.NextValue());
+                    if (needRefresh)
+                    {
+                        gpuCounters3D = counterNames
+                            .Where(counterName => counterName.EndsWith("engtype_3D"))
+                            .SelectMany(counterName => categoryGPU3D.GetCounters(counterName))
+                            .Where(counter => counter.CounterName.Equals("Utilization Percentage"))
+                            .ToList();
+                        lastCounterNames = counterNames;
+                        lastRefresh = DateTime.Now;
+                        // Prime counters
+                        gpuCounters3D.ForEach(x => x.NextValue());
+                    }
+
+                    // Only call NextValue once per counter
                     currentValue = gpuCounters3D.Sum(x => x.NextValue());
                 }
                 else if(GPUCounterType == GPUType.MEMORY)
