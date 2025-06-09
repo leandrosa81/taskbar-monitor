@@ -121,7 +121,8 @@ namespace TaskbarMonitor
         {
             if(Monitor != null)
                 Monitor.OnMonitorUpdated -= Monitor_OnMonitorUpdated;
-            StopMousePolling();
+            if(BLL.WindowsInformation.IsWindows11())
+                StopMousePolling();
         }
 
         private void Monitor_OnMonitorUpdated()
@@ -281,7 +282,8 @@ namespace TaskbarMonitor
 
             InitializeComponent();
             AdjustControlSize();
-            StartMousePolling();
+            if (BLL.WindowsInformation.IsWindows11())
+                StartMousePolling();
             //BLL.Win32Api.SetWindowPos(this.Handle, new IntPtr(0), this.Left, this.Top, this.Width, this.Height, 0);
 
         }
@@ -304,6 +306,8 @@ namespace TaskbarMonitor
 
             if (taskbarWidth > 0 && taskbarHeight == 0)
                 VerticalTaskbarMode = true;
+            else if (taskbarWidth == 0 && taskbarHeight > 0)
+                VerticalTaskbarMode = false;
 
             int counterSize = (Options.HistorySize + 10);
             int controlWidth = counterSize * CountersCount;
@@ -330,7 +334,7 @@ namespace TaskbarMonitor
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            var maximumHeight = this.Height;
+            var maximumHeight = VerticalTaskbarMode ? 30 : this.Height;
 
             int graphPosition = 0;
             int graphPositionY = 0;
@@ -542,6 +546,7 @@ namespace TaskbarMonitor
          
         private void drawGraph(System.Drawing.Graphics formGraphics, int x, int y, int maxH, bool invertido, TaskbarMonitor.Counters.CounterInfo info, GraphTheme theme, CounterOptions opt)
         {
+            if (info.MaximumValue == 0) return;
             var pos = maxH - ((info.CurrentValue * maxH) / info.MaximumValue);
             if (pos > Int32.MaxValue) pos = Int32.MaxValue;
             int posInt = Convert.ToInt32(Math.Round(pos)) + y;
