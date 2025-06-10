@@ -66,6 +66,7 @@
     <Compile Include="Controls\MenuButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Counters\CounterGPUMEM.cs" />
     <Compile Include="Counters\CounterGPU.cs" />
     <Compile Include="Counters\CounterNetwork.cs" />
     <Compile Include="Counters\CounterDisk.cs" />

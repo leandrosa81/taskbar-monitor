@@ -37,6 +37,10 @@ namespace TaskbarMonitor.Counters
             MIRRORED
         }
         public abstract string GetName();
+        public virtual string GetLabel()
+        {
+            return GetName();
+        }
         public abstract void Initialize();
 
         public abstract void Update();

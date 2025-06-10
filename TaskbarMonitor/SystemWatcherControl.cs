@@ -416,7 +416,7 @@ namespace TaskbarMonitor
                         }
                     }
 
-                    var sizeTitle = formGraphics.MeasureString(ct.GetName(), fontTitle);
+                    var sizeTitle = formGraphics.MeasureString(ct.GetLabel(), fontTitle);
                     Dictionary<CounterOptions.DisplayPosition, float> positions = new Dictionary<CounterOptions.DisplayPosition, float>();
 
                     positions.Add(CounterOptions.DisplayPosition.MIDDLE, (maximumHeight / 2 - sizeTitle.Height / 2) + 1 + graphPositionY);
@@ -453,12 +453,12 @@ namespace TaskbarMonitor
                             int offset = 1;
                             if (!mouseOver)
                                 offset = 0;
-                               formGraphics.DrawString(ct.GetName(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) + offset, positions[opt.TitlePosition] + offset, sizeTitle.Width, maximumHeight), new StringFormat());
+                               formGraphics.DrawString(ct.GetLabel(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) + offset, positions[opt.TitlePosition] + offset, sizeTitle.Width, maximumHeight), new StringFormat());
                             }
                             // show title only on SHOW, or (HOVER and mouseover)
                             if ((opt.ShowTitle == CounterOptions.DisplayType.HOVER && mouseOver) || opt.ShowTitle == CounterOptions.DisplayType.SHOW)
                             {
-                                formGraphics.DrawString(ct.GetName(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), positions[opt.TitlePosition], sizeTitle.Width, maximumHeight), new StringFormat());
+                                formGraphics.DrawString(ct.GetLabel(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), positions[opt.TitlePosition], sizeTitle.Width, maximumHeight), new StringFormat());
                             }
                         //}
                         
