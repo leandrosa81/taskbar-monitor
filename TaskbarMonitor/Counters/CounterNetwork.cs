@@ -11,6 +11,7 @@ namespace TaskbarMonitor.Counters
 {
     class CounterNetwork : ICounter
     {
+        PerformanceCounterReader reader;
         public CounterNetwork(Options options)
            : base(options)
         {
@@ -21,10 +22,13 @@ namespace TaskbarMonitor.Counters
         string[] instances = null;
         //Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
 
-        public override void Initialize()
+        internal override void Initialize(PerformanceCounterReader reader)
         {
+            this.reader = reader;
+            reader.AddPath(@"\Network Interface(*)\Bytes Sent/sec");
+            reader.AddPath(@"\Network Interface(*)\Bytes Received/sec");
 
-            ReadCounters();
+            //ReadCounters();
             lock (ThreadLock)
             {
                 InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = 1 };
@@ -33,30 +37,7 @@ namespace TaskbarMonitor.Counters
                 Infos.Add(new CounterInfo() { Name = "U", History = new List<float>(), MaximumValue = 1 });
             }
         }
-
-        private void ReadCounters()
-        {
-            PerformanceCounterCategory pcg = new PerformanceCounterCategory("Network Interface");
-            string[] newinstances = pcg.GetInstanceNames();
-            bool changed = instances == null
-                || newinstances.Length != instances.Length
-                || !newinstances.SequenceEqual(instances);
-            if (changed)
-            {
-                instances = newinstances;
-                netCountersSent = new List<PerformanceCounter>();
-                netCountersReceived = new List<PerformanceCounter>();
-                foreach (var instance in instances)
-                {
-                    netCountersSent.Add(new PerformanceCounter("Network Interface", "Bytes Sent/sec", instance));
-                    netCountersReceived.Add(new PerformanceCounter("Network Interface", "Bytes Received/sec", instance));
-                }
-                netCountersSent.ForEach(x => x.NextValue());
-                netCountersReceived.ForEach(x => x.NextValue());
-            }
-        }
-       
-
+ 
         public override void Update()
         {
             Action<CounterInfo, float> addValue = (info, value) =>
@@ -71,52 +52,27 @@ namespace TaskbarMonitor.Counters
                 else
                     info.CurrentStringValue = (info.CurrentValue / 1024).ToString("0.0") + "KB/s";
             };
-            bool success = false;
-            int maxRetries = 1;
-            int retries = 0;
-            while (!success && retries <= maxRetries)
+            
+            float currentSent = reader.Values.Where(x => x.Key.StartsWith(@"\Network Interface(*)\Bytes Sent/sec")).Sum(x => x.Value);
+            float currentReceived = reader.Values.Where(x => x.Key.StartsWith(@"\Network Interface(*)\Bytes Received/sec")).Sum(x => x.Value);                    
+
+            lock (ThreadLock)
             {
-                try
+                addValue(InfoSummary, currentSent + currentReceived);
+                addValue(Infos.Where(x => x.Name == "D").Single(), currentReceived);
+                addValue(Infos.Where(x => x.Name == "U").Single(), currentSent);
+
+                // if locks down same scale for both counters is on
+                if (!Options.CounterOptions["NET"].SeparateScales)
                 {
-                    float currentSent = 0;
-                    float currentReceived = 0;
-                    ReadCounters();
-                    currentSent = netCountersSent.Sum(x => x.NextValue());
-                    currentReceived = netCountersReceived.Sum(x => x.NextValue());
-                    /*foreach (var netCounter in netCountersSent)
-                    {
-                        currentSent += netCounter.NextValue();
-                    }
-                    foreach (var netCounter in netCountersReceived)
-                    {
-                        currentReceived += netCounter.NextValue();
-                    }*/
+                    var info1 = Infos.Where(x => x.Name == "D").Single();
+                    var info2 = Infos.Where(x => x.Name == "U").Single();
 
-                    lock (ThreadLock)
-                    {
-                        addValue(InfoSummary, currentSent + currentReceived);
-                        addValue(Infos.Where(x => x.Name == "D").Single(), currentReceived);
-                        addValue(Infos.Where(x => x.Name == "U").Single(), currentSent);
-
-                        // if locks down same scale for both counters is on
-                        if (!Options.CounterOptions["NET"].SeparateScales)
-                        {
-                            var info1 = Infos.Where(x => x.Name == "D").Single();
-                            var info2 = Infos.Where(x => x.Name == "U").Single();
-
-                            float max = info1.MaximumValue > info2.MaximumValue ? info1.MaximumValue : info2.MaximumValue;
-                            info1.MaximumValue = info2.MaximumValue = max;
-                        }
-                        success = true;
-                    }                    
-                }
-                catch (InvalidOperationException e)
-                {
-                    // in this case we have to reevaluate the counters
-                    ReadCounters();
-                    retries++;
-                }
-            }
+                    float max = info1.MaximumValue > info2.MaximumValue ? info1.MaximumValue : info2.MaximumValue;
+                    info1.MaximumValue = info2.MaximumValue = max;
+                }                
+            }                    
+                
 
 
         }

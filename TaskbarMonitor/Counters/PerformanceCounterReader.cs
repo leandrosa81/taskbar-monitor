@@ -13,16 +13,25 @@ namespace TaskbarMonitor.Counters
 {
     internal class PerformanceCounterReader: IDisposable
     {
-        public string Path { get; private set; }
+        private List<string> paths = new List<string>();
+        public IReadOnlyList<string> Paths
+        {
+            get
+            {
+                return paths;
+            }
+        }
+        private bool changedPaths = false;
         private DateTime lastRefresh = DateTime.MinValue;
         private readonly TimeSpan refreshInterval;
 
         private IntPtr queryHandle = IntPtr.Zero;
-        private List<IntPtr> counterHandles = new List<IntPtr>();
+        private Dictionary<string, List<IntPtr>> counterHandles = new Dictionary<string, List<IntPtr>>();
 
-        public PerformanceCounterReader(string path, TimeSpan refreshInterval)
-        {
-            this.Path = path;
+        public Dictionary<string, float> Values = new Dictionary<string, float>();
+
+        public PerformanceCounterReader(TimeSpan refreshInterval)
+        {            
             this.refreshInterval = refreshInterval;
 
             // Open PDH query
@@ -40,74 +49,105 @@ namespace TaskbarMonitor.Counters
             return true;
         }
 
+        public void AddPath(string path)
+        {
+            paths.Add(path);
+            changedPaths = true;
+        }
+
         private void RefreshCounters()
         {
             // Clear previous counters
-            foreach (var handle in counterHandles)
-                PdhRemoveCounter(handle);
-
+            foreach (var path in counterHandles.Keys)
+            {
+                foreach (var handle in counterHandles[path])
+                {
+                    PdhRemoveCounter(handle);
+                }
+            }
             counterHandles.Clear();
 
-            int status = PdhAddEnglishCounter(queryHandle, Path, IntPtr.Zero, out IntPtr counterHandle);
-            if (status == 0)
-                counterHandles.Add(counterHandle);            
+            foreach (var path in Paths)
+            {
+                int status = PdhAddEnglishCounter(queryHandle, path, IntPtr.Zero, out IntPtr counterHandle);
+                if (status == 0)
+                {
+                    if (!counterHandles.ContainsKey(path))
+                        counterHandles.Add(path, new List<IntPtr>());
 
+                    counterHandles[path].Add(counterHandle);
+                }
+            }
         }
 
         public Dictionary<string, float> ReadCounters()
         {
-            Dictionary<string, float> ret = new Dictionary<string, float>();
+            Values = new Dictionary<string, float>();
             try
             {
-                if ((DateTime.Now - lastRefresh) > refreshInterval)
+                if (changedPaths || (DateTime.Now - lastRefresh) > refreshInterval)
                 {
+                    changedPaths = false;
                     RefreshCounters();
                     lastRefresh = DateTime.Now;
                 }
                 if (PdhCollectQueryData(queryHandle) != 0)
                     throw new InvalidOperationException("Failed to collect PDH data.");
 
-                 
-                IntPtr handle = counterHandles[0];
-                uint bufferSize = 0;
-                uint itemCount = 0;
-                int status = PdhGetFormattedCounterArray(handle, PDH_FMT_DOUBLE, ref bufferSize, ref itemCount, IntPtr.Zero);
-                if ((uint)status == PDH_MORE_DATA && bufferSize > 0 && itemCount > 0)
+                foreach (var countersByPath in counterHandles)
                 {
-                    IntPtr buffer = Marshal.AllocHGlobal((int)bufferSize);
-                    try
+                    foreach (var counterHandle in countersByPath.Value)
                     {
-                        status = PdhGetFormattedCounterArray(handle, PDH_FMT_DOUBLE, ref bufferSize, ref itemCount, buffer);
-                        if (status == 0)
+                        uint bufferSize = 0;
+                        uint itemCount = 0;
+                        int status = PdhGetFormattedCounterArray(counterHandle, PDH_FMT_DOUBLE, ref bufferSize, ref itemCount, IntPtr.Zero);
+                        if ((uint)status == PDH_MORE_DATA && bufferSize > 0 && itemCount > 0)
                         {
-                            int structSize = Marshal.SizeOf(typeof(PDH_FMT_COUNTERVALUE_ITEM));
-                            for (int i = 0; i < itemCount; i++)
+                            IntPtr buffer = Marshal.AllocHGlobal((int)bufferSize);
+                            try
                             {
-                                IntPtr itemPtr = new IntPtr(buffer.ToInt64() + i * structSize);
-                                var item = Marshal.PtrToStructure<PDH_FMT_COUNTERVALUE_ITEM>(itemPtr);
-                                string instanceName = Marshal.PtrToStringUni(item.szName);
-                                float value = (float)item.value.doubleValue;
-                                ret[instanceName] = value;
+                                status = PdhGetFormattedCounterArray(counterHandle, PDH_FMT_DOUBLE, ref bufferSize, ref itemCount, buffer);
+                                if (status == 0)
+                                {
+                                    int structSize = Marshal.SizeOf(typeof(PDH_FMT_COUNTERVALUE_ITEM));
+                                    for (int i = 0; i < itemCount; i++)
+                                    {
+                                        IntPtr itemPtr = new IntPtr(buffer.ToInt64() + i * structSize);
+                                        var item = Marshal.PtrToStructure<PDH_FMT_COUNTERVALUE_ITEM>(itemPtr);
+                                        string instanceName = Marshal.PtrToStringUni(item.szName);
+                                        float value = (float)item.value.doubleValue;
+                                        Values[countersByPath.Key + ":" + instanceName] = value;
+                                    }
+                                }
+                            }
+                            finally
+                            {
+                                Marshal.FreeHGlobal(buffer);
                             }
                         }
                     }
-                    finally
-                    {
-                        Marshal.FreeHGlobal(buffer);
-                    }
                 }
+                
                  
             }
             catch (InvalidOperationException ex)
             {
                 Console.WriteLine(ex.Message);
             }
-            return ret;
+            return Values;
         }
 
         public void Dispose()
         {
-            if(queryHandle != IntPtr.Zero)
+            foreach (var path in counterHandles.Keys)
+            {
+                foreach (var handle in counterHandles[path])
+                {
+                    PdhRemoveCounter(handle);
+                }
+            }
+
+            if (queryHandle != IntPtr.Zero)
                 PdhCloseQuery(queryHandle);
         }
 

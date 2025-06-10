@@ -10,25 +10,21 @@ using System.Threading.Tasks;
 namespace TaskbarMonitor.Counters
 {
     class CounterGPUMemory : ICounter
-    {                        
-        PerformanceCounterCategory categoryGPUMEM = null;
-                
-        private Dictionary<string, List<PerformanceCounter>> gpuCounters = new Dictionary<string, List<PerformanceCounter>>();
-        private string[] lastCounterNames = new string[0];
-        private DateTime lastRefresh = DateTime.MinValue;
-        private readonly TimeSpan refreshInterval = TimeSpan.FromSeconds(30);
-
+    {
+        PerformanceCounterReader reader;
         
-
         public CounterGPUMemory(Options options)
             : base(options)
         {
         }
 
-        public override void Initialize()
+        internal override void Initialize(PerformanceCounterReader reader)
         {
             float max = 100.0f;
             
+            this.reader = reader;
+            reader.AddPath(@"\GPU Adapter Memory(*)\Dedicated Usage");
+
             var category = new PerformanceCounterCategory("GPU Local Adapter Memory");
             var counterNames = category.GetInstanceNames();
 
@@ -39,9 +35,7 @@ namespace TaskbarMonitor.Counters
                                     .ToList();
 
             gpuCounters.ForEach(x => x.NextValue());
-            max = gpuCounters.Sum(x => x.NextValue()) / 1024;
-
-            categoryGPUMEM = new PerformanceCounterCategory("GPU Adapter Memory");
+            max = gpuCounters.Sum(x => x.NextValue()) / 1024;            
              
             lock (ThreadLock)
             {
@@ -55,18 +49,8 @@ namespace TaskbarMonitor.Counters
             float currentValue = 0;
 
             try
-            {                
-                    
-                var counterNames = categoryGPUMEM.GetInstanceNames();
-
-                List<PerformanceCounter> gpuCountersMem = counterNames                                            
-                                        .SelectMany(counterName => categoryGPUMEM.GetCounters(counterName))
-                                        .Where(counter => counter.CounterName.Equals("Dedicated Usage"))
-                                        .ToList();
-
-                //gpuCountersMem.ForEach(x => x.NextValue());
-                currentValue = gpuCountersMem.Sum(x => x.NextValue()) / 1024 / 1024 / 1024;
-             
+            {
+                currentValue = reader.Values.Where(x => x.Key.StartsWith(@"\GPU Adapter Memory(*)\Dedicated Usage")).Sum(x => x.Value) / 1024 / 1024 / 1024;                
             }
             catch (InvalidOperationException ex)
             {

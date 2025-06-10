@@ -3,51 +3,31 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace TaskbarMonitor.Counters
 {
     class CounterCPU : ICounter
     {
-        PerformanceCounter cpuCounter;
-        List<PerformanceCounter> cpuCounterCores;
-        float currentValue = 0;
-        
-        //Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
+        PerformanceCounterReader reader;
+         
         public CounterCPU(Options options)
             : base(options)
         {
 
         }
 
-        public override void Initialize()
+        internal override void Initialize(PerformanceCounterReader reader)
         {
-            cpuCounter = new PerformanceCounter("Processor Information", "% Processor Utility", "_Total", true);
-            PerformanceCounterCategory cat = new PerformanceCounterCategory("Processor Information");
-            var instances = cat.GetInstanceNames();
-            /*
-            info.Add(CounterType.SINGLE, new List<CounterInfo> {
-                new CounterInfo() { Name = "default", History = new List<float>(), MaximumValue = 100.0f }
-            });
-
-            info.Add(CounterType.STACKED, new List<CounterInfo> {
-                
-            });
+            this.reader = reader;
+            //reader.AddPath(@"\Processor Information(_Total)\% Processor Utility");
+            reader.AddPath(@"\Processor Information(*)\% Processor Utility");
             
-             */
             lock (ThreadLock)
             {
                 InfoSummary = new CounterInfo() { Name = "summary", History = new List<float>(), MaximumValue = 100.0f };
-                Infos = new List<CounterInfo>();
-                cpuCounterCores = new List<PerformanceCounter>();
-                foreach (var item in instances.OrderBy(x => x))
-                {
-                    if (item.ToLower().Contains("_total")) continue;
-
-                    // info[CounterType.STACKED].Add(new CounterInfo() { Name = item, History = new List<float>(), MaximumValue = 100.0f });
-                    Infos.Add(new CounterInfo() { Name = item, History = new List<float>(), MaximumValue = 100.0f });
-                    cpuCounterCores.Add(new PerformanceCounter("Processor Information", "% Processor Utility", item));
-                }
+                Infos = new List<CounterInfo>();                
             }
             
         }
@@ -57,7 +37,7 @@ namespace TaskbarMonitor.Counters
 
             lock (ThreadLock)
             {
-                currentValue = cpuCounter.NextValue();
+                float currentValue = reader.Values.Where(x => x.Key == @"\Processor Information(*)\% Processor Utility:_Total").Sum(x => x.Value);
                 // if (currentValue > 100.0f) currentValue = 100.0f;
                 InfoSummary.CurrentValue = currentValue;
                 InfoSummary.History.Add(currentValue);
@@ -67,18 +47,22 @@ namespace TaskbarMonitor.Counters
                 else
                     InfoSummary.CurrentStringValue = InfoSummary.MaximumValue.ToString("0") + "% +" + (InfoSummary.MaximumValue - InfoSummary.CurrentValue).ToString("0");
 
-                foreach (var item in cpuCounterCores)
-                {
-                    var ct = Infos.Where(x => x.Name == item.InstanceName).Single();
+                var cores = reader.Values.Where(x => x.Key.StartsWith(@"\Processor Information(*)\% Processor Utility:") && Regex.IsMatch(x.Key, @"\d+,\d+$")).ToList();
 
-                    //var ct = info[CounterType.STACKED].Find(x => x.Name == item.InstanceName);
-                    ct.CurrentValue = item.NextValue();
-                    // if (ct.CurrentValue > 100.0f) ct.CurrentValue = 100.0f;
+                foreach (var item in cores)
+                {
+                    var ct = Infos.Where(x => x.Name == item.Key).SingleOrDefault();
+                    if(ct == null)
+                    {
+                        ct = new CounterInfo() { Name = item.Key, History = new List<float>(), MaximumValue = 100.0f };
+                        Infos.Add(ct);
+                    }
+                    ct.CurrentValue = item.Value;   
+                    //ct.CurrentValue = item.NextValue();                    
                     ct.History.Add(ct.CurrentValue);
                     if (ct.History.Count > Options.HistorySize) ct.History.RemoveAt(0);
-
                     ct.CurrentStringValue = InfoSummary.CurrentStringValue;// same string value from summary
-                }                
+                }
             }
 
         }

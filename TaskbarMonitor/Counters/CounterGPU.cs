@@ -13,9 +13,6 @@ namespace TaskbarMonitor.Counters
     {
         PerformanceCounterReader reader;
 
-        
-        private readonly TimeSpan refreshInterval = TimeSpan.FromSeconds(30);
-
         string maxValue = "3D";        
         Dictionary<string, string> labels = new Dictionary<string, string> {
             { "VideoEncode" , "VENC" },
@@ -37,10 +34,11 @@ namespace TaskbarMonitor.Counters
         {
         }
 
-        public override void Initialize()
+        internal override void Initialize(PerformanceCounterReader reader)
         {
             float max = 100.0f;
-            reader = new PerformanceCounterReader(@"\GPU Engine(*)\Utilization Percentage", refreshInterval);            
+            this.reader = reader;
+            reader.AddPath(@"\GPU Engine(*)\Utilization Percentage");
 
             lock (ThreadLock)
             {
@@ -55,16 +53,10 @@ namespace TaskbarMonitor.Counters
             
             try
             {
-                var counters = reader.ReadCounters();                
+                var counters = reader.Values;
                 foreach (var item in labels.Keys)
                 {
                     var itemValue = counters.Where(x => x.Key.EndsWith("engtype_" + item)).Sum(x => x.Value);
-                    /*float itemValue = 0;
-                    for (int i = 0; i < gpuCounters[item].Count; i++)
-                    {
-                        //itemValue += gpuCounters[item][i].NextValue();
-                        itemValue += gpuCounters[item][i].NextValue();
-                    }*/
 
                     if (itemValue > currentValue)
                     {
@@ -137,12 +129,7 @@ namespace TaskbarMonitor.Counters
             {
                 return false;
             }
-        }
-
-        public override void Dispose()
-        {
-            reader.Dispose();
-        }
+        }        
 
     }
 }

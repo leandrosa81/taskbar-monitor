@@ -160,6 +160,9 @@ namespace TaskbarMonitor
                     ShowTitleShadowOnHover = true,
                     Order = 4
                 });
+            }
+            if (Counters.CounterGPUMemory.IsAvailable())
+            { 
                 opt.CounterOptions.Add("GPU MEM", new CounterOptions {
                     GraphType = TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
                     SeparateScales = true,
@@ -255,6 +258,9 @@ namespace TaskbarMonitor
                             Enabled = true,
                             ShowTitleShadowOnHover = true
                         });
+                }
+                if (Counters.CounterGPUMemory.IsAvailable())
+                { 
                     if (!this.CounterOptions.ContainsKey("GPU MEM"))
                         this.CounterOptions.Add("GPU MEM", new CounterOptions
                         {

@@ -10,21 +10,20 @@ namespace TaskbarMonitor.Counters
 {
     class CounterDisk: ICounter
     {
+        PerformanceCounterReader reader;
+
         public CounterDisk(Options options)
            : base(options)
         {
 
         }
-        PerformanceCounter diskReadCounter;
-        PerformanceCounter diskWriteCounter;
-
-        //Dictionary<CounterType, List<CounterInfo>> info = new Dictionary<CounterType, List<CounterInfo>>();
         
 
-        public override void Initialize()
+        internal override void Initialize(PerformanceCounterReader reader)
         {
-            diskReadCounter = new PerformanceCounter("PhysicalDisk", "Disk Read Bytes/sec", "_Total");
-            diskWriteCounter = new PerformanceCounter("PhysicalDisk", "Disk Write Bytes/sec", "_Total");
+            this.reader = reader;
+            reader.AddPath(@"\PhysicalDisk(_Total)\Disk Read Bytes/sec");
+            reader.AddPath(@"\PhysicalDisk(_Total)\Disk Write Bytes/sec");
 
             lock (ThreadLock)
             {
@@ -46,8 +45,9 @@ namespace TaskbarMonitor.Counters
                 info.CurrentStringValue = (info.CurrentValue / 1024 / 1024).ToString("0.0") + "MB/s";
             };
 
-            float currentRead = diskReadCounter.NextValue();
-            float currentWritten = diskWriteCounter.NextValue();
+            float currentRead = reader.Values.Where(x => x.Key.StartsWith(@"\PhysicalDisk(_Total)\Disk Read Bytes/sec")).Sum(x => x.Value);
+            float currentWritten = reader.Values.Where(x => x.Key.StartsWith(@"\PhysicalDisk(_Total)\Disk Write Bytes/sec")).Sum(x => x.Value);
+
 
             lock (ThreadLock)
             {

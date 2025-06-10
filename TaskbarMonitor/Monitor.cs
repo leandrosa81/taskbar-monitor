@@ -9,6 +9,7 @@ namespace TaskbarMonitor
 {
     public class Monitor: IDisposable
     {
+        PerformanceCounterReader reader;
         public delegate void NotifyUpdate();
         public event NotifyUpdate OnMonitorUpdated;
 
@@ -36,8 +37,8 @@ namespace TaskbarMonitor
         private static bool updating = false;
         private Monitor(Options opt)
         {
-            UpdateOptions(opt);            
-
+            reader = new PerformanceCounterReader(TimeSpan.FromSeconds(30));
+            UpdateOptions(opt);                        
             pollingTimer = new System.Timers.Timer(opt.PollTime * 1000);
             pollingTimer.Enabled = true;
             pollingTimer.Elapsed += PollingTimer_Elapsed;
@@ -80,7 +81,7 @@ namespace TaskbarMonitor
                             break;
                     }
                     
-                    ct.Initialize();
+                    ct.Initialize(reader);
                     Counters.Add(ct);
                 }
                 else if(q != null && !opt.CounterOptions.ContainsKey(counterName))
@@ -107,6 +108,8 @@ namespace TaskbarMonitor
             }
             try
             {
+                reader.ReadCounters();
+
                 foreach (var ct in Counters)
                 {
                     ct.Update();
@@ -127,6 +130,7 @@ namespace TaskbarMonitor
 
         public void Dispose()
         {
+            reader.Dispose();
             foreach(var ct in Counters)
             {
                 ct.Dispose();

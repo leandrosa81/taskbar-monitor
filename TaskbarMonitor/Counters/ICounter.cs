@@ -41,7 +41,7 @@ namespace TaskbarMonitor.Counters
         {
             return GetName();
         }
-        public abstract void Initialize();
+        internal abstract void Initialize(PerformanceCounterReader reader);
 
         public abstract void Update();
 

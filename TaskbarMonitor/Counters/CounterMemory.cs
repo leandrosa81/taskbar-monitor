@@ -10,7 +10,7 @@ namespace TaskbarMonitor.Counters
 {
     class CounterMemory: ICounter
     {
-
+        PerformanceCounterReader reader;
         public CounterMemory(Options options)
            : base(options)
         {
@@ -39,11 +39,12 @@ namespace TaskbarMonitor.Counters
         static extern bool GetPhysicallyInstalledSystemMemory(out long TotalMemoryInKilobytes);
 
         PerformanceCounter ramCounter;        
-        long totalMemory = 0;        
+        long totalMemory = 0;
 
-        public override void Initialize()
+        internal override void Initialize(PerformanceCounterReader reader)
         {
-            ramCounter = new PerformanceCounter("Memory", "Available MBytes");
+            this.reader = reader;
+            reader.AddPath(@"\Memory(*)\Available MBytes");
             
             if (!GetPhysicallyInstalledSystemMemory(out totalMemory) || totalMemory == 0)
             {                
@@ -64,7 +65,8 @@ namespace TaskbarMonitor.Counters
 
         public override void Update()
         {
-            float currentValue = (totalMemory / 1024) - ramCounter.NextValue();
+            float currentRead = reader.Values.Where(x => x.Key.StartsWith(@"\Memory(*)\Available MBytes")).Sum(x => x.Value);
+            float currentValue = (totalMemory / 1024) - currentRead;
 
             lock (ThreadLock)
             {
