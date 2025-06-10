@@ -13,16 +13,10 @@ namespace TaskbarMonitor
         private static Control _control;
         public Size Size { get { return Options.MinHorizontalSize; } }
 
-        [DllImport("user32.dll")]
-        private static extern bool SetProcessDPIAware();
-
         public Deskband()
         {
             try
             {
-                if (Environment.OSVersion.Version.Major >= 6)
-                    SetProcessDPIAware();
-
                 Application.EnableVisualStyles();
                 AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
                 Options opt = TaskbarMonitor.Options.ReadFromDisk();
