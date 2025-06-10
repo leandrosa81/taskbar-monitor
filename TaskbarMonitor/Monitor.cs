@@ -66,7 +66,7 @@ namespace TaskbarMonitor
                             ct = new Counters.CounterGPU(opt);
                             break;
                         case "GPU MEM":
-                            ct = new Counters.CounterGPUMEM(opt);
+                            ct = new Counters.CounterGPUMemory(opt);
                             break;
                         case "MEM":
                             ct = new Counters.CounterMemory(opt);

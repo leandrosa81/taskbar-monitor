@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace TaskbarMonitor.Counters
 {
-    class CounterGPUMEM : ICounter
+    class CounterGPUMemory : ICounter
     {                        
         PerformanceCounterCategory categoryGPUMEM = null;
                 
@@ -20,7 +20,7 @@ namespace TaskbarMonitor.Counters
 
         
 
-        public CounterGPUMEM(Options options)
+        public CounterGPUMemory(Options options)
             : base(options)
         {
         }
