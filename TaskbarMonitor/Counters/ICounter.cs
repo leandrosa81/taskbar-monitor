@@ -14,7 +14,7 @@ namespace TaskbarMonitor.Counters
         public string CurrentStringValue { get; set; }
         public List<float> History { get; set; }
     }
-    public abstract class ICounter
+    public abstract class ICounter: IDisposable
     {
         public Options Options { get; private set; }
 
@@ -52,6 +52,11 @@ namespace TaskbarMonitor.Counters
         public static bool IsAvailable()
         {
             return true;
+        }
+
+        public virtual void Dispose()
+        {
+            
         }
     }
 }

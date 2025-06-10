@@ -73,6 +73,7 @@
     <Compile Include="Counters\CounterMemory.cs" />
     <Compile Include="Counters\CounterCPU.cs" />
     <Compile Include="Counters\ICounter.cs" />
+    <Compile Include="Counters\PerformanceCounterReader.cs" />
     <Compile Include="CSDeskBand.cs" />
     <Compile Include="DeskBand.cs" />
     <Compile Include="GithubUpdater.cs" />

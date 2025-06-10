@@ -11,27 +11,24 @@ namespace TaskbarMonitor.Counters
 {
     class CounterGPU : ICounter
     {
-        PerformanceCounterCategory categoryGPU3D = null;
+        PerformanceCounterReader reader;
 
-        private Dictionary<string, List<PerformanceCounter>> gpuCounters = new Dictionary<string, List<PerformanceCounter>>();
-        private string[] lastCounterNames = new string[0];
-        private DateTime lastRefresh = DateTime.MinValue;
+        
         private readonly TimeSpan refreshInterval = TimeSpan.FromSeconds(30);
 
-        string maxValue = "3D";
-        // commented out because it is expensive for now
+        string maxValue = "3D";        
         Dictionary<string, string> labels = new Dictionary<string, string> {
-            //{ "VideoEncode" , "VENC" },
+            { "VideoEncode" , "VENC" },
             { "3D", "3D" },
-            //{ "LegacyOverlay", "OVER" },
-            //{ "Copy", "COPY" },
-            //{ "VideoDecode", "VDEC" },
-            //{ "Compute_1", "CPT1" },
+            { "LegacyOverlay", "OVER" },
+            { "Copy", "COPY" },
+            { "VideoDecode", "VDEC" },
+            { "Compute_1", "CPT1" },
             { "Graphics_1", "GFX" },
-            //{ "Security", "SEC" },
-            //{ "Compute_0", "CPT0" },
-            //{ "VR", "VR" },
-            //{ "Cuda", "CUDA" }
+            { "Security", "SEC" },
+            { "Compute_0", "CPT0" },
+            { "VR", "VR" },
+            { "Cuda", "CUDA" }
         };
 
 
@@ -43,8 +40,7 @@ namespace TaskbarMonitor.Counters
         public override void Initialize()
         {
             float max = 100.0f;
-
-            categoryGPU3D = new PerformanceCounterCategory("GPU Engine");
+            reader = new PerformanceCounterReader(@"\GPU Engine(*)\Utilization Percentage", refreshInterval);            
 
             lock (ThreadLock)
             {
@@ -56,41 +52,19 @@ namespace TaskbarMonitor.Counters
         public override void Update()
         {
             float currentValue = 0;
-
+            
             try
             {
-
-                // Refresh counters only if enough time has passed or if instance names have changed
-                var counterNames = categoryGPU3D.GetInstanceNames();
-                bool needRefresh = (DateTime.Now - lastRefresh) > refreshInterval ||
-                                    !counterNames.SequenceEqual(lastCounterNames);
-
-                if (needRefresh)
-                {
-                    lastCounterNames = counterNames;
-                    lastRefresh = DateTime.Now;
-                    // Prime counters                        
-                    foreach (var item in labels.Keys)
-                    {
-                        gpuCounters[item] = counterNames
-                        .Where(counterName => counterName.EndsWith("engtype_" + item))
-                        .SelectMany(counterName => categoryGPU3D.GetCounters(counterName))
-                        .Where(counter => counter.CounterName.Equals("Utilization Percentage"))
-                        .ToList();
-                        gpuCounters[item].ForEach(x => x.NextValue());
-                    }
-
-                }
-
+                var counters = reader.ReadCounters();                
                 foreach (var item in labels.Keys)
                 {
-                    //var itemValue = gpuCounters[item].Sum(x => x.NextValue());
-                    float itemValue = 0;
+                    var itemValue = counters.Where(x => x.Key.EndsWith("engtype_" + item)).Sum(x => x.Value);
+                    /*float itemValue = 0;
                     for (int i = 0; i < gpuCounters[item].Count; i++)
                     {
                         //itemValue += gpuCounters[item][i].NextValue();
                         itemValue += gpuCounters[item][i].NextValue();
-                    }
+                    }*/
 
                     if (itemValue > currentValue)
                     {
@@ -133,9 +107,7 @@ namespace TaskbarMonitor.Counters
         }
         public override string GetLabel()
         {
-
             return "GPU " + labels[maxValue];
-
         }
 
         public override CounterType GetCounterType()
@@ -165,6 +137,11 @@ namespace TaskbarMonitor.Counters
             {
                 return false;
             }
+        }
+
+        public override void Dispose()
+        {
+            reader.Dispose();
         }
 
     }

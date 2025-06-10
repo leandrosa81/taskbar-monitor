@@ -49,7 +49,8 @@ namespace TaskbarMonitor
         {
             this.Options = opt;
 
-            Counters = new List<Counters.ICounter>();
+            if(Counters == null)
+                Counters = new List<Counters.ICounter>();
             var counterNames = new List<string> { "CPU", "MEM", "DISK", "NET", "GPU 3D", "GPU MEM" };
             foreach(var counterName in counterNames)
             {
@@ -82,8 +83,9 @@ namespace TaskbarMonitor
                     ct.Initialize();
                     Counters.Add(ct);
                 }
-                else if(q != null)
+                else if(q != null && !opt.CounterOptions.ContainsKey(counterName))
                 {
+                    q.Dispose();
                     Counters.Remove(q);
                 }
             }
@@ -125,6 +127,10 @@ namespace TaskbarMonitor
 
         public void Dispose()
         {
+            foreach(var ct in Counters)
+            {
+                ct.Dispose();
+            }
             pollingTimer?.Stop();
             pollingTimer?.Dispose();
             pollingTimer.Elapsed -= PollingTimer_Elapsed;
