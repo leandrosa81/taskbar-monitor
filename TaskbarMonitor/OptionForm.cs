@@ -74,14 +74,12 @@ namespace TaskbarMonitor
                 },
                 {"GPU 3D",  new List<TaskbarMonitor.Counters.ICounter.CounterType>
                 {
-                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE
                 }
                 },
                 {"GPU MEM",  new List<TaskbarMonitor.Counters.ICounter.CounterType>
                 {
-                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE,
-                    TaskbarMonitor.Counters.ICounter.CounterType.STACKED
+                    TaskbarMonitor.Counters.ICounter.CounterType.SINGLE
                 }
                 }
             };
