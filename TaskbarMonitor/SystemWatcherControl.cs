@@ -752,7 +752,7 @@ namespace TaskbarMonitor
         }
         private void MenuItem_About_onClick(object sender, EventArgs e)
         {
-            OpenSettings(2);
+            OpenSettings(3);
 
         }
 
