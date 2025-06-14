@@ -289,20 +289,16 @@ namespace TaskbarMonitor
                 }
                 ret = true;
             }
-            this.OptionsVersion = LATESTOPTIONSVERSION;
-             
-            /*
-            if (BLL.WindowsInformation.IsWindows11())
+            if (this.OptionsVersion <= 5)
             {
                 foreach (var item in this.CounterOptions)
                 {
-                    if(item.Value.ShowTitle == TaskbarMonitor.CounterOptions.DisplayType.HOVER)
-                        item.Value.ShowTitle = TaskbarMonitor.CounterOptions.DisplayType.SHOW;
-
-                    if (item.Value.ShowCurrentValue == TaskbarMonitor.CounterOptions.DisplayType.HOVER)
-                        item.Value.ShowCurrentValue = TaskbarMonitor.CounterOptions.DisplayType.SHOW;
+                    if (item.Key.StartsWith("GPU") && item.Value.GraphType != Counters.ICounter.CounterType.SINGLE)
+                        item.Value.GraphType = Counters.ICounter.CounterType.SINGLE;
                 }
-            }*/
+                
+            }
+            this.OptionsVersion = LATESTOPTIONSVERSION;              
             return ret;
         }
     }
