@@ -240,6 +240,13 @@ namespace TaskbarMonitor
             {
                 _contextMenu = new ContextMenu();
                 _contextMenu.MenuItems.Add(new MenuItem("Settings...", MenuItem_Settings_onClick));
+                _contextMenu.MenuItems.Add(new MenuItem("Open Task Manager...", (e, a) =>
+                {
+                    if (System.IO.File.Exists(Environment.SystemDirectory + @"\taskmgr.exe"))
+                        System.Diagnostics.Process.Start(Environment.SystemDirectory + @"\taskmgr.exe");
+                    else
+                        System.Diagnostics.Process.Start(@"taskmgr.exe");
+                }));
                 _contextMenu.MenuItems.Add(new MenuItem("Open Resource Monitor...", (e, a) =>
                 {
                     System.Diagnostics.Process.Start("resmon.exe");
