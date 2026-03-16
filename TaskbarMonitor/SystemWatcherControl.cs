@@ -167,10 +167,18 @@ namespace TaskbarMonitor
                     {
                         if (key != null)
                         {
-                            object regValue = key.GetValue("AppsUseLightTheme");
+                            object regValue = key.GetValue("SystemUsesLightTheme");
                             if (regValue != null)
                             {
                                 isLightTheme = ((int)regValue) > 0;
+                            }
+                            else
+                            {
+                                regValue = key.GetValue("AppsUseLightTheme");
+                                if (regValue != null)
+                                {
+                                    isLightTheme = ((int)regValue) > 0;
+                                }
                             }
                         }
                     }
