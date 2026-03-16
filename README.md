@@ -18,5 +18,11 @@ Then, download the **TaskbarMonitorInstaller.exe** installer and run it.</p>
 The reason for this is that this tool registers itself for all users, so the dll files should be accessible for
     all users on the computer.</p>
 
+## Usage
+
+To enable taskbar-monitor toolbar in your taskbar you have to:
+
+right-click on your taskbar -> select Toolbars -> check "Taskbar Monitor"
+
 ## Uninstall
 To uninstall it, just use the uninstaller from the "Add or Remove Programs" list.
