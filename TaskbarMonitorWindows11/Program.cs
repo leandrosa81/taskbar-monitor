@@ -15,9 +15,6 @@ namespace TaskbarMonitorWindows11
     static class Program
     {
 
-        [DllImport("user32.dll")]
-        private static extern bool SetProcessDPIAware();
-
         private static TaskbarManager taskbarManager;
         private static TaskbarMonitorApplicationContext ctx;
         private static Mutex singleInstanceMutex;
@@ -31,8 +28,6 @@ namespace TaskbarMonitorWindows11
         {
             try
             {
-                if (Environment.OSVersion.Version.Major >= 6)
-                    SetProcessDPIAware();
                 if (!TaskbarMonitor.BLL.WindowsInformation.IsWindows11())
                 {
                     MessageBox.Show("Please use this application on Windows 11+ devices only.");
