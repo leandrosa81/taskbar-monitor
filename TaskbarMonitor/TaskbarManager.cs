@@ -410,13 +410,13 @@ namespace TaskbarMonitor
      
         private void LocationChangedCallback(IntPtr winEventHookHandle, AccessibleEvents accEvent, IntPtr windowHandle, int objectId, int childId, uint eventThreadId, uint eventTimeInMilliseconds)
         {
-            if (accEvent == AccessibleEvents.LocationChange)
+            if (accEvent != AccessibleEvents.LocationChange) 
+                return;
+            
+            Taskbar taskbar = TaskbarList.FirstOrDefault(x => x.TrayWnd.ToInt32() == windowHandle.ToInt32());
+            if (taskbar != null)
             {
-                var taskbar = TaskbarList.Where(x => x.TrayWnd.ToInt32() == windowHandle.ToInt32()).SingleOrDefault();
-                if (taskbar != null)
-                {
-                    UpdatePosition(taskbar);
-                }
+                UpdatePosition(taskbar);
             }
         }
          
