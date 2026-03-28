@@ -327,6 +327,7 @@ namespace TaskbarMonitor
             int counterSize = (Options.HistorySize + 10);
             int controlWidth = counterSize * CountersCount;
             int controlHeight = minimumHeight;
+            int padding = 5;
 
             if (VerticalTaskbarMode && taskbarWidth < controlWidth)
             {
@@ -336,13 +337,13 @@ namespace TaskbarMonitor
             }
             if (VerticalTaskbarMode)
             {
-                this.Left = 5;
-                controlWidth = controlWidth - 5;
+                this.Left = padding;
+                controlWidth = controlWidth - padding;
             }
             else 
             { 
-                this.Top = 1;
-                controlHeight = controlHeight - 2;
+                this.Top = padding;
+                controlHeight = controlHeight - padding - 2;
             }
             if (this.Size.Width != controlWidth || this.Size.Height != controlHeight)
             {
