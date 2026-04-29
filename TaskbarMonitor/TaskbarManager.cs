@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -57,7 +57,25 @@ namespace TaskbarMonitor
             //timer.Start(); // we start only after first taskbars are create
             Options opt = TaskbarMonitor.Options.ReadFromDisk();
             this.Monitor = Monitor.GetInstance(opt);
-            this.Monitor.OnOptionsUpdated += Monitor_OnOptionsUpdated;                
+            this.Monitor.OnOptionsUpdated += Monitor_OnOptionsUpdated;
+            Microsoft.Win32.SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
+        }
+
+        private void SystemEvents_PowerModeChanged(object sender, Microsoft.Win32.PowerModeChangedEventArgs e)
+        {
+            if (e.Mode == Microsoft.Win32.PowerModes.Resume)
+            {
+                Debug.WriteLine("System Resume detected. Re-registering taskbars in 5 seconds...");
+                // Delay re-registration to let Windows finish setting up displays
+                System.Timers.Timer delayTimer = new System.Timers.Timer(5000);
+                delayTimer.AutoReset = false;
+                delayTimer.Elapsed += (s, ev) => {
+                    if (TaskbarList.Count > 0)
+                        TaskbarList[0].TaskbarMonitorControl?.Invoke(new Action(() => AddControlsToTaskbars()));
+                    delayTimer.Dispose();
+                };
+                delayTimer.Start();
+            }
         }
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -111,7 +129,8 @@ namespace TaskbarMonitor
                     }
                     else if (WindowsInformation.IsWindows11_22621())
                     {
-                        offset = new Rectangle(0, 0, 100, 0);
+                        float scale = taskbar.TaskbarMonitorControl?.DpiScale ?? 1.0f;
+                        offset = new Rectangle(0, 0, (int)(100 * scale), 0);
                     }
                 }
             }
@@ -152,30 +171,34 @@ namespace TaskbarMonitor
         {
             var everythingOK = true;
 
-            List<WindowInformation> windowListExtended = WindowList.GetAllWindowsExtendedInfo();
-
             string taskbarClass = "Shell_TrayWnd";
             string trayClass = "TrayNotifyWnd";
 
-            var taskbarArea = windowListExtended.Where(w => w.Class == taskbarClass).SingleOrDefault();
-            if (taskbarArea == null) return false;
-
-            var trayArea = taskbarArea.ChildWindows.Where(x => x.Class == trayClass).SingleOrDefault();
-            if (trayArea == null) return false;
-            
-            everythingOK &= AddControlToTaskbar(taskbarArea, trayArea, true);
+            // Find primary taskbar
+            IntPtr primaryTaskbarHwnd = BLL.Win32Api.FindWindow(taskbarClass, null);
+            if (primaryTaskbarHwnd != IntPtr.Zero)
+            {
+                IntPtr trayHwnd = BLL.Win32Api.FindWindowEx(primaryTaskbarHwnd, IntPtr.Zero, trayClass, null);
+                if (trayHwnd != IntPtr.Zero)
+                {
+                    everythingOK &= AddControlToTaskbar(primaryTaskbarHwnd, trayHwnd, true);
+                }
+            }
 
             if (BLL.WindowsInformation.IsWindows11())
             {
                 taskbarClass = "Shell_SecondaryTrayWnd";
                 trayClass = "Windows.UI.Composition.DesktopWindowContentBridge";
 
-                var taskbarsAreas = windowListExtended.Where(w => w.Class == taskbarClass).ToList();
-
-                foreach (var tbArea in taskbarsAreas)
+                // Find secondary taskbars
+                IntPtr secondaryTaskbarHwnd = BLL.Win32Api.FindWindowEx(IntPtr.Zero, IntPtr.Zero, taskbarClass, null);
+                while (secondaryTaskbarHwnd != IntPtr.Zero)
                 {
-                    var clockArea = !WindowsInformation.IsWindows11_22621() ? tbArea.ChildWindows.Where(x => x.Class == trayClass).LastOrDefault() : null;
-                    everythingOK &= AddControlToTaskbar(tbArea, clockArea, false);
+                    IntPtr clockArea = !WindowsInformation.IsWindows11_22621() ? BLL.Win32Api.FindWindowEx(secondaryTaskbarHwnd, IntPtr.Zero, trayClass, null) : IntPtr.Zero;
+                    everythingOK &= AddControlToTaskbar(secondaryTaskbarHwnd, clockArea, false);
+
+                    // Move to the next one
+                    secondaryTaskbarHwnd = BLL.Win32Api.FindWindowEx(IntPtr.Zero, secondaryTaskbarHwnd, taskbarClass, null);
                 }
             }
 
@@ -218,63 +241,43 @@ namespace TaskbarMonitor
             return mopt;            
         }
 
-        private bool AddControlToTaskbar(WindowInformation taskbarArea, WindowInformation trayArea, bool isMainTaskbar)
+        private bool AddControlToTaskbar(IntPtr taskbarHandle, IntPtr trayHandle, bool isMainTaskbar)
         {
             Debug.WriteLine("AddControlToTaskbar");
 
-            if (TaskbarList.Any(x => x.TaskbarMonitorControl?.Name == "taskbarMonitorFor" + taskbarArea.Handle))
+            if (TaskbarList.Any(x => x.TargetWnd == taskbarHandle))
                 return true;
 
-            Taskbar tb = TaskbarList.Where(x => x.TargetWnd == taskbarArea.Handle).SingleOrDefault();
+            Taskbar tb = TaskbarList.Where(x => x.TargetWnd == taskbarHandle).SingleOrDefault();
             if(tb == null)
             {
                 tb = new Taskbar(isMainTaskbar);
                 TaskbarList.Add(tb);
-                tb.TargetWnd = taskbarArea.Handle;
-            }
-
-            if(isMainTaskbar && WindowsInformation.IsWindows11_22621())
-            {
-                //taskbarArea = taskbarArea.ChildWindows.Where(x => x.Class == "Windows.UI.Composition.DesktopWindowContentBridge").SingleOrDefault();
-                //taskbarArea = taskbarArea.ChildWindows.Where(x => x.Class == "Windows.UI.Input.InputSite.WindowClass").SingleOrDefault();
+                tb.TargetWnd = taskbarHandle;
             }
             
-            
-            
-            var mopt = GetOptionsForTaskbar(tb);
-            //if (!this.Monitor.Options.EnableOnAllMonitors || (mopt != null && !mopt.Enabled))
-                //return true;
-
-
             if (isMainTaskbar)
             {
                 MainTaskbar = tb;
-                tb.TrayWnd = trayArea.Handle;
+                tb.TrayWnd = trayHandle;
             }       
-            else if(trayArea != null)
+            else if(trayHandle != IntPtr.Zero)
             {
-                tb.ClockWnd = trayArea.Handle;
+                tb.ClockWnd = trayHandle;
             }
-
-            var rect = BLL.Win32Api.GetWindowSize(taskbarArea.Handle);
-            var rectTray = trayArea != null ? BLL.Win32Api.GetWindowSize(trayArea.Handle) : Rectangle.Empty;
 
             var taskbarMonitorControl = new SystemWatcherControl(this.Monitor);
             tb.TaskbarMonitorControl = taskbarMonitorControl;
-            taskbarMonitorControl.Name = "taskbarMonitorFor" + taskbarArea.Handle;
-            // taskbarMonitorControl.Left = rect.Width - taskbarMonitorControl.Width - rectTray.Width;
+            taskbarMonitorControl.Name = "taskbarMonitorFor" + taskbarHandle;
 
 
-            BLL.Win32Api.SetParent(taskbarMonitorControl.Handle, taskbarArea.Handle);
-            //taskbarMonitorControl.BringToFront();
+            BLL.Win32Api.SetParent(taskbarMonitorControl.Handle, taskbarHandle);
 
             if (WindowsInformation.IsWindows11_22621())
             {
                 Win32Api.SetWindowLong(taskbarMonitorControl.Handle, Win32Api.GWLParameter.GWL_EXSTYLE, (uint)(0x00000000L | 0x00010000L | 0x00080000 | 0x02000000L | 0x00000020L));
                 Win32Api.SetLayeredWindowAttributes(taskbarMonitorControl.Handle, 0, 255, 0x00000001 | 0x00000002);
             }
-            //Win32Api.SetWindowPos(taskbarMonitorControl.Handle,  new IntPtr(-1), 0, 0, 0, 0,
-            //0x0001 | 0x0002 | 0x0040);
             taskbarMonitorControl.Show();
 
             UpdatePosition(tb);
@@ -390,20 +393,15 @@ namespace TaskbarMonitor
                 var taskbar = TaskbarList.Where(x => x.TargetWnd.ToInt32() == windowHandle.ToInt32()).SingleOrDefault();
                 if(taskbar != null)
                 {
-                    bool waitForit = taskbar.IsMainTaskbar;
+                    bool isMain = taskbar.IsMainTaskbar;
                     RemoveControl(taskbar);
-                    if(waitForit)
+                    
+                    if(isMain)
                     {
-                        int timeout = 0;
-
-                        while(!AddControlsToTaskbars() && timeout < timeoutToRegisterAttemptAfterTaskbarRestart)
-                        {
-                            int step = timeoutToRegisterAttemptAfterTaskbarRestart / 5;
-                            System.Threading.Thread.Sleep(step);
-                            timeout += step;
-                        }
+                        // Don't block the thread with Sleep. 
+                        // Instead, let the existing 4-second timer (Timer_Elapsed) handle the re-registration.
+                        Debug.WriteLine("Main taskbar destroyed. Re-registration will be handled by timer.");
                     }
-                   
                 }
             } 
         }
@@ -422,6 +420,7 @@ namespace TaskbarMonitor
          
         public void Dispose()
         {
+            Microsoft.Win32.SystemEvents.PowerModeChanged -= SystemEvents_PowerModeChanged;
             UnhookEvents();
             timer.Stop();
             timer.Dispose();    
