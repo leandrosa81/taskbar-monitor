@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -19,6 +19,15 @@ namespace TaskbarMonitor.BLL
         public int uEdge;
         public RECT rc;
         public IntPtr lParam;
+    }
+
+    public enum DPI_AWARENESS_CONTEXT
+    {
+        DPI_AWARENESS_CONTEXT_UNAWARE = -1,
+        DPI_AWARENESS_CONTEXT_SYSTEM_AWARE = -2,
+        DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE = -3,
+        DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = -4,
+        DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED = -5
     }
 
     internal struct RECT
@@ -60,9 +69,11 @@ namespace TaskbarMonitor.BLL
         [DllImport("user32.dll")]
         internal static extern bool DestroyWindow(IntPtr hWnd);
 
-        // Find window by Caption only. Note you must pass IntPtr.Zero as the first parameter.
         [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)]
         internal static extern IntPtr FindWindowByCaption(IntPtr ZeroOnly, string lpWindowName);
+
+        [DllImport("user32.dll", EntryPoint = "FindWindowEx", CharSet = CharSet.Auto)]
+        internal static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
 
         ///The SetWindowLongPtr function changes an attribute of the specified window
         [DllImport("user32.dll", EntryPoint = "SetWindowLong")]
@@ -102,6 +113,15 @@ namespace TaskbarMonitor.BLL
 
         [DllImport("user32.dll", EntryPoint = "EnableWindow")]
         internal static extern bool EnableWindow(IntPtr hWnd, bool bEnable);
+
+        [DllImport("user32.dll")]
+        internal static extern bool SetProcessDpiAwarenessContext(IntPtr value);
+
+        [DllImport("user32.dll")]
+        internal static extern uint GetDpiForWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        internal static extern uint GetDpiForSystem();
 
         [return: MarshalAs(UnmanagedType.Bool)]
         [DllImport("user32.dll")]
@@ -195,14 +215,6 @@ namespace TaskbarMonitor.BLL
             //5    Close button.
         }
 
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct RECT
-        {
-            internal int left;
-            internal int top;
-            internal int right;
-            internal int bottom;
-        }
 
 
         public static Rectangle GetTaskbarPosition()

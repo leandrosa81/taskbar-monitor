@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -17,6 +17,10 @@ namespace TaskbarMonitorWindows11
 
         [DllImport("user32.dll")]
         private static extern bool SetProcessDPIAware();
+        [DllImport("user32.dll")]
+        private static extern bool SetProcessDpiAwarenessContext(IntPtr value);
+
+        private static readonly IntPtr DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = (IntPtr)(-4);
 
         private static TaskbarManager taskbarManager;
         private static TaskbarMonitorApplicationContext ctx;
@@ -31,8 +35,22 @@ namespace TaskbarMonitorWindows11
         {
             try
             {
-                if (Environment.OSVersion.Version.Major >= 6)
+                if (Environment.OSVersion.Version.Major >= 10)
+                {
+                    try
+                    {
+                        SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+                    }
+                    catch
+                    {
+                        // Fallback for older Windows 10 versions if needed
+                        SetProcessDPIAware();
+                    }
+                }
+                else if (Environment.OSVersion.Version.Major >= 6)
+                {
                     SetProcessDPIAware();
+                }
                 if (!TaskbarMonitor.BLL.WindowsInformation.IsWindows11())
                 {
                     MessageBox.Show("Please use this application on Windows 11+ devices only.");
