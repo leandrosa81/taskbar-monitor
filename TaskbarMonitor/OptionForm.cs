@@ -309,7 +309,8 @@ namespace TaskbarMonitor
                 Options.CounterOptions[item].SummaryPosition = ActiveCounter.SummaryPosition;
                 Options.CounterOptions[item].ShowTitleShadowOnHover = ActiveCounter.ShowTitleShadowOnHover;
                 Options.CounterOptions[item].ShowCurrentValueShadowOnHover = ActiveCounter.ShowCurrentValueShadowOnHover;
-                Options.CounterOptions[item].TitlePosition = ActiveCounter.TitlePosition;                
+                Options.CounterOptions[item].TitlePosition = ActiveCounter.TitlePosition;
+                Options.CounterOptions[item].Padding = ActiveCounter.Padding;
 
             }
         }
@@ -327,6 +328,7 @@ namespace TaskbarMonitor
             listSummaryPosition.Text = ActiveCounter.SummaryPosition.ToString();
             checkInvertOrder.Checked = ActiveCounter.InvertOrder;
             checkSeparateScales.Checked = ActiveCounter.SeparateScales;
+            editPadding.Value = Math.Max(editPadding.Minimum, Math.Min(editPadding.Maximum, ActiveCounter.Padding));
             checkTitleShadowHover.Checked = ActiveCounter.ShowTitleShadowOnHover;
             checkValueShadowHover.Checked = ActiveCounter.ShowCurrentValueShadowOnHover;
             listTitlePosition.Text = ActiveCounter.TitlePosition.ToString();
@@ -432,6 +434,13 @@ namespace TaskbarMonitor
         {
             if (initializing) return;
             ActiveCounter.InvertOrder = checkInvertOrder.Checked;
+            UpdatePreview();
+        }
+
+        private void editPadding_ValueChanged(object sender, EventArgs e)
+        {
+            if (initializing) return;
+            ActiveCounter.Padding = (int)editPadding.Value;
             UpdatePreview();
         }
 

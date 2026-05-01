@@ -324,15 +324,19 @@ namespace TaskbarMonitor
             else if (taskbarWidth == 0 && taskbarHeight > 0)
                 VerticalTaskbarMode = false;
 
-            int counterSize = (Options.HistorySize + 10);
-            int controlWidth = counterSize * CountersCount;
+            var enabledCounters = Options.CounterOptions.Where(x => x.Value.Enabled).ToList();
+            int controlWidth = enabledCounters.Sum(x => Options.HistorySize + x.Value.Padding);
             int controlHeight = minimumHeight;
 
             if (VerticalTaskbarMode && taskbarWidth < controlWidth)
             {
+                // Each counter is a fixed graph width plus its own padding; size the wrap math by the widest cell so we never overflow.
+                int maxPadding = enabledCounters.Count > 0 ? enabledCounters.Max(x => x.Value.Padding) : 10;
+                int counterSize = Options.HistorySize + maxPadding;
                 int countersPerLine = Convert.ToInt32(Math.Floor((float)taskbarWidth / (float)counterSize));
+                if (countersPerLine < 1) countersPerLine = 1;
                 controlWidth = counterSize * countersPerLine;
-                controlHeight = Convert.ToInt32(Math.Ceiling((float)CountersCount / (float)countersPerLine)) * (30 + 10);
+                controlHeight = Convert.ToInt32(Math.Ceiling((float)CountersCount / (float)countersPerLine)) * (30 + maxPadding);
             }
             if (VerticalTaskbarMode)
             {
@@ -550,11 +554,11 @@ namespace TaskbarMonitor
                     }
 
 
-                    graphPosition += Options.HistorySize + 10;
+                    graphPosition += Options.HistorySize + opt.Padding;
                     if (VerticalTaskbarMode && graphPosition >= this.Size.Width)
                     {
                         graphPosition = 0;
-                        graphPositionY += (maximumHeight + 10);
+                        graphPositionY += (maximumHeight + opt.Padding);
                     }
 
                 }
