@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -31,7 +32,10 @@ namespace TaskbarMonitor
                 TaskbarInfo.TaskbarOrientationChanged += TaskbarInfo_TaskbarOrientationChanged;
                 Monitor monitor = Monitor.GetInstance(opt);
                 var ctl = new SystemWatcherControl(monitor, false, this);
-                Options.MinHorizontalSize = new Size((ctl.Options.HistorySize + 10) * ctl.CountersCount, CSDeskBand.CSDeskBandOptions.TaskbarHorizontalHeightSmall);
+                int totalWidth = ctl.Options.CounterOptions
+                    .Where(x => x.Value.Enabled)
+                    .Sum(x => ctl.Options.HistorySize + x.Value.Padding);
+                Options.MinHorizontalSize = new Size(totalWidth, CSDeskBand.CSDeskBandOptions.TaskbarHorizontalHeightSmall);
                 
                 ctl.OnChangeSize += Ctl_OnChangeSize;
                 //Options.HeightCanChange = false;                

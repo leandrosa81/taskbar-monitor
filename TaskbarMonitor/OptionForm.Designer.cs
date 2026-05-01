@@ -34,6 +34,8 @@
             this.labelTitle = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.editHistorySize = new System.Windows.Forms.NumericUpDown();
+            this.editPadding = new System.Windows.Forms.NumericUpDown();
+            this.labelPadding = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.panelMenu = new System.Windows.Forms.Panel();
             this.btnMenuMultiMonitor = new System.Windows.Forms.Button();
@@ -138,6 +140,7 @@
             this.buttonApply = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editHistorySize)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editPadding)).BeginInit();
             this.panelMenu.SuspendLayout();
             this.panel3.SuspendLayout();
             this.contextMenuStripReplicateSettings.SuspendLayout();
@@ -326,7 +329,7 @@
             // 
             // buttonReplicateSettings
             // 
-            this.buttonReplicateSettings.Location = new System.Drawing.Point(249, 355);
+            this.buttonReplicateSettings.Location = new System.Drawing.Point(249, 388);
             this.buttonReplicateSettings.Menu = this.contextMenuStripReplicateSettings;
             this.buttonReplicateSettings.Name = "buttonReplicateSettings";
             this.buttonReplicateSettings.ShowMenuUnderCursor = true;
@@ -367,7 +370,7 @@
             this.groupBox4.Controls.Add(this.listSummaryPosition);
             this.groupBox4.Controls.Add(this.label20);
             this.groupBox4.Controls.Add(this.checkShowSummary);
-            this.groupBox4.Location = new System.Drawing.Point(8, 203);
+            this.groupBox4.Location = new System.Drawing.Point(8, 236);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(403, 146);
             this.groupBox4.TabIndex = 9;
@@ -474,7 +477,7 @@
             this.groupBox3.Controls.Add(this.label7);
             this.groupBox3.Controls.Add(this.label3);
             this.groupBox3.Controls.Add(this.listShowTitle);
-            this.groupBox3.Location = new System.Drawing.Point(8, 102);
+            this.groupBox3.Location = new System.Drawing.Point(8, 135);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(403, 95);
             this.groupBox3.TabIndex = 7;
@@ -553,9 +556,11 @@
             this.groupBox2.Controls.Add(this.listGraphType);
             this.groupBox2.Controls.Add(this.label21);
             this.groupBox2.Controls.Add(this.checkInvertOrder);
+            this.groupBox2.Controls.Add(this.labelPadding);
+            this.groupBox2.Controls.Add(this.editPadding);
             this.groupBox2.Location = new System.Drawing.Point(5, 7);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(404, 89);
+            this.groupBox2.Size = new System.Drawing.Size(404, 122);
             this.groupBox2.TabIndex = 6;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Main settings";
@@ -640,9 +645,43 @@
             this.checkInvertOrder.TabIndex = 9;
             this.checkInvertOrder.UseVisualStyleBackColor = true;
             this.checkInvertOrder.CheckedChanged += new System.EventHandler(this.checkInvertOrder_CheckedChanged);
-            // 
+            //
+            // labelPadding
+            //
+            this.labelPadding.AutoSize = true;
+            this.labelPadding.Location = new System.Drawing.Point(8, 95);
+            this.labelPadding.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.labelPadding.Name = "labelPadding";
+            this.labelPadding.Size = new System.Drawing.Size(70, 14);
+            this.labelPadding.TabIndex = 14;
+            this.labelPadding.Text = "Padding (px):";
+            //
+            // editPadding
+            //
+            this.editPadding.Location = new System.Drawing.Point(90, 92);
+            this.editPadding.Margin = new System.Windows.Forms.Padding(2);
+            this.editPadding.Minimum = new decimal(new int[] {
+            0,
+            0,
+            0,
+            0});
+            this.editPadding.Maximum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.editPadding.Name = "editPadding";
+            this.editPadding.Size = new System.Drawing.Size(75, 22);
+            this.editPadding.TabIndex = 15;
+            this.editPadding.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.editPadding.ValueChanged += new System.EventHandler(this.editPadding_ValueChanged);
+            //
             // panel4
-            // 
+            //
             this.panel4.BackColor = System.Drawing.Color.Transparent;
             this.panel4.Controls.Add(this.buttonDown);
             this.panel4.Controls.Add(this.buttonUp);
@@ -1394,6 +1433,7 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editHistorySize)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editPadding)).EndInit();
             this.panelMenu.ResumeLayout(false);
             this.panel3.ResumeLayout(false);
             this.contextMenuStripReplicateSettings.ResumeLayout(false);
@@ -1432,6 +1472,8 @@
 
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.NumericUpDown editHistorySize;
+        private System.Windows.Forms.NumericUpDown editPadding;
+        private System.Windows.Forms.Label labelPadding;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel panelMenu;
         private System.Windows.Forms.Panel panel3;

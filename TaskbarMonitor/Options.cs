@@ -16,7 +16,7 @@ namespace TaskbarMonitor
             LIGHT,
             CUSTOM            
         }
-        public static readonly int LATESTOPTIONSVERSION = 5;
+        public static readonly int LATESTOPTIONSVERSION = 6;
         public int OptionsVersion = LATESTOPTIONSVERSION;
         public Dictionary<string, CounterOptions> CounterOptions { get; set; }
         public int HistorySize { get; set; } = 50;
@@ -51,6 +51,7 @@ namespace TaskbarMonitor
                 opt.CounterOptions[item.Key].SeparateScales = item.Value.SeparateScales;
                 opt.CounterOptions[item.Key].GraphType = item.Value.GraphType;
                 opt.CounterOptions[item.Key].Order = item.Value.Order;
+                opt.CounterOptions[item.Key].Padding = item.Value.Padding;
             }
 
             opt.EnableOnAllMonitors = this.EnableOnAllMonitors;
@@ -296,9 +297,19 @@ namespace TaskbarMonitor
                     if (item.Key.StartsWith("GPU") && item.Value.GraphType != Counters.ICounter.CounterType.SINGLE)
                         item.Value.GraphType = Counters.ICounter.CounterType.SINGLE;
                 }
-                
+
             }
-            this.OptionsVersion = LATESTOPTIONSVERSION;              
+            if (this.OptionsVersion <= 6)
+            {
+                // Pre-v6 configs had a hardcoded 10px gap; preserve that as the per-counter default so existing layouts don't shift.
+                foreach (var item in this.CounterOptions)
+                {
+                    if (item.Value.Padding == 0)
+                        item.Value.Padding = 10;
+                }
+                ret = true;
+            }
+            this.OptionsVersion = LATESTOPTIONSVERSION;
             return ret;
         }
     }
@@ -329,6 +340,7 @@ namespace TaskbarMonitor
         public bool SeparateScales { get; set; } = true;
         public TaskbarMonitor.Counters.ICounter.CounterType GraphType { get; set; }
         public int? Order { get; set; }
+        public int Padding { get; set; } = 10;
     }
 
     public class MonitorOptions
