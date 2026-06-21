@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 using TaskbarMonitor;
 using TaskbarMonitorWindows11.Properties;
@@ -18,7 +19,9 @@ namespace TaskbarMonitorWindows11
         private static extern bool SetProcessDPIAware();
 
         private static TaskbarManager taskbarManager;
-        private static TaskbarMonitorApplicationContext ctx;        
+        private static TaskbarMonitorApplicationContext ctx;
+        private static Mutex singleInstanceMutex;
+        private static bool isMutexOwner = false;
 
         /// <summary>
         /// The main entry point for the application.
@@ -38,6 +41,24 @@ namespace TaskbarMonitorWindows11
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
+#if (!DEBUG)
+                // Ensure single instance in release builds
+                try
+                {
+                    bool createdNew;
+                    singleInstanceMutex = new Mutex(true, @"Global\TaskbarMonitorWindows11_SingleInstance_LeandroLugarinho", out createdNew);
+                    isMutexOwner = createdNew;
+                    if (!createdNew)
+                    {
+                        MessageBox.Show("Another instance of taskbar-monitor is already running.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+                }
+                catch
+                {
+                    // If mutex creation fails, continue running to avoid blocking on unexpected errors
+                }
+#endif
 #if (!DEBUG)
                 Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);                    
                 Application.ThreadException += Application_ThreadException;
@@ -60,7 +81,12 @@ namespace TaskbarMonitorWindows11
             }
             finally 
             { 
-                taskbarManager.Dispose(); 
+                try { taskbarManager.Dispose(); } catch { }
+                if (singleInstanceMutex != null && isMutexOwner)
+                {
+                    try { singleInstanceMutex.ReleaseMutex(); } catch { }
+                    try { singleInstanceMutex.Dispose(); } catch { }
+                }
             }
             
         }

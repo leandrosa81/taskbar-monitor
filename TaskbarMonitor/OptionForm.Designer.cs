@@ -43,6 +43,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.listCounters = new System.Windows.Forms.ListBox();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.buttonReplicateSettings = new TaskbarMonitor.Controls.MenuButton();
             this.contextMenuStripReplicateSettings = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -73,6 +74,8 @@
             this.label21 = new System.Windows.Forms.Label();
             this.checkInvertOrder = new System.Windows.Forms.CheckBox();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.buttonDown = new System.Windows.Forms.Button();
+            this.buttonUp = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
@@ -110,6 +113,7 @@
             this.listMonitorPosition = new System.Windows.Forms.ComboBox();
             this.chkEnableAllTaskbars = new System.Windows.Forms.CheckBox();
             this.label36 = new System.Windows.Forms.Label();
+            this.screenPositioning1 = new TaskbarMonitor.ScreenPositioning();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.linkLatestVersion = new System.Windows.Forms.LinkLabel();
             this.btnCheckUpdate = new System.Windows.Forms.Button();
@@ -128,14 +132,10 @@
             this.panelFooter = new System.Windows.Forms.Panel();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.label17 = new System.Windows.Forms.Label();
+            this.swcPreview = new TaskbarMonitor.SystemWatcherControl();
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonResetDefaults = new System.Windows.Forms.Button();
             this.buttonApply = new System.Windows.Forms.Button();
-            this.buttonUp = new System.Windows.Forms.Button();
-            this.buttonDown = new System.Windows.Forms.Button();
-            this.swcPreview = new TaskbarMonitor.SystemWatcherControl();
-            this.buttonReplicateSettings = new TaskbarMonitor.Controls.MenuButton();
-            this.screenPositioning1 = new TaskbarMonitor.ScreenPositioning();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editHistorySize)).BeginInit();
             this.panelMenu.SuspendLayout();
@@ -324,8 +324,20 @@
             this.panel3.Size = new System.Drawing.Size(415, 426);
             this.panel3.TabIndex = 2;
             // 
+            // buttonReplicateSettings
+            // 
+            this.buttonReplicateSettings.Location = new System.Drawing.Point(249, 355);
+            this.buttonReplicateSettings.Menu = this.contextMenuStripReplicateSettings;
+            this.buttonReplicateSettings.Name = "buttonReplicateSettings";
+            this.buttonReplicateSettings.ShowMenuUnderCursor = true;
+            this.buttonReplicateSettings.Size = new System.Drawing.Size(154, 23);
+            this.buttonReplicateSettings.TabIndex = 2;
+            this.buttonReplicateSettings.Text = "Replicate Settings";
+            this.buttonReplicateSettings.UseVisualStyleBackColor = true;
+            // 
             // contextMenuStripReplicateSettings
             // 
+            this.contextMenuStripReplicateSettings.ImageScalingSize = new System.Drawing.Size(28, 28);
             this.contextMenuStripReplicateSettings.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem1,
             this.toolStripSeparator1});
@@ -642,6 +654,26 @@
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(169, 545);
             this.panel4.TabIndex = 3;
+            // 
+            // buttonDown
+            // 
+            this.buttonDown.Location = new System.Drawing.Point(87, 262);
+            this.buttonDown.Name = "buttonDown";
+            this.buttonDown.Size = new System.Drawing.Size(51, 23);
+            this.buttonDown.TabIndex = 3;
+            this.buttonDown.Text = "down";
+            this.buttonDown.UseVisualStyleBackColor = true;
+            this.buttonDown.Click += new System.EventHandler(this.buttonDown_Click);
+            // 
+            // buttonUp
+            // 
+            this.buttonUp.Location = new System.Drawing.Point(20, 262);
+            this.buttonUp.Name = "buttonUp";
+            this.buttonUp.Size = new System.Drawing.Size(48, 23);
+            this.buttonUp.TabIndex = 2;
+            this.buttonUp.Text = "up";
+            this.buttonUp.UseVisualStyleBackColor = true;
+            this.buttonUp.Click += new System.EventHandler(this.buttonUp_Click);
             // 
             // tabControl1
             // 
@@ -1080,6 +1112,15 @@
             this.label36.TabIndex = 7;
             this.label36.Text = "Multi Monitors && Positioning";
             // 
+            // screenPositioning1
+            // 
+            this.screenPositioning1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.screenPositioning1.Location = new System.Drawing.Point(13, 70);
+            this.screenPositioning1.Name = "screenPositioning1";
+            this.screenPositioning1.Size = new System.Drawing.Size(330, 219);
+            this.screenPositioning1.TabIndex = 9;
+            this.screenPositioning1.OnSelectedScreenChange += new TaskbarMonitor.ScreenPositioning.SelectedScreenChangeHandler(this.screenPositioning1_OnSelectedScreenChange);
+            // 
             // tabPage3
             // 
             this.tabPage3.BackColor = System.Drawing.Color.Transparent;
@@ -1285,6 +1326,17 @@
             this.label17.TabIndex = 5;
             this.label17.Text = "Preview:";
             // 
+            // swcPreview
+            // 
+            this.swcPreview.BackColor = System.Drawing.Color.Transparent;
+            this.swcPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.swcPreview.Location = new System.Drawing.Point(15, 39);
+            this.swcPreview.Name = "swcPreview";
+            this.swcPreview.PreviewMode = true;
+            this.swcPreview.Size = new System.Drawing.Size(240, 30);
+            this.swcPreview.TabIndex = 4;
+            this.swcPreview.Version = ((System.Version)(resources.GetObject("swcPreview.Version")));
+            // 
             // buttonOK
             // 
             this.buttonOK.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -1319,61 +1371,10 @@
             this.buttonApply.UseVisualStyleBackColor = false;
             this.buttonApply.Click += new System.EventHandler(this.buttonApply_Click);
             // 
-            // buttonUp
-            // 
-            this.buttonUp.Location = new System.Drawing.Point(20, 262);
-            this.buttonUp.Name = "buttonUp";
-            this.buttonUp.Size = new System.Drawing.Size(48, 23);
-            this.buttonUp.TabIndex = 2;
-            this.buttonUp.Text = "up";
-            this.buttonUp.UseVisualStyleBackColor = true;
-            this.buttonUp.Click += new System.EventHandler(this.buttonUp_Click);
-            // 
-            // buttonDown
-            // 
-            this.buttonDown.Location = new System.Drawing.Point(87, 262);
-            this.buttonDown.Name = "buttonDown";
-            this.buttonDown.Size = new System.Drawing.Size(51, 23);
-            this.buttonDown.TabIndex = 3;
-            this.buttonDown.Text = "down";
-            this.buttonDown.UseVisualStyleBackColor = true;
-            this.buttonDown.Click += new System.EventHandler(this.buttonDown_Click);
-            // 
-            // swcPreview
-            // 
-            this.swcPreview.BackColor = System.Drawing.Color.Transparent;
-            this.swcPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.swcPreview.Location = new System.Drawing.Point(15, 39);
-            this.swcPreview.Name = "swcPreview";
-            this.swcPreview.PreviewMode = true;
-            this.swcPreview.Size = new System.Drawing.Size(240, 30);
-            this.swcPreview.TabIndex = 4;
-            this.swcPreview.Version = ((System.Version)(resources.GetObject("swcPreview.Version")));
-            // 
-            // buttonReplicateSettings
-            // 
-            this.buttonReplicateSettings.Location = new System.Drawing.Point(249, 355);
-            this.buttonReplicateSettings.Menu = this.contextMenuStripReplicateSettings;
-            this.buttonReplicateSettings.Name = "buttonReplicateSettings";
-            this.buttonReplicateSettings.ShowMenuUnderCursor = true;
-            this.buttonReplicateSettings.Size = new System.Drawing.Size(154, 23);
-            this.buttonReplicateSettings.TabIndex = 2;
-            this.buttonReplicateSettings.Text = "Replicate Settings";
-            this.buttonReplicateSettings.UseVisualStyleBackColor = true;
-            // 
-            // screenPositioning1
-            // 
-            this.screenPositioning1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.screenPositioning1.Location = new System.Drawing.Point(13, 70);
-            this.screenPositioning1.Name = "screenPositioning1";
-            this.screenPositioning1.Size = new System.Drawing.Size(330, 219);
-            this.screenPositioning1.TabIndex = 9;
-            this.screenPositioning1.OnSelectedScreenChange += new TaskbarMonitor.ScreenPositioning.SelectedScreenChangeHandler(this.screenPositioning1_OnSelectedScreenChange);
-            // 
             // OptionForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.White;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(762, 605);
