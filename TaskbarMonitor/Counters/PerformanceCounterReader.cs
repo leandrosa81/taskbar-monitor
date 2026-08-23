@@ -116,7 +116,14 @@ namespace TaskbarMonitor.Counters
                                         var item = Marshal.PtrToStructure<PDH_FMT_COUNTERVALUE_ITEM>(itemPtr);
                                         string instanceName = Marshal.PtrToStringUni(item.szName);
                                         float value = (float)item.value.doubleValue;
-                                        Values[countersByPath.Key + ":" + instanceName] = value;
+                                        // Multiple instances can share the same name (e.g. GPU Engine instances for
+                                        // several contexts of one process, common with WSL/vmwp); sum them instead
+                                        // of letting the last duplicate overwrite the others.
+                                        string key = countersByPath.Key + ":" + instanceName;
+                                        if (Values.TryGetValue(key, out float existing))
+                                            Values[key] = existing + value;
+                                        else
+                                            Values[key] = value;
                                     }
                                 }
                             }

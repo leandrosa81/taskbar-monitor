@@ -20,6 +20,7 @@ namespace TaskbarMonitor.Counters
             { "LegacyOverlay", "OVER" },
             { "Copy", "COPY" },
             { "VideoDecode", "VDEC" },
+            { "Compute", "CPT" },
             { "Compute_1", "CPT1" },
             { "Graphics_1", "GFX" },
             { "Security", "SEC" },
@@ -64,6 +65,9 @@ namespace TaskbarMonitor.Counters
                         currentValue = itemValue;
                     }
                 }
+                // summing engine instances of the same type can slightly exceed 100%
+                if (currentValue > 100f)
+                    currentValue = 100f;
 
             }
             catch (InvalidOperationException ex)
