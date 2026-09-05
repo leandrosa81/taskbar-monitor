@@ -28,6 +28,12 @@ namespace TaskbarMonitor
         private Font ChosenTitleFont;
         private Font ChosenCurrentValueFont;
 
+        // footer/dialog measurements as designed, used to grow them for a vertical preview
+        private int defaultFooterHeight;
+        private int defaultFormHeight;
+        private int buttonBottomMargin;
+        private const int PreviewBottomMargin = 12;
+
         public OptionForm(Options opt, GraphTheme theme, Version version, TaskbarManager manager/*, SystemWatcherControl originalControl*/)
         {
             try
@@ -151,6 +157,11 @@ namespace TaskbarMonitor
             btnColor2.BackColor = this.Theme.StackedColors[1];
 
             chkEnableAllTaskbars.Checked = this.Options.EnableOnAllMonitors;
+
+            defaultFooterHeight = panelFooter.Height;
+            defaultFormHeight = this.Height;
+            buttonBottomMargin = defaultFooterHeight - buttonOK.Top;
+
             UpdateMonitorForm();
 
             UpdatePreview();
@@ -192,6 +203,126 @@ namespace TaskbarMonitor
             }
 
             swcPreview.ApplyOptions(previewOptions, previewTheme);
+
+            UpdatePreviewLayout();
+        }
+
+        /// <summary>
+        /// Bounds of the taskbar on a screen, derived from the area it takes off the working area.
+        /// Empty when the taskbar is hidden or does not appear on that screen.
+        /// </summary>
+        private static Rectangle GetTaskbarBoundsForScreen(Screen screen)
+        {
+            if (screen == null)
+                return Rectangle.Empty;
+
+            var bounds = screen.Bounds;
+            var working = screen.WorkingArea;
+
+            int left = working.Left - bounds.Left;
+            int right = bounds.Right - working.Right;
+            int top = working.Top - bounds.Top;
+            int bottom = bounds.Bottom - working.Bottom;
+
+            if (left > 0) return new Rectangle(bounds.Left, bounds.Top, left, bounds.Height);
+            if (right > 0) return new Rectangle(working.Right, bounds.Top, right, bounds.Height);
+            if (top > 0) return new Rectangle(bounds.Left, bounds.Top, bounds.Width, top);
+            if (bottom > 0) return new Rectangle(bounds.Left, working.Bottom, bounds.Width, bottom);
+
+            return Rectangle.Empty;
+        }
+
+        /// <summary>
+        /// Geometry the preview imitates: the taskbar of the currently selected screen, falling
+        /// back to the primary one and finally to a horizontal default.
+        /// </summary>
+        private Rectangle GetPreviewTaskbarBounds()
+        {
+            var screen = screenPositioning1 != null ? screenPositioning1.SelectedScreen : null;
+            var bounds = GetTaskbarBoundsForScreen(screen ?? Screen.PrimaryScreen);
+
+            if (bounds == Rectangle.Empty)
+                bounds = GetTaskbarBoundsForScreen(Screen.PrimaryScreen);
+
+            if (bounds == Rectangle.Empty)
+            {
+                // hidden taskbar: ask the shell where it would be
+                try { bounds = BLL.Win32Api.GetTaskbarPosition(); }
+                catch { }
+            }
+
+            if (bounds == Rectangle.Empty || bounds.Width <= 0 || bounds.Height <= 0)
+                bounds = new Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, 40);
+
+            return bounds;
+        }
+
+        private bool IsPreviewTaskbarVertical()
+        {
+            var bounds = GetPreviewTaskbarBounds();
+            return bounds.Height > bounds.Width;
+        }
+
+        /// <summary>
+        /// Makes the preview imitate the real taskbar, including a vertical one where the graphs
+        /// are stacked, and grows the footer and the dialog to make room for it.
+        /// </summary>
+        private void UpdatePreviewLayout()
+        {
+            if (defaultFooterHeight == 0)
+                return;
+
+            swcPreview.SetTaskbarBounds(GetPreviewTaskbarBounds());
+
+            int needed = swcPreview.Top + swcPreview.Height + PreviewBottomMargin;
+            int footerHeight = Math.Max(defaultFooterHeight, needed);
+            int formHeight = defaultFormHeight + (footerHeight - defaultFooterHeight);
+
+            // never grow the dialog beyond the screen it is shown on
+            int maxHeight = Screen.FromControl(this).WorkingArea.Height - 40;
+            if (formHeight > maxHeight)
+            {
+                footerHeight -= (formHeight - maxHeight);
+                formHeight = maxHeight;
+            }
+
+            if (panelFooter.Height == footerHeight && this.Height == formHeight)
+                return;
+
+            panelFooter.Height = footerHeight;
+            this.Height = formHeight;
+
+            // keep the action buttons anchored to the bottom of the footer
+            int buttonTop = footerHeight - buttonBottomMargin;
+            buttonOK.Top = buttonTop;
+            buttonCancel.Top = buttonTop;
+            buttonApply.Top = buttonTop;
+
+            UpdateFooterBackColor();
+        }
+
+        /// <summary>
+        /// The dialog is painted with a vertical gradient that restarts at the top of every
+        /// control. A tall footer would therefore stand out as a darker block below the tab area,
+        /// so it is filled with the colour the gradient has reached at the bottom of that area.
+        /// </summary>
+        private void UpdateFooterBackColor()
+        {
+            var page = tabControl1.SelectedTab ?? tabPage1;
+            var gradient = (page.BackgroundImage ?? this.BackgroundImage) as Bitmap;
+            if (gradient == null || gradient.Height == 0 || page.Height <= 0)
+                return;
+
+            try
+            {
+                // the image is tiled, so wrap around for tab areas taller than the gradient
+                int y = (page.Height - 1) % gradient.Height;
+                panelFooter.BackColor = gradient.GetPixel(0, y);
+            }
+            catch
+            {
+                // leave the designed colour if the image cannot be sampled
+            }
         }
 
         private void EditHistorySize_ValueChanged(object sender, EventArgs e)
@@ -692,16 +823,58 @@ namespace TaskbarMonitor
         private void UpdateMonitorForm()
         {
             Screen selectedScreen = screenPositioning1.SelectedScreen;
+            UpdateMonitorPositionItems();
             var opt = Options.MonitorOptions.ContainsKey(selectedScreen.DeviceName) ? Options.MonitorOptions[selectedScreen.DeviceName] : null;
             if (opt == null)
             {
                 chkMonitorEnabled.Checked = true;
-                listMonitorPosition.SelectedItem = MonitorOptions.DisplayPosition.RIGHT.ToString();
+                listMonitorPosition.SelectedIndex = PositionIndexEnd;
             }
             else
             {
                 chkMonitorEnabled.Checked = opt.Enabled;
-                listMonitorPosition.SelectedItem = opt.Position.ToString();
+                listMonitorPosition.SelectedIndex = opt.Position == MonitorOptions.DisplayPosition.LEFT
+                    ? PositionIndexStart
+                    : PositionIndexEnd;
+            }
+        }
+
+        // the list holds the end of the taskbar first, its start second; the stored option values
+        // stay RIGHT/LEFT so existing configurations keep working
+        private const int PositionIndexEnd = 0;
+        private const int PositionIndexStart = 1;
+
+        /// <summary>
+        /// Labels the position list after the orientation of the taskbar: the two ends of a
+        /// vertical taskbar are its top and bottom, not its left and right.
+        /// </summary>
+        private void UpdateMonitorPositionItems()
+        {
+            bool vertical = IsPreviewTaskbarVertical();
+            string end = vertical ? "BOTTOM" : "RIGHT";
+            string start = vertical ? "TOP" : "LEFT";
+
+            if (listMonitorPosition.Items.Count == 2
+                && listMonitorPosition.Items[PositionIndexEnd].ToString() == end
+                && listMonitorPosition.Items[PositionIndexStart].ToString() == start)
+                return;
+
+            // repopulating raises SelectedIndexChanged, which must not write back options here
+            bool wasInitializing = initializing;
+            initializing = true;
+            try
+            {
+                int selected = listMonitorPosition.SelectedIndex;
+                listMonitorPosition.Items.Clear();
+                listMonitorPosition.Items.Add(end);
+                listMonitorPosition.Items.Add(start);
+                listMonitorPosition.SelectedIndex = selected >= 0 && selected <= PositionIndexStart
+                    ? selected
+                    : PositionIndexEnd;
+            }
+            finally
+            {
+                initializing = wasInitializing;
             }
         }
 
@@ -709,6 +882,8 @@ namespace TaskbarMonitor
         {
             if (initializing) return;
             UpdateMonitorForm();
+            // the selected screen may have a differently oriented taskbar
+            UpdatePreview();
         }
 
         private void chkEnableAllTaskbars_CheckedChanged(object sender, EventArgs e)
@@ -737,7 +912,7 @@ namespace TaskbarMonitor
 
         private void listMonitorPosition_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (initializing) return;
+            if (initializing || listMonitorPosition.SelectedIndex < 0) return;
             Screen selectedScreen = screenPositioning1.SelectedScreen;
             var opt = Options.MonitorOptions.ContainsKey(selectedScreen.DeviceName) ? Options.MonitorOptions[selectedScreen.DeviceName] : null;
             if (opt == null)
@@ -745,7 +920,9 @@ namespace TaskbarMonitor
                 opt = new MonitorOptions();
                 Options.MonitorOptions.Add(selectedScreen.DeviceName, opt);
             }
-            opt.Position = (MonitorOptions.DisplayPosition)Enum.Parse(typeof(MonitorOptions.DisplayPosition), listMonitorPosition.SelectedItem.ToString());
+            opt.Position = listMonitorPosition.SelectedIndex == PositionIndexStart
+                ? MonitorOptions.DisplayPosition.LEFT
+                : MonitorOptions.DisplayPosition.RIGHT;
 
             if (opt.Enabled && opt.Position == MonitorOptions.DisplayPosition.RIGHT)
             {

@@ -20,6 +20,15 @@ namespace TaskbarMonitor
     {
         public bool SHOW_DEBUG = false;
         int taskbarHeight = 0;
+
+        // layout constants shared by the horizontal and the vertical taskbar layout
+        private const int GraphSpacing = 10;        // gap reserved after each graph
+        private const int CurrentValueBarWidth = 4; // bar drawn right of a graph showing its current value
+        private const int VerticalGraphHeight = 30; // height of a single graph when the taskbar is vertical
+        private const int VerticalSideMargin = 2;   // margin kept on both sides of a vertical taskbar
+        private const int MinimumGraphWidth = 10;   // never shrink a graph below this
+        private const float MinimumFontSize = 5f;   // never shrink a label below this
+
         public delegate void SizeChangeHandler(Size size);
         public event SizeChangeHandler OnChangeSize;
         public Version Version { get; set; } = new Version(Properties.Resources.Version);
@@ -37,7 +46,98 @@ namespace TaskbarMonitor
         {
             get; private set;
         }
-        
+
+        /// <summary>
+        /// Bounds of the taskbar window this control lives in. When set (Windows 11 mode, where
+        /// TaskbarManager owns the positioning) it is used instead of the primary screen metrics,
+        /// so that every taskbar - including secondary ones - is measured on its own.
+        /// </summary>
+        private Rectangle taskbarBounds = Rectangle.Empty;
+
+        /// <summary>
+        /// Width of a single graph. Equals Options.HistorySize on a horizontal taskbar, but gets
+        /// reduced on a vertical taskbar that is narrower than the configured history size.
+        /// </summary>
+        private int graphWidth = 0;
+
+        /// <summary>
+        /// Width used to draw a single graph. Falls back to the configured history size while no
+        /// layout pass has run yet (preview mode).
+        /// </summary>
+        private int CurrentGraphWidth
+        {
+            get
+            {
+                if (graphWidth > 0) return graphWidth;
+                return Options != null ? Options.HistorySize : 0;
+            }
+        }
+
+        // fonts scaled down to fit a narrow vertical taskbar, kept to avoid recreating them on every paint
+        private readonly Dictionary<string, Font> shrunkFonts = new Dictionary<string, Font>();
+
+        /// <summary>
+        /// Measures <paramref name="text"/> and, on a vertical taskbar, returns a smaller font when
+        /// the text would not fit into the available width. Counter labels such as "GPU VIDEO
+        /// DECODE" are far wider than the few dozen pixels a vertical taskbar offers.
+        /// </summary>
+        private Font GetFittingFont(Graphics formGraphics, Font baseFont, string text, float available, ref SizeF size)
+        {
+            size = formGraphics.MeasureString(text, baseFont);
+            if (!VerticalTaskbarMode || available <= 0 || size.Width <= available || size.Width <= 0)
+                return baseFont;
+
+            float scaled = baseFont.Size * (available / size.Width);
+            // round down to half points so the cache stays small
+            scaled = (float)Math.Floor(scaled * 2f) / 2f;
+            if (scaled < MinimumFontSize) scaled = MinimumFontSize;
+            if (scaled >= baseFont.Size) return baseFont;
+
+            string key = baseFont.Name + "|" + baseFont.Style + "|" + scaled;
+            Font font;
+            if (!shrunkFonts.TryGetValue(key, out font))
+            {
+                font = new Font(baseFont.FontFamily, scaled, baseFont.Style);
+                shrunkFonts[key] = font;
+            }
+            size = formGraphics.MeasureString(text, font);
+            return font;
+        }
+
+        private void ClearShrunkFonts()
+        {
+            foreach (var font in shrunkFonts.Values)
+                font.Dispose();
+            shrunkFonts.Clear();
+        }
+
+        /// <summary>
+        /// Horizontal position of a label centered over a graph. A vertical taskbar is only a few
+        /// dozen pixels wide, so labels that are wider than the graph are kept inside the control
+        /// instead of overflowing (and being clipped) on the left.
+        /// </summary>
+        private float GetCenteredTextPosition(int graphPosition, float textWidth, int graphW)
+        {
+            float x = graphPosition + (graphW / 2f) - (textWidth / 2f);
+            if (VerticalTaskbarMode)
+            {
+                if (x + textWidth > this.Width)
+                    x = this.Width - textWidth;
+                if (x < 0)
+                    x = 0;
+            }
+            return x;
+        }
+
+        public void SetTaskbarBounds(Rectangle bounds)
+        {
+            if (taskbarBounds == bounds)
+                return;
+            taskbarBounds = bounds;
+            AdjustControlSize();
+            this.Invalidate();
+        }
+
         public bool PreviewMode
         {
             get
@@ -119,6 +219,7 @@ namespace TaskbarMonitor
 
         private void OnDispose(object sender, EventArgs e)
         {
+            ClearShrunkFonts();
             if(Monitor != null)
                 Monitor.OnMonitorUpdated -= Monitor_OnMonitorUpdated;
             if(BLL.WindowsInformation.IsWindows11())
@@ -243,6 +344,7 @@ namespace TaskbarMonitor
 
             fontTitle = new Font(defaultTheme.TitleFont, defaultTheme.TitleSize, defaultTheme.TitleFontStyle);
             fontCounter = new Font(defaultTheme.CurrentValueFont, defaultTheme.CurrentValueSize, defaultTheme.CurrentValueFontStyle);
+            ClearShrunkFonts();
 
             if (!PreviewMode)
             {
@@ -305,45 +407,110 @@ namespace TaskbarMonitor
 
         private void AdjustControlSize()
         {
-            if (PreviewMode)
+            // SetTaskbarBounds can be called before the options have been applied
+            if (Options == null)
                 return;
-            int taskbarWidth = GetTaskbarWidth();
-            taskbarHeight = GetTaskbarHeight();
-
-            // taskbar not being shown
-            if(taskbarWidth == 0 && taskbarHeight == 0)
-            {
+            // in preview mode the control keeps its designer size until the form tells us
+            // which taskbar to imitate
+            if (PreviewMode && taskbarBounds == Rectangle.Empty)
                 return;
-            }
-            int minimumHeight = taskbarHeight;            
-            if (minimumHeight < 20)
-                minimumHeight = 20;
 
-            if (taskbarWidth > 0 && taskbarHeight == 0)
-                VerticalTaskbarMode = true;
-            else if (taskbarWidth == 0 && taskbarHeight > 0)
-                VerticalTaskbarMode = false;
+            int taskbarThickness;
 
-            int counterSize = (Options.HistorySize + 10);
-            int controlWidth = counterSize * CountersCount;
-            int controlHeight = minimumHeight;
-
-            if (VerticalTaskbarMode && taskbarWidth < controlWidth)
+            if (taskbarBounds != Rectangle.Empty)
             {
-                int countersPerLine = Convert.ToInt32(Math.Floor((float)taskbarWidth / (float)counterSize));
-                controlWidth = counterSize * countersPerLine;
-                controlHeight = Convert.ToInt32(Math.Ceiling((float)CountersCount / (float)countersPerLine)) * (30 + 10);
+                // the taskbar window is known (Windows 11 mode): measure that window instead of
+                // deriving the taskbar size from the primary screen, so multi monitor setups and
+                // mixed orientations are handled correctly.
+                VerticalTaskbarMode = taskbarBounds.Height > taskbarBounds.Width;
+                taskbarThickness = VerticalTaskbarMode ? taskbarBounds.Width : taskbarBounds.Height;
+                taskbarHeight = VerticalTaskbarMode ? 0 : taskbarBounds.Height;
             }
+            else
+            {
+                int taskbarWidth = GetTaskbarWidth();
+                taskbarHeight = GetTaskbarHeight();
+
+                // taskbar not being shown
+                if (taskbarWidth == 0 && taskbarHeight == 0)
+                {
+                    return;
+                }
+
+                if (taskbarWidth > 0 && taskbarHeight == 0)
+                    VerticalTaskbarMode = true;
+                else if (taskbarWidth == 0 && taskbarHeight > 0)
+                    VerticalTaskbarMode = false;
+
+                taskbarThickness = VerticalTaskbarMode ? taskbarWidth : taskbarHeight;
+            }
+
+            if (taskbarThickness <= 0)
+                return;
+
+            int controlWidth;
+            int controlHeight;
+
             if (VerticalTaskbarMode)
             {
-                this.Left = 5;
-                controlWidth = controlWidth - 5;
+                // On a vertical taskbar the available width is the (usually small) taskbar
+                // thickness, so the graphs are stacked from top to bottom. If more than one graph
+                // fits side by side we still use the available width, wrapping into extra lines.
+                int availableWidth = taskbarThickness - (2 * VerticalSideMargin);
+                if (availableWidth < MinimumGraphWidth + CurrentValueBarWidth)
+                    availableWidth = MinimumGraphWidth + CurrentValueBarWidth;
+
+                // the last graph of a line is followed by its current value bar only, not by
+                // a gap, so that narrow taskbars are used up to their right edge
+                int counterSize = Options.HistorySize + GraphSpacing;
+                int countersPerLine = (availableWidth + GraphSpacing - CurrentValueBarWidth) / counterSize;
+
+                if (countersPerLine < 1)
+                {
+                    // taskbar narrower than a full sized graph: shrink the graph to fit
+                    countersPerLine = 1;
+                    graphWidth = Math.Max(MinimumGraphWidth, availableWidth - CurrentValueBarWidth);
+                }
+                else
+                {
+                    graphWidth = Options.HistorySize;
+                }
+                if (countersPerLine > CountersCount && CountersCount > 0)
+                    countersPerLine = CountersCount;
+
+                int lines = CountersCount > 0
+                    ? Convert.ToInt32(Math.Ceiling((float)CountersCount / (float)countersPerLine))
+                    : 0;
+
+                controlWidth = countersPerLine * (graphWidth + GraphSpacing) - GraphSpacing + CurrentValueBarWidth;
+                controlHeight = lines * (VerticalGraphHeight + GraphSpacing);
+
+                if (taskbarBounds == Rectangle.Empty)
+                {
+                    // deskband mode: keep the historical left padding
+                    this.Left = 5;
+                    controlWidth = controlWidth - 5;
+                }
             }
-            else 
-            { 
-                this.Top = 1;
-                controlHeight = controlHeight - 2;
+            else
+            {
+                graphWidth = Options.HistorySize;
+
+                int minimumHeight = taskbarThickness;
+                if (minimumHeight < 20)
+                    minimumHeight = 20;
+
+                controlWidth = (graphWidth + GraphSpacing) * CountersCount;
+                controlHeight = minimumHeight - 2;
+
+                // the preview is placed by the options dialog, not by us
+                if (!PreviewMode)
+                    this.Top = 1;
             }
+
+            if (controlWidth < 1) controlWidth = 1;
+            if (controlHeight < 1) controlHeight = 1;
+
             if (this.Size.Width != controlWidth || this.Size.Height != controlHeight)
             {
                 this.Size = new Size(controlWidth, controlHeight);
@@ -354,7 +521,8 @@ namespace TaskbarMonitor
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            var maximumHeight = VerticalTaskbarMode ? 30 : this.Height;
+            var maximumHeight = VerticalTaskbarMode ? VerticalGraphHeight : this.Height;
+            int currentGraphWidth = CurrentGraphWidth;
 
             int graphPosition = 0;
             int graphPositionY = 0;
@@ -436,7 +604,8 @@ namespace TaskbarMonitor
                         }
                     }
 
-                    var sizeTitle = formGraphics.MeasureString(ct.GetLabel(), fontTitle);
+                    SizeF sizeTitle = SizeF.Empty;
+                    Font titleFont = GetFittingFont(formGraphics, fontTitle, ct.GetLabel(), this.Width, ref sizeTitle);
                     Dictionary<CounterOptions.DisplayPosition, float> positions = new Dictionary<CounterOptions.DisplayPosition, float>();
 
                     positions.Add(CounterOptions.DisplayPosition.MIDDLE, (maximumHeight / 2 - sizeTitle.Height / 2) + 1 + graphPositionY);
@@ -473,12 +642,12 @@ namespace TaskbarMonitor
                             int offset = 1;
                             if (!mouseOver)
                                 offset = 0;
-                               formGraphics.DrawString(ct.GetLabel(), fontTitle, brushShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2) + offset, positions[opt.TitlePosition] + offset, sizeTitle.Width, maximumHeight), new StringFormat());
+                               formGraphics.DrawString(ct.GetLabel(), titleFont, brushShadow, new RectangleF(GetCenteredTextPosition(graphPosition, sizeTitle.Width, currentGraphWidth) + offset, positions[opt.TitlePosition] + offset, sizeTitle.Width, maximumHeight), new StringFormat());
                             }
                             // show title only on SHOW, or (HOVER and mouseover)
                             if ((opt.ShowTitle == CounterOptions.DisplayType.HOVER && mouseOver) || opt.ShowTitle == CounterOptions.DisplayType.SHOW)
                             {
-                                formGraphics.DrawString(ct.GetLabel(), fontTitle, brushTitle, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeTitle.Width / 2), positions[opt.TitlePosition], sizeTitle.Width, maximumHeight), new StringFormat());
+                                formGraphics.DrawString(ct.GetLabel(), titleFont, brushTitle, new RectangleF(GetCenteredTextPosition(graphPosition, sizeTitle.Width, currentGraphWidth), positions[opt.TitlePosition], sizeTitle.Width, maximumHeight), new StringFormat());
                             }
                         //}
                         
@@ -512,7 +681,8 @@ namespace TaskbarMonitor
                         {
                             string text = item.Value;
 
-                            var sizeString = formGraphics.MeasureString(text, fontCounter);
+                            SizeF sizeString = SizeF.Empty;
+                            Font valueFont = GetFittingFont(formGraphics, fontCounter, text, this.Width, ref sizeString);
                             float ypos = positions[item.Key];
 
                             var textShadow = defaultTheme.TextShadowColor;
@@ -537,11 +707,11 @@ namespace TaskbarMonitor
                                 int offset = 1;
                                 if (!mouseOver)
                                     offset = 0;
-                                formGraphics.DrawString(text, fontCounter, BrushTextShadow, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2) + offset, ypos + offset, sizeString.Width, maximumHeight), new StringFormat());
+                                formGraphics.DrawString(text, valueFont, BrushTextShadow, new RectangleF(GetCenteredTextPosition(graphPosition, sizeString.Width, currentGraphWidth) + offset, ypos + offset, sizeString.Width, maximumHeight), new StringFormat());
                             }
                             if ((opt.ShowCurrentValue == CounterOptions.DisplayType.HOVER && mouseOver) || opt.ShowCurrentValue == CounterOptions.DisplayType.SHOW)
                             { 
-                                formGraphics.DrawString(text, fontCounter, BrushText, new RectangleF(graphPosition + (Options.HistorySize / 2) - (sizeString.Width / 2), ypos, sizeString.Width, maximumHeight), new StringFormat());
+                                formGraphics.DrawString(text, valueFont, BrushText, new RectangleF(GetCenteredTextPosition(graphPosition, sizeString.Width, currentGraphWidth), ypos, sizeString.Width, maximumHeight), new StringFormat());
                             }
                             //}
                             BrushText.Dispose();
@@ -550,11 +720,11 @@ namespace TaskbarMonitor
                     }
 
 
-                    graphPosition += Options.HistorySize + 10;
+                    graphPosition += currentGraphWidth + GraphSpacing;
                     if (VerticalTaskbarMode && graphPosition >= this.Size.Width)
                     {
                         graphPosition = 0;
-                        graphPositionY += (maximumHeight + 10);
+                        graphPositionY += (maximumHeight + GraphSpacing);
                     }
 
                 }
@@ -567,6 +737,9 @@ namespace TaskbarMonitor
         private void drawGraph(System.Drawing.Graphics formGraphics, int x, int y, int maxH, bool invertido, TaskbarMonitor.Counters.CounterInfo info, GraphTheme theme, CounterOptions opt)
         {
             if (info.MaximumValue == 0) return;
+            int graphW = CurrentGraphWidth;
+            if (graphW <= 0) return;
+
             var pos = maxH - ((info.CurrentValue * maxH) / info.MaximumValue);
             if (pos > Int32.MaxValue) pos = Int32.MaxValue;
             int posInt = Convert.ToInt32(Math.Round(pos)) + y;
@@ -578,17 +751,24 @@ namespace TaskbarMonitor
             using (SolidBrush BrushBar = new SolidBrush(theme.BarColor))
             {
                 if (invertido)
-                    formGraphics.FillRectangle(BrushBar, new Rectangle(x + Options.HistorySize, maxH, 4, heightInt));
+                    formGraphics.FillRectangle(BrushBar, new Rectangle(x + graphW, maxH, CurrentValueBarWidth, heightInt));
                 else
-                    formGraphics.FillRectangle(BrushBar, new Rectangle(x + Options.HistorySize, posInt, 4, heightInt));
+                    formGraphics.FillRectangle(BrushBar, new Rectangle(x + graphW, posInt, CurrentValueBarWidth, heightInt));
             }
 
-            var initialGraphPosition = x + Options.HistorySize - info.History.Count;
-            Point[] points = new Point[info.History.Count + 2];
+            // when the graph is narrower than the history (vertical taskbar) only the most
+            // recent samples are drawn
+            int visibleCount = Math.Min(info.History.Count, graphW);
+            if (visibleCount == 0) return;
+            int firstVisible = info.History.Count - visibleCount;
+
+            var initialGraphPosition = x + graphW - visibleCount;
+            Point[] points = new Point[visibleCount + 2];
             int i = 0;
             int inverter = invertido ? -1 : 1;
-            foreach (var item in info.History)
+            for (int idx = firstVisible; idx < info.History.Count; idx++)
             {
+                var item = info.History[idx];
                 var heightItem = (item * maxH) / info.MaximumValue;
                 if (heightItem > Int32.MaxValue) height = Int32.MaxValue;
                 var convertido = Convert.ToInt32(Math.Round(heightItem));
@@ -637,7 +817,14 @@ namespace TaskbarMonitor
                 values.Add(value);
                 lastValue = value;
             }
-            var historySize = values.Count > 0 ? values[0].Count : 0;
+            int graphW = CurrentGraphWidth;
+            if (graphW <= 0) return;
+
+            // when the graph is narrower than the history (vertical taskbar) only the most
+            // recent samples are drawn
+            var fullHistorySize = values.Count > 0 ? values[0].Count : 0;
+            var historySize = Math.Min(fullHistorySize, graphW);
+            var firstVisible = fullHistorySize - historySize;
             // now we draw it
 
             var colors = theme.GetColorGradient(theme.StackedColors[0], theme.StackedColors[1], values.Count);
@@ -656,14 +843,15 @@ namespace TaskbarMonitor
                 int heightInt = Convert.ToInt32(Math.Round(height));
 
                 SolidBrush BrushBar = new SolidBrush(theme.BarColor);
-                formGraphics.FillRectangle(BrushBar, new Rectangle(x + Options.HistorySize, posInt, 4, heightInt));
+                formGraphics.FillRectangle(BrushBar, new Rectangle(x + graphW, posInt, CurrentValueBarWidth, heightInt));
                 BrushBar.Dispose();
 
                 int i = 0;
-                var initialGraphPosition = x + Options.HistorySize - historySize;
+                var initialGraphPosition = x + graphW - historySize;
                 Point[] points = new Point[historySize + 2];
-                foreach (var item in info)
+                for (int idx = Math.Max(firstVisible, info.Count - historySize); idx < info.Count && i < historySize; idx++)
                 {
+                    var item = info[idx];
                     var heightItem = (item * maxH) / absMax;
                     if (heightItem > Int32.MaxValue) heightItem = Int32.MaxValue;
                     var convertido = Convert.ToInt32(Math.Round(heightItem));

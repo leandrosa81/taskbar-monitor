@@ -25,6 +25,16 @@ namespace TaskbarMonitor
         public IntPtr ClockWnd = IntPtr.Zero;
         public SystemWatcherControl TaskbarMonitorControl;        
         public Rectangle PreviousRect = Rectangle.Empty;
+        /// <summary>
+        /// Bounds of the taskbar window on the last layout pass. Used to detect that the user moved
+        /// the taskbar to another screen edge (Windows 11 supports left/top/right since KB5120998).
+        /// </summary>
+        public Rectangle PreviousTaskbarRect = Rectangle.Empty;
+        /// <summary>
+        /// True when the taskbar is docked to the left or right edge, so the graphs have to be
+        /// stacked vertically instead of being lined up horizontally.
+        /// </summary>
+        public bool IsVertical = false;
     }
     public class TaskbarManager: IDisposable
     {
@@ -65,6 +75,35 @@ namespace TaskbarMonitor
             if (TaskbarList.Count > 0)
             {                
                 TaskbarList[0].TaskbarMonitorControl?.Invoke(new Func<bool>(() => { return AddControlsToTaskbars(); }));
+                CheckForTaskbarGeometryChanges();
+            }
+        }
+
+        /// <summary>
+        /// Detects that a taskbar was moved to another screen edge or resized and re-lays out the
+        /// control in that case. The location hook only fires for the tray window, which does not
+        /// cover every way the taskbar can change.
+        /// </summary>
+        private void CheckForTaskbarGeometryChanges()
+        {
+            foreach (var taskbar in TaskbarList.ToList())
+            {
+                try
+                {
+                    var rect = BLL.Win32Api.GetWindowSize(taskbar.TargetWnd);
+                    if (rect == Rectangle.Empty)
+                        continue;
+                    if (rect != taskbar.PreviousTaskbarRect)
+                    {
+                        Debug.WriteLine("Taskbar geometry changed, updating layout");
+                        UpdatePosition(taskbar, true);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // the control may be disposed while the timer runs
+                    Debug.WriteLine("CheckForTaskbarGeometryChanges: " + ex.Message);
+                }
             }
         }
 
@@ -93,6 +132,12 @@ namespace TaskbarMonitor
             var handle = taskbar.TargetWnd;
             Rectangle rect = BLL.Win32Api.GetWindowSize(handle);           
             Rectangle offset = Rectangle.Empty;
+
+            // a taskbar docked to the left or right edge is taller than it is wide
+            bool isVertical = rect.Height > rect.Width;
+            bool orientationChanged = isVertical != taskbar.IsVertical || taskbar.PreviousTaskbarRect == Rectangle.Empty;
+            taskbar.IsVertical = isVertical;
+
             if (taskbar.TaskbarMonitorControl != null)
             {
                 if (taskbar.IsMainTaskbar)
@@ -111,28 +156,69 @@ namespace TaskbarMonitor
                     }
                     else if (WindowsInformation.IsWindows11_22621())
                     {
-                        offset = new Rectangle(0, 0, 100, 0);
+                        offset = isVertical ? new Rectangle(0, 0, 0, 100) : new Rectangle(0, 0, 100, 0);
                     }
                 }
             }
-              
-            if (force || taskbar.PreviousRect.Width == 0 || (offset.Width != taskbar.PreviousRect.Width && taskbar.TaskbarMonitorControl.IsHandleCreated))
+
+            // the size of the tray area grows along the taskbar, so only that dimension matters
+            int offsetSize = isVertical ? offset.Height : offset.Width;
+            int previousOffsetSize = isVertical ? taskbar.PreviousRect.Height : taskbar.PreviousRect.Width;
+
+            if (force || orientationChanged || previousOffsetSize == 0
+                || (offsetSize != previousOffsetSize && taskbar.TaskbarMonitorControl.IsHandleCreated))
             {
                 Debug.WriteLine("UpdatePosition");
                 taskbar.TaskbarMonitorControl?.Invoke((MethodInvoker)delegate
                 {
-                    var mopt = GetOptionsForTaskbar(taskbar);                    
+                    var mopt = GetOptionsForTaskbar(taskbar);
+
+                    // let the control lay its graphs out for this taskbar before positioning it
+                    taskbar.TaskbarMonitorControl.SetTaskbarBounds(rect);
+
                     taskbar.TaskbarMonitorControl.Visible = this.Monitor.Options.EnableOnAllMonitors || mopt == null || mopt.Enabled;
-                    taskbar.TaskbarMonitorControl.Left =
-                       (mopt == null || mopt.Position == MonitorOptions.DisplayPosition.RIGHT)
-                       ? (rect.Width - taskbar.TaskbarMonitorControl.Width - offset.Width)
-                       : 0;
+
+                    // DisplayPosition.RIGHT means "at the end of the taskbar, next to the tray",
+                    // which is the bottom end when the taskbar is vertical.
+                    bool atEnd = mopt == null || mopt.Position == MonitorOptions.DisplayPosition.RIGHT;
 
                     RECT recDiff = new RECT();
-                    recDiff.left = rect.Width - taskbar.TaskbarMonitorControl.Width - taskbar.PreviousRect.Width;
-                    recDiff.top = 0;
-                    recDiff.right = rect.Width - taskbar.TaskbarMonitorControl.Width - offset.Width;
-                    recDiff.bottom = rect.Bottom;
+
+                    if (isVertical)
+                    {
+                        int top = atEnd
+                            ? (rect.Height - taskbar.TaskbarMonitorControl.Height - offset.Height)
+                            : 0;
+                        if (top < 0) top = 0;
+
+                        taskbar.TaskbarMonitorControl.Top = top;
+                        taskbar.TaskbarMonitorControl.Left = Math.Max(0, (rect.Width - taskbar.TaskbarMonitorControl.Width) / 2);
+
+                        recDiff.left = 0;
+                        recDiff.top = rect.Height - taskbar.TaskbarMonitorControl.Height - taskbar.PreviousRect.Height;
+                        recDiff.right = rect.Width;
+                        recDiff.bottom = rect.Height - taskbar.TaskbarMonitorControl.Height - offset.Height;
+                    }
+                    else
+                    {
+                        taskbar.TaskbarMonitorControl.Left = atEnd
+                           ? (rect.Width - taskbar.TaskbarMonitorControl.Width - offset.Width)
+                           : 0;
+
+                        recDiff.left = rect.Width - taskbar.TaskbarMonitorControl.Width - taskbar.PreviousRect.Width;
+                        recDiff.top = 0;
+                        recDiff.right = rect.Width - taskbar.TaskbarMonitorControl.Width - offset.Width;
+                        recDiff.bottom = rect.Bottom;
+                    }
+
+                    if (orientationChanged)
+                    {
+                        // repaint the whole taskbar so no remains of the previous layout are left
+                        recDiff.left = 0;
+                        recDiff.top = 0;
+                        recDiff.right = rect.Width;
+                        recDiff.bottom = rect.Height;
+                    }
 
                     int rawsize = Marshal.SizeOf(recDiff);
                     IntPtr ptr = Marshal.AllocHGlobal(rawsize);
@@ -141,11 +227,13 @@ namespace TaskbarMonitor
                      
                     var ret = BLL.WindowList.InvalidateRect(taskbar.TargetWnd, ptr, true);
                     Marshal.DestroyStructure(ptr, typeof(RECT));
+                    Marshal.FreeHGlobal(ptr);
                 });
 
             }
             
             taskbar.PreviousRect = offset;
+            taskbar.PreviousTaskbarRect = rect;
         }
         
         public bool AddControlsToTaskbars()
@@ -262,6 +350,8 @@ namespace TaskbarMonitor
             var taskbarMonitorControl = new SystemWatcherControl(this.Monitor);
             tb.TaskbarMonitorControl = taskbarMonitorControl;
             taskbarMonitorControl.Name = "taskbarMonitorFor" + taskbarArea.Handle;
+            // lay the graphs out for this taskbar (vertical taskbars stack them top to bottom)
+            taskbarMonitorControl.SetTaskbarBounds(rect);
             // taskbarMonitorControl.Left = rect.Width - taskbarMonitorControl.Width - rectTray.Width;
 
 
@@ -412,7 +502,9 @@ namespace TaskbarMonitor
         {
             if (accEvent == AccessibleEvents.LocationChange)
             {
-                var taskbar = TaskbarList.Where(x => x.TrayWnd.ToInt32() == windowHandle.ToInt32()).SingleOrDefault();
+                // react to the tray area moving as well as to the taskbar itself being moved to
+                // another screen edge, so a switch to a vertical taskbar is picked up immediately
+                var taskbar = TaskbarList.Where(x => x.TrayWnd == windowHandle || x.TargetWnd == windowHandle).FirstOrDefault();
                 if (taskbar != null)
                 {
                     UpdatePosition(taskbar);
